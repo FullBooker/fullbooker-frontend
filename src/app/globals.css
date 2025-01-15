@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .no-padding {
+    padding: 0px !important;
+  }
+
+  :root {
+    --background: 0, 0%, 100%;
+    --auth-background: 0, 0%, 100%;
+    --main-color: 24, 97%, 60%;
+    --white-color: 0, 0%, 100%;
+    --text-color: 0, 0%, 69%;
+    --text-color-2: 0, 0%, 54%;
+    --primary: 330, 6%, 7%, 1;
+    --red-medium: 24, 97%, 50%;
+    --red-dark: 24, 97%, 40%;
+    --red-dark2: 357, 25%, 15%;
+    --light-red-color: 4, 53%, 94%;
+    --green-color: 193, 70%, 88%;
+    --foreground: 0, 0%, 56%;
+    --placeholder: 0, 0%, 54%;
+    --sidebar-color: 0, 0%, 100%;
+    --footer-link: 0, 0%, 66%;
+
+    --card-color: 0, 0%, 100%;
+    --input-border-color: 0, 0%, 69%;
+    --input-search-table: 0, 0%, 34%;
+    --stroke: 0, 0%, 18%;
+    --stroke-2: 0, 0%, 93%;
+    --grey-color: 0, 0%, 16%;
+
+    --switch-background: 60, 3%, 7%, 1;
+    --switch-border: 60, 3%, 7%, 1;
+
+    --radius: 14px;
+    --ring: 240, 5%, 65%;
+
+    background: rgba(var(--background));
+  }
+
+  .dark {
+    --background: 215, 33%, 13%;
+    --auth-background: 0, 3%, 6%;
+    --main-color: 24, 97%, 60%;
+    --white-color: 0, 0%, 100%;
+    --text-color: 0, 0%, 69%;
+    --text-color-2: 0, 0%, 54%;
+    --primary: 0, 0%, 100%, 1;
+    --red-medium: 24, 97%, 50%;
+    --red-dark: 24, 97%, 40%;
+    --red-dark2: 357, 25%, 15%;
+    --light-red-color: 4, 53%, 94%;
+    --green-color: 193, 70%, 88%;
+    --foreground: 240, 5%, 65%;
+    --placeholder: 0, 0%, 41%;
+    --sidebar-color: 215, 33%, 13%;
+    --footer-link: 0, 0%, 66%;
+
+    --card-color: 60, 2%, 10%;
+    --input-border-color: 0, 0%, 23%;
+    --input-search-table: 0, 0%, 34%;
+    --stroke: 0, 0%, 18%;
+    --stroke-2: 0, 0%, 93%;
+    --grey-color: 0, 0%, 16%;
+
+    --switch-background: 60, 3%, 7%, 1;
+    --switch-border: 0, 0%, 18%, 1;
+    background: rgba(var(--background));
+  }
+
+  .light [data-hide-on-theme="light"],
+  .dark [data-hide-on-theme="dark"] {
+    display: none;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      to right,
+      #f0f0f0 0%,
+      #e0e0e0 20%,
+      #f0f0f0 40%,
+      #f0f0f0 100%
+    );
+    background-size: 2000px 100%;
+  }
+
+  .animate-shimmer-slow {
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+.rs-picker {
+  background-color: #292929 !important;
+}
+
+.rs-input-group-inside {
+  background-color: #292929 !important;
+}
+
+.rs-input {
+  background-color: #292929 !important;
+}
+
+.css-nsqv84-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected {
+  color: #ab3029 !important;
+}
+
+.bottom-nav-link.Mui-selected {
+  color: #ab3029 !important;
+}
