@@ -1,1 +1,0 @@
-export const truncateText = (text: string, maxLength: number = 55) => text.length <= maxLength ? text : `${text.slice(0, maxLength)}...`;
