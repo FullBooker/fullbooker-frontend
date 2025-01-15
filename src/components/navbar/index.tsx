@@ -50,6 +50,7 @@ import CustomAvatar from "./components/customAvatar";
 import BottomNavBar from "../bottomNavbar";
 import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
+import { ModalID } from "@/domain/components";
 
 type NavbarProps = {
   openNav: boolean;
@@ -63,6 +64,7 @@ type NavbarProps = {
   profile: UserProfile;
   showBalance: boolean;
   toggleBalanceVisibility: (showBalance: boolean) => void;
+  setActiveModal: (modalId: ModalID) => void;
 };
 
 const Navbar: FC<NavbarProps> = ({
@@ -77,6 +79,7 @@ const Navbar: FC<NavbarProps> = ({
   getUserProfile,
   showBalance,
   toggleBalanceVisibility,
+  setActiveModal,
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -285,92 +288,37 @@ const Navbar: FC<NavbarProps> = ({
             </div>
           </div>
         </div>
+        <div className="flex items-center">
+          <ul className="flex justify-between">
+            <li>
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              Activities  
+              </Link>
+            </li>
+            <li>
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              Events  
+              </Link>
+            </li>
+            <li>
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              Experiences  
+              </Link>
+            </li>
+            <li>
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              Workshops  
+              </Link>
+            </li>
+            <li>
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              Coorprate Clubs  
+              </Link>
+            </li>
+          </ul>
+          </div>
         <div className="flex items-center gap-1">
       
-          <Link
-            href="/main-menu/promotions"
-            className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4"
-          >
-            <GiftIcon
-              className={`w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 ${
-                themeMode === "light" ? "text-dark" : "text-white"
-              }`}
-            />
-          </Link>
-          {/* {isLoggedIn && (
-            <Notification
-              button={
-                <div
-                  className={`flex items-center px-[10px] py-[10px] md:px-3 md:py-3 me-1 sm:me-1 xl:me-4 ${
-                    themeMode === "light"
-                      ? "border-[1px] border-strokeColor2"
-                      : "border border-inputBorderColor"
-                  } rounded-full cursor-pointer transition-opacity duration-300 hover:opacity-50`}
-                >
-                  <BellDot className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
-                </div>
-              }
-              openState={openNotification}
-              setOpenState={setOpenNotification}
-              classNames="py-2 top-[44px] right-[-2px] sm:top-[50px] sm:right-[-130px] w-max"
-            >
-              <div
-                className={`flex w-[236px] h-[364px] sm:h-[464px] sm:w-[300px] flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
-                  themeMode === "light"
-                    ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
-                    : "border-[1px] border-inputBorderColor"
-                }`}
-              >
-                <div
-                  className={`flex justify-start items-center p-[14px] ${
-                    themeMode === "light"
-                      ? "border-[1px] border-t-0 border-x-0 border-strokeColor2"
-                      : "border-b border-inputBorderColor"
-                  }`}
-                >
-                  <span className="text-[13px] sm:text-base lg:text-lg">
-                    Notification
-                  </span>
-                </div>
-                <div className="flex flex-col overflow-auto">
-                  {titles.map((item, i) => (
-                    <Link
-                      key={i}
-                      className={`flex flex-col p-[14px] sm:p-4 ${
-                        themeMode === "light"
-                          ? "border-[1px] border-t-0 border-x-0 border-strokeColor2"
-                          : "border-b border-inputBorderColor"
-                      } ${i === titles.length - 1 ? "border-b-0" : ""}`}
-                      href={item.href}
-                    >
-                      <NotificationItem
-                        key={i}
-                        theme={themeMode}
-                        icon={item.icon}
-                        title={item.title}
-                        info={item.info}
-                        date={new Date(item.date)}
-                      />
-                    </Link>
-                  ))}
-                </div>
-                <div
-                  className={`p-[14px] ${
-                    themeMode === "light"
-                      ? "border-t border-strokeColor2"
-                      : "border-t border-inputBorderColor"
-                  }`}
-                >
-                  <button className="flex gap-2 text-mainColor">
-                    <CheckCheck className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-[13px] sm:text-base lg:text-lg">
-                      Read All
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </Notification>
-          )} */}
           {authToken && (
             <div
               className="flex md:border-inputBorderColor md:me-4 rounded-sm pl-4"
@@ -429,22 +377,21 @@ const Navbar: FC<NavbarProps> = ({
             </div>
           )}
           {!authToken && (
-            <div className="flex md:flex md:pe-4 lg:pe-8 md:border-r-[1px] md:border-inputBorderColor md:me-4">
-              <Link
-                href={`/login?redirect=${pathname?.slice(1)}`}
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-full bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium me-3"
+            <div className="flex md:flex gap-2">
+              <button
+                onClick={() => setActiveModal(ModalID.register)}
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium"
               >
-                Login
-                <LogIn className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-              </Link>
-
-              <Link
-                href="/register"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-full bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium"
+                Become a Host
+                {/* <UserPlus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> */}
+              </button>
+              <button
+                onClick={() => setActiveModal(ModalID.login)}
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium me-3"
               >
-                Register
-                <UserPlus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-              </Link>
+                Sign In
+                {/* <LogIn className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> */}
+              </button>
             </div>
           )}
           {/* Profile & Dropdown */}
@@ -672,6 +619,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   getUserProfile: () => dispatch.profile.getUserProfile(),
   toggleBalanceVisibility: (showBalance: boolean) =>
     dispatch.profile.toggleBalanceVisibility(showBalance),
+  setActiveModal: (modalId: ModalID) => dispatch.components.setActiveModal(modalId)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

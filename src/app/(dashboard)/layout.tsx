@@ -10,15 +10,21 @@ import { useTheme } from "next-themes";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { ActiveGamePayload } from "@/domain/dto/input";
-
+import { ModalID } from "@/domain/components";
+import UniversalModal from "@/components/modal/UniversalModal";
+import LoginModalContent from "@/components/views/auth/login";
+import RegisterModalContent from "@/components/views/auth/register";
+import ForgotPasswordModalContent from "@/components/views/auth/forgotPassword";
 type DashboardLayoutProps = {
   children: React.ReactNode;
   activeGame: ActiveGamePayload;
+  modalId: ModalID;
 };
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({
   children,
   activeGame,
+  modalId,
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -111,9 +117,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   }, [theme]);
 
   return (
-      <div className="flex h-fit w-full overflow-x-hidden">
-        {/* Sidebar */}
-        {/* <div className="h-fit" ref={sidebarRef}>
+    <div className="flex h-fit w-full overflow-x-hidden">
+      {/* Sidebar */}
+      {/* <div className="h-fit" ref={sidebarRef}>
           {!data ? (
             <Sidebar
               theme={themeMode}
@@ -126,64 +132,80 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           )}
         </div> */}
 
-        <div
-          className={`h-full w-full overflow-x-hidden ${
-            open && isMobile && themeMode === "dark"
-              ? "bg-black opacity-30 z-40"
-              : open && isMobile && themeMode === "light"
-              ? "blur-sm bg-white opacity-30 z-40"
-              : ""
-          }`}
+      <div
+        className={`h-full w-full overflow-x-hidden ${
+          open && isMobile && themeMode === "dark"
+            ? "bg-black opacity-30 z-40"
+            : open && isMobile && themeMode === "light"
+            ? "blur-sm bg-white opacity-30 z-40"
+            : ""
+        }`}
+      >
+        <main
+          className={`h-fit mx-auto max-w-[1200px] w-full px-2 md:px-3 lg:px-4 overflow-x-hidden ${
+            data
+              ? "mt-7"
+              : router === "/" || router.startsWith("/promotions/detail/")
+              ? "xl:ml-56"
+              : "xl:ml-56"
+          } content-container`}
         >
-          <main
-            className={`h-fit mx-auto max-w-[1200px] w-full px-2 md:px-3 lg:px-4 overflow-x-hidden ${
-              data
-                ? "mt-7"
-                : router === "/" || router.startsWith("/promotions/detail/")
-                ? "xl:ml-56"
-                : "xl:ml-56"
-            } content-container`}
-          >
-            {/* Navbar */}
-            {!data && !isPlayingGameOnMobile ? (
-              <Navbar
-                openNav={open}
-                onOpenSideNav={() => setOpen(true)}
-                isMobile={isMobile}
-              />
-            ) : (
-              <></>
-            )}
-
-            <div className="h-full">{children}</div>
-
-            {themeMode === "dark" ? (
-              <Image
-                src={`/assets/bg_effects.png`}
-                className="fixed bottom-0 right-0 -z-20 opacity-40"
-                alt="Background Effect"
-                width={1000}
-                height={1000}
-              />
-            ) : (
-              <></>
-            )}
-              {/* Footer */}
+          {/* Navbar */}
           {!data && !isPlayingGameOnMobile ? (
-            <Footer />
+            <Navbar
+              openNav={open}
+              onOpenSideNav={() => setOpen(true)}
+              isMobile={isMobile}
+            />
           ) : (
             <></>
           )}
-          </main>
-        
-        </div>
+
+          <div className="h-full">{children}</div>
+
+          {themeMode === "dark" ? (
+            <Image
+              src={`/assets/bg_effects.png`}
+              className="fixed bottom-0 right-0 -z-20 opacity-40"
+              alt="Background Effect"
+              width={1000}
+              height={1000}
+            />
+          ) : (
+            <></>
+          )}
+          {/* Footer */}
+          {!data && !isPlayingGameOnMobile ? <Footer /> : <></>}
+        </main>
       </div>
+      {modalId === ModalID.login && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<LoginModalContent />}
+        />
+      )}
+       {modalId === ModalID.register && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<RegisterModalContent />}
+        />
+      )}
+       {modalId === ModalID.forgotPassword && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ForgotPasswordModalContent />}
+        />
+      )}
+    </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const { activeGame } = state.games;
-  return { activeGame };
+  const { modalId } = state.components;
+  return { modalId };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({});
