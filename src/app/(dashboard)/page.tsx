@@ -15,6 +15,22 @@ import {
   Heart,
   Hourglass,
   UserRound,
+  Music,
+  Palette,
+  Utensils,
+  Mountain,
+  Landmark,
+  Trees,
+  Theater,
+  Trophy,
+  ChevronLeft,
+  Users,
+  Dumbbell,
+  Car,
+  Bike,
+  // Swimming,
+  Mic,
+  Target
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -81,12 +97,71 @@ const HomePage: FC<HomePageProps> = ({
     shimmer animate shimmer-slow bg-gray-200 animate-shimmer-slow
   `;
 
+  const categories = [
+    {
+      name: "Kids",
+      icon: Users
+    },
+    {
+      name: "Concerts",
+      icon: Music
+    },
+    {
+      name: "Gyms",
+      icon: Dumbbell
+    },
+    {
+      name: "Go karting",
+      icon: Car
+    },
+    {
+      name: "Quad biking",
+      icon: Bike
+    },
+    // {
+    //   name: "Swimming",
+    //   icon: Swimming
+    // },
+    {
+      name: "Stand Ups",
+      icon: Mic
+    },
+    {
+      name: "Car shows",
+      icon: Car
+    },
+    {
+      name: "Paintballing",
+      icon: Target
+    },
+    {
+      name: "Sports",
+      icon: Trophy
+    },
+    {
+      name: "Arts",
+      icon: Palette
+    },
+    {
+      name: "Food",
+      icon: Utensils
+    },
+    {
+      name: "Adventure",
+      icon: Mountain
+    },
+    {
+      name: "Culture",
+      icon: Landmark
+    }
+  ];
+
   return (
     <div className="flex flex-col gap-5 h-fit px-4 sm:px-7">
       {/* Hero Section */}
       <div className="flex flex-col lg:flex-row gap-8 py-8 bg-gray-100 px-8">
         <div className="flex-1">
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className="text-5xl font-semibold mb-4">
             Seamless Ticket booking at Your Fingertips
           </h1>
           <p className="text-textColor mb-6">
@@ -130,16 +205,16 @@ const HomePage: FC<HomePageProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className=" w-[400px] h-[400px] flex justify-between">
+        <div className="flex-1 flex justify-center items-start">
+          <div className="w-[400px] h-[400px] flex justify-between gap-5 items-center">
             <div>
               <Image
                 src="/assets/popular-event.svg"
                 alt="Hero"
                 objectFit="contain"
-                className="w-[400px] h-[400px]"
-                height={400}
-                width={400}
+                className="w-[250px] h-[250px]"
+                height={250}
+                width={250}
               />
             </div>
             <div className="">
@@ -149,44 +224,62 @@ const HomePage: FC<HomePageProps> = ({
               </p>
             </div>
           </div>
+          {/* <div className=" w-[200px] h-[200px] flex justify-between">
+              <Image
+                src="/assets/image_60.png"
+                alt="Hero"
+                objectFit="contain"
+                className="w-[200px] h-[200px]"
+                height={200}
+                width={420}
+              />
+          </div> */}
         </div>
       </div>
 
       {/* Activity Categories */}
       <div className="py-8">
-        <div className="flex gap-8 overflow-x-auto pb-4">
-          {/* {categories.map((category, index) => (
-            <div key={index} className="flex flex-col items-center gap-2 min-w-[80px]">
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <Image
-                  src={category.icon}
-                  alt={category.name}
-                  width={24}
-                  height={24}
-                />
+        <div className="flex items-center justify-center gap-8">
+          <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 flex-shrink-0">
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          
+          <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
+            {categories.map((category, index) => (
+              <div key={index} className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0">
+                <div className="w-12 h-12 rounded-ful flex items-center justify-center">
+                  {React.createElement(category.icon, {
+                    size: 24,
+                    className: "text-gray-600"
+                  })}
+                </div>
+                <span className="text-sm text-center">{category.name}</span>
               </div>
-              <span className="text-sm">{category.name}</span>
-            </div>
-          ))} */}
+            ))}
+          </div>
+
+          <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 flex-shrink-0">
+            <ChevronRight className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
       </div>
 
       {/* Popular Now Section */}
-      {/* <div className="py-8">
+      <div className="py-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Popular now</h2>
           <Link href="/popular" className="text-mainColor">See all</Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {games?.games?.map((game: Game, index: number) => (
+          {Array(10).fill(null).map((_, index) => (
             <div key={index} className="relative group rounded-lg overflow-hidden">
               <Image
-                src={game.game_image || "/assets/default-activity.png"}
-                alt={game.game_name}
+                src={"/assets/quad.png"}
+                alt={"Event"}
                 width={300}
                 height={200}
-                className="w-full h-[200px] object-cover"
+                className="w-full h-[200px] object-cover shadow-md rounded-sm"
               />
               <div className="absolute top-3 right-3">
                 <button className="p-2 rounded-full bg-white/80">
@@ -194,7 +287,7 @@ const HomePage: FC<HomePageProps> = ({
                 </button>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold mb-2">{game.game_name}</h3>
+                <h3 className="font-semibold mb-2">{"Quad Biking"}</h3>
                 <div className="flex items-center gap-2 text-sm text-textColor">
                   <CalendarDays className="w-4 h-4" />
                   <span>Every day from 8:00 AM to 10:00 PM</span>
@@ -206,7 +299,7 @@ const HomePage: FC<HomePageProps> = ({
             </div>
           ))}
         </div>
-      </div> */}
+      </div>
 
       {/* <div className="w-full flex flex-col gap-5">
         <div className="flex items-center gap-3 px-4 sm:px-7">

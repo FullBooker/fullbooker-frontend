@@ -209,7 +209,7 @@ const LoginPage: FC<LoginPageProps> & {
         <div className="hidden lg:w-6/12 lg:block lg:self-center xl:w-7/12 pr:4 py-4 xl:py-7 xl:pr-7">
           <div className="lg:shrink-0">
             <Image
-              src={`/assets/img_bg_auth.png`}
+              src={`/assets/logo.svg`}
               alt={`Image Background Auth`}
               width={1030}
               height={900}
