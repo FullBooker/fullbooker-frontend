@@ -2,7 +2,6 @@
 
 import { FC } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
 import FormInputAuth from "../../../components/auth/FormInputAuth";
@@ -10,40 +9,32 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
-import Link from "next/link";
 import { ModalID } from "@/domain/components";
-import { components } from '../../../store/models/components';
+import { RequestOTPPayload } from "@/domain/dto/input";
 
 type ForgotPasswordModalContentProps = {
   loading: boolean;
-  requestPasswordReset: (payload: { email: string; phone: string }) => void;
+  requestOTP: (payload: RequestOTPPayload) => void;
   setActiveModal: (modalId: ModalID) => void;
 };
 
 const defaultValues = {
   email: "",
-  phone: "",
 };
 
 interface FormData {
   email: string;
-  phone: string;
 }
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
-  phone: yup
-    .string()
-    .min(10, "Phone number must be at least 10 digits")
-    .required("Phone number is required"),
 });
 
 const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
   loading,
-  requestPasswordReset,
-  setActiveModal,
+  requestOTP,
+  setActiveModal
 }) => {
-  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -55,7 +46,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    requestPasswordReset(data);
+    requestOTP({identifier: data?.email});
   };
 
   return (
@@ -91,24 +82,6 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
             )}
           />
 
-          <Controller
-            name="phone"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
-              <FormInputAuth
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="Phone Number"
-                icon="phone"
-                onChange={onChange}
-                value={value}
-                error={errors?.phone?.message}
-              />
-            )}
-          />
-
           <button
             type="submit"
             className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-500"
@@ -135,9 +108,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-  requestPasswordReset: (payload: { email: string; phone: string }) =>
-    dispatch.authentication.requestPasswordReset(payload),
   setActiveModal: (modalId: ModalID) => dispatch.components.setActiveModal(modalId),
+  requestOTP: (payload: RequestOTPPayload) => dispatch.authentication.requestOTP(payload)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ForgotPasswordModalContent); 

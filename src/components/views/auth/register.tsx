@@ -32,30 +32,36 @@ type RegisterModalContentProps = {
 };
 
 const defaultValues = {
-  phone: "",
+  phone_number: "",
+  email: "",
+  first_name: "",
+  last_name: "",
   password: "",
   confirm_password: "",
-  acceptedTermsAndConditions: false,
 };
 
 interface FormData {
-  phone: string;
+  phone_number: string;
+  email: string;
+  first_name: string;
+  last_name: string;
   password: string;
   confirm_password: string;
-  acceptedTermsAndConditions: boolean;
 }
 
 const schema = yup.object().shape({
-  phone: yup
+  phone_number: yup
     .string()
     .min(10, "Phone number must be atleast 10 digits")
     .required("Phone number is required"),
+  email: yup.string().email("Invalid email address").required("Email is required"),
+  first_name: yup.string().required("First name is required"),
+  last_name: yup.string().required("Last name is required"),
   password: yup.string().required("Password is required"),
-  confirm_password: yup.string().required("Confirm your password"),
-  acceptedTermsAndConditions: yup
-    .boolean()
-    .oneOf([true], "You must accept the terms and conditions")
-    .required("Accepting terms and conditions is required"),
+  confirm_password: yup
+    .string()
+    .required("Confirm your password")
+    .oneOf([yup.ref('password')], "Passwords must match"),
 });
 
 const RegisterModalContent: FC<RegisterModalContentProps> = ({
@@ -79,8 +85,8 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    const { phone, password, confirm_password } = data;
-    registerUser({ phone, password, confirm_password } as NewUserPayload);
+    const { phone_number, email, first_name, last_name, password, confirm_password } = data;
+    registerUser({ phone_number, email, first_name, last_name, password, confirm_password } as NewUserPayload);
   };
 
   const { theme = "light" } = useTheme();
@@ -97,10 +103,12 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
         "Verify your account with the OTP code sent to your phone number"
       )
     ) {
-      router.push(`/verify-account?phone=${getValues("phone")}`);
+      router.push(`/verify-account?phone=${getValues("phone_number")}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, message]);
+
+  console.log(errors)
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -117,18 +125,70 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
-          <Controller
-            name="phone"
+
+        <Controller
+            name="first_name"
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <FormInputAuth
                 type="text"
-                placeholder="Email Address"
+                placeholder="First Name"
                 value={value}
                 onChange={onChange}
-                error={errors.phone?.message}
-                helperText={errors?.phone?.message}
+                error={errors.first_name?.message}
+                helperText={errors?.first_name?.message}
+                startIcon={<User className="w-5 h-5 text-gray-400" />}
+              />
+            )}
+          />
+
+          <Controller
+            name="last_name"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <FormInputAuth
+                type="text"
+                placeholder="Last Name"
+                value={value}
+                onChange={onChange}
+                error={errors.last_name?.message}
+                helperText={errors?.last_name?.message}
+                startIcon={<User className="w-5 h-5 text-gray-400" />}
+              />
+            )}
+          />
+
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <FormInputAuth
+                type="text"
+                placeholder="Email"
+                value={value}
+                onChange={onChange}
+                error={errors.email?.message}
+                helperText={errors?.email?.message}
+                startIcon={<Mail className="w-5 h-5 text-gray-400" />}
+              />
+            )}
+          />
+
+          <Controller
+            name="phone_number"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <FormInputAuth
+                type="text"
+                placeholder="Phone Number"
+                value={value}
+                onChange={onChange}
+                error={errors.phone_number?.message}
+                helperText={errors?.phone_number?.message}
                 startIcon={<User className="w-5 h-5 text-gray-400" />}
               />
             )}

@@ -318,73 +318,15 @@ const Navbar: FC<NavbarProps> = ({
           </ul>
           </div>
         <div className="flex items-center gap-1">
-      
-          {authToken && (
-            <div
-              className="flex md:border-inputBorderColor md:me-4 rounded-sm pl-4"
-              style={{
-                background: themeMode === "dark" ? "#2D3B50" : "#e3e3e3",
-              }}
-            >
-              <div
-                className="flex items-center gap-1"
-                style={{
-                  background: themeMode === "dark" ? "#2D3B50" : "#e3e3e3",
-                }}
-              >
-                {/* Balance Display */}
-                <div className="lg:me-2 md:me-2">
-                  <Typography
-                    sx={{
-                      filter: !showBalance ? "blur(5px)" : "none",
-                      transition: "filter 0.3s ease-in-out",
-                      cursor: "pointer",
-                    }}
-                    className="text-xs md:text-sm lg:text-sm"
-                    fontSize={isMobile ? 10 : 14}
-                    marginLeft={isMobile ? -1 : 0}
-                  >
-                    KES {addCommaSeparators(profile?.wallet_balance)}
-                  </Typography>
-                </div>
-
-                {/* Toggle Button */}
-                <div className="me-2">
-                  {showBalance ? (
-                    <EyeOff
-                      className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5"
-                      onClick={() => toggleBalanceVisibility(false)}
-                    />
-                  ) : (
-                    <EyeIcon
-                      className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5"
-                      onClick={() => toggleBalanceVisibility(true)}
-                    />
-                  )}
-                </div>
-              </div>
-              <Link
-                href={
-                  authToken
-                    ? "/deposit"
-                    : `/login?redirect=${pathname?.slice(1)}`
-                }
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium transition-opacity duration-300 hover:opacity-40 bg-dark"
-              >
-                Deposit
-                <HandCoins className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-              </Link>
-            </div>
-          )}
           {!authToken && (
             <div className="flex md:flex gap-2">
-              <button
+              {/* <button
                 onClick={() => setActiveModal(ModalID.register)}
                 className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium"
               >
                 Become a Host
-                {/* <UserPlus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> */}
-              </button>
+                <UserPlus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+              </button> */}
               <button
                 onClick={() => setActiveModal(ModalID.login)}
                 className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium me-3"
@@ -398,15 +340,15 @@ const Navbar: FC<NavbarProps> = ({
           {authToken && (
             <Profile
               button={
-                <div className="flex gap-1 lg:gap-3 justify-center content-center items-center cursor-pointer me-1 sm:me-1 xl:me-4">
+                <div className="flex gap-1 lg:gap-3 justify-center content-center items-center cursor-pointer me-1 sm:me-1 xl:me-2">
                   <div className="w-[37px] h-[37px] sm:w-10 sm:h-10 md:w-11 md:h-11 xl:w-11 xl:h-11 lg:w-10 lg:h-10 ">
                     <CustomAvatar
                       name={getInitials(
-                        `${profile?.first_name} ${profile?.last_name}`
+                        `${authData?.user?.first_name} ${authData?.user?.last_name}`
                       )}
                     />
                   </div>
-                  {/* <div className="hidden md:block h-fit">
+                  <div className="hidden md:block h-fit">
                     <ChevronDown
                       className={`${
                         !openProfile ? "block" : "hidden"
@@ -415,7 +357,7 @@ const Navbar: FC<NavbarProps> = ({
                     {openProfile && (
                       <ChevronUp className="w-5 h-fit lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
                     )}
-                  </div> */}
+                  </div>
                 </div>
               }
               openState={openProfile}
@@ -435,9 +377,9 @@ const Navbar: FC<NavbarProps> = ({
                   {authToken && (
                     <>
                       <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
-                        {authData?.user?.phone && (
+                        {authData?.user?.phone_number && (
                           <span className="text-[13px] sm:text-base lg:text-lg">
-                            {`+${hideMiddleCharacters(authData?.user?.phone)}`}
+                            {`${hideMiddleCharacters(authData?.user?.phone_number)}`}
                           </span>
                         )}
                         <span
@@ -447,39 +389,11 @@ const Navbar: FC<NavbarProps> = ({
                               : "text-textColor"
                           }`}
                         >
-                          {profile?.first_name
-                            ? `${profile?.first_name} ${profile?.last_name}`
+                          {authData?.user?.first_name
+                            ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
                             : ""}
                         </span>
                       </div>
-                      <Link
-                        href="/deposit"
-                        className={`w-full flex items-end py-[10px] px-[8px] sm:py-[14px] sm:px-[12px] border-[1.5px] rounded-[10px] sm:rounded-[15px] justify-between text-[13px] hover:opacity-40 ${
-                          themeMode === "light"
-                            ? "border-strokeColor2"
-                            : "border-inputBorderColor"
-                        }`}
-                      >
-                        <div className="flex flex-col gap-1 md:me-4 ">
-                          <span className="text-[10px] sm:text-xs text-textColor">
-                            Your Balance
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <Wallet className="w-5 h-5 xl:w-[18px] xl:h-[18px]" />
-                            <span className="text-xs md:text-sm lg:text-base font-semibold">
-                              KSH
-                              {profile?.wallet_balance
-                                ? addCommaSeparators(profile?.wallet_balance)
-                                : 0}
-                            </span>
-                          </div>
-                        </div>
-                        <div
-                          className={`flex items-center p-[6px] sm:p-2 lg:p-[10px] rounded-full flex-shrink-0 cursor-pointer bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor`}
-                        >
-                          <Plus className="w-3 h-3 md:w-[14px] md:h-[14px] lg:w-4 lg:h-4" />
-                        </div>
-                      </Link>
                     </>
                   )}
                   <div className="w-full flex flex-col gap-2 sm:gap-3">
@@ -494,48 +408,7 @@ const Navbar: FC<NavbarProps> = ({
                       }
                       onItemClick={handleCloseLink}
                     />
-                    <ProfileItem
-                      theme={themeMode}
-                      icon={<HandCoins className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      text="Deposit"
-                      href={
-                        authToken
-                          ? "/deposit"
-                          : `/login?redirect=${pathname?.slice(1)}`
-                      }
-                    />
-                    <ProfileItem
-                      theme={themeMode}
-                      icon={<Banknote className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      text="Withdraw"
-                      href={
-                        authToken
-                          ? "/withdraw"
-                          : `/login?redirect=${pathname?.slice(1)}`
-                      }
-                    />
-                    <ProfileItem
-                      theme={themeMode}
-                      icon={<History className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      text="Transaction History"
-                      href={
-                        authToken
-                          ? "/transaction-history"
-                          : `/login?redirect=${pathname?.slice(1)}`
-                      }
-                    />
-                    <ProfileItem
-                      theme={themeMode}
-                      icon={
-                        <ArrowRightLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                      }
-                      text="Gaming Transaction"
-                      href={
-                        authToken
-                          ? "/gaming-transaction"
-                          : `/login?redirect=${pathname?.slice(1)}`
-                      }
-                    />
+                    
                   </div>
                   <div className="-mt-1 -mb-1 h-[1.5px] w-full bg-gray-200 dark:bg-white/20 " />
                   <div className="flex flex-col gap-3 w-full hover:opacity-40">

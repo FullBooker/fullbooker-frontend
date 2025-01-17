@@ -30,17 +30,17 @@ type LoginModalContentProps = {
 };
 
 const defaultValues = {
-  phone: "",
+  phone_number: "",
   password: "",
 };
 
 interface FormData {
-  phone: string;
+  phone_number: string;
   password: string;
 }
 
 const schema = yup.object().shape({
-  phone: yup
+  phone_number: yup
     .string()
     .min(10, "Phone number must be atleast 10 digits")
     .required("Phone number is required"),
@@ -70,8 +70,8 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    const { phone, password } = data;
-    signIn({ phone, password } as UserCredentials);
+    const { phone_number, password } = data;
+    signIn({ phone_number, password } as UserCredentials);
   };
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <Controller
-            name="phone"
+            name="phone_number"
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
@@ -107,11 +107,11 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 id="phone_number"
                 name="phone_number"
                 type="text"
-                placeholder="Username"
+                placeholder="Phone Number"
                 icon="user"
                 onChange={onChange}
                 value={value}
-                error={errors?.phone?.message}
+                error={errors?.phone_number?.message}
               />
             )}
           />

@@ -15,6 +15,10 @@ import UniversalModal from "@/components/modal/UniversalModal";
 import LoginModalContent from "@/components/views/auth/login";
 import RegisterModalContent from "@/components/views/auth/register";
 import ForgotPasswordModalContent from "@/components/views/auth/forgotPassword";
+import PhoneOtpVerificationModalContent from "@/components/views/auth/phoneOTPVerification";
+import ChangePasswordModalContent from "@/components/views/auth/changePassword";
+import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVerification";
+
 type DashboardLayoutProps = {
   children: React.ReactNode;
   activeGame: ActiveGamePayload;
@@ -192,13 +196,34 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<RegisterModalContent />}
         />
       )}
-       {modalId === ModalID.forgotPassword && (
-        <UniversalModal
-          theme={themeMode}
-          open={true}
-          content={<ForgotPasswordModalContent />}
-        />
-      )}
+        {modalId === ModalID.forgotPassword && (
+          <UniversalModal
+            theme={themeMode}
+            open={true}
+            content={<ForgotPasswordModalContent />}
+          />
+        )}
+        {modalId === ModalID.phoneOTPVerification && (
+          <UniversalModal
+            theme={themeMode}
+            open={true}
+            content={<PhoneOtpVerificationModalContent />}
+          />
+        )}
+        {modalId === ModalID.emailOTPVerification && (
+          <UniversalModal
+            theme={themeMode}
+            open={true}
+            content={<EmailOtpVerificationModalContent />}
+          />
+        )}
+        {modalId === ModalID.changePassword && (
+          <UniversalModal
+            theme={themeMode}
+            open={true}
+            content={<ChangePasswordModalContent />}
+          />
+        )}
     </div>
   );
 };

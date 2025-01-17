@@ -6,12 +6,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
   } from "@/components/ui/dialog";
 import { ModalID } from "@/domain/components";
 import { RootState } from "@/store";
-  import { CircularProgress } from "@mui/material";
-  import Image from "next/image";
   import React, { FC } from "react";
 import { connect } from "react-redux";
 import { X } from "lucide-react";
@@ -32,9 +29,6 @@ import { X } from "lucide-react";
     theme,
     title,
     description,
-    type,
-    amount,
-    buttonTitle,
     open = true,
     content,
     setActiveModal
@@ -64,13 +58,7 @@ import { X } from "lucide-react";
           </div>
 
           <DialogFooter className="w-full mt-2 md:mt-6">
-            {/* <button
-              onClick={() => close()}
-              className="w-full text-xs md:text-sm px-[16px] py-[14px] lg:px-[16px] lg:py-[14px] xl:px-[18px] xl:py-[16px] bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor rounded-full flex justify-center"
-            >
-              <CircularProgress size={18} color="inherit" />
-              <span className="ml-2">Processing Payment</span>
-            </button> */}
+           
           </DialogFooter>
         </DialogContent>
       </Dialog>
