@@ -1,11 +1,10 @@
 import axios from "axios";
 import { authHeader } from "./auth.header";
 import { store } from "../store";
-// const { dispatch } = store;
 
 //Create axios instance
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_API_BASE_URL || "https://stagingv1.api.mowinbet.com",
+  baseURL: process.env.NEXT_API_BASE_URL || "https://fullbooker-dev-be-sm.nbh4jqg707y8y.eu-central-1.cs.amazonlightsail.com",
   timeout: 10000,
   withCredentials: false,
 });
@@ -15,11 +14,13 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
-      // store.dispatch({ type: "authentication/signOut", payload: {} });
-      // store.dispatch({ type: "alert/setFailureAlert", payload: "Session expired!" });
       return;
     } else {
-      return Promise.reject(error);
+      return Promise.reject({
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data
+      });
     }
   }
 );

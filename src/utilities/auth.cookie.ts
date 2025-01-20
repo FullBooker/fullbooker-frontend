@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 
-export const TOKEN_KEY = "mowinbet-auth";
+export const TOKEN_KEY = "fullbooker-auth";
 const ENCRYPTION_SECRET = "base64:ssrzj+9i94HpNXm0zgXyijec3DxbDdETLOCq7Xagyvo=";
 
 export const saveToken = (token: string, maxAgeInSeconds: number): void => {
