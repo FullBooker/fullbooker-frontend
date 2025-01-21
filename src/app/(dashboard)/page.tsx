@@ -39,10 +39,6 @@ import React, { FC, useEffect, useState } from "react";
 import { truncateText } from "../helpers/general-helper";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
-import { GamesApiResponse } from "@/domain/dto/output";
-import { Game } from "@/domain/games";
-import { ActiveGamePayload, GamesFilters } from "@/domain/dto/input";
-import { Promotion } from "@/domain/promotions";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import TablePaginationComponent from "@/components/ui/pagination";
@@ -54,10 +50,6 @@ type HomePageProps = {
 const HomePage: FC<HomePageProps> = ({
   isLoggedIn,
 }) => {
-  const [filters, setFilters] = useState<GamesFilters>({
-    page: 1,
-    pageSize: 12,
-  });
 
   const { theme = "light" } = useTheme();
   const [themeMode, setThemeMode] = useState("light");

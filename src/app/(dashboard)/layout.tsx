@@ -9,7 +9,6 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { ActiveGamePayload } from "@/domain/dto/input";
 import { ModalID } from "@/domain/components";
 import UniversalModal from "@/components/modal/UniversalModal";
 import LoginModalContent from "@/components/views/auth/login";
@@ -21,13 +20,11 @@ import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVe
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
-  activeGame: ActiveGamePayload;
   modalId: ModalID;
 };
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({
   children,
-  activeGame,
   modalId,
 }) => {
   const [open, setOpen] = useState(false);
@@ -40,14 +37,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isPlayingGameOnMobile, setIsPlayingGameOnMobile] =
     useState<boolean>(false);
-
-  useEffect(() => {
-    const isGamePage = router.startsWith("/crash-game/detail/");
-    const isActiveGame = activeGame !== null;
-    const isMobileDevice = isMobile;
-
-    setIsPlayingGameOnMobile(isGamePage && isActiveGame && isMobileDevice);
-  }, [router, activeGame, isMobile]);
 
   useEffect(() => {
     const handleResize = () => {
