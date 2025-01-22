@@ -291,27 +291,27 @@ const Navbar: FC<NavbarProps> = ({
         <div className="flex items-center">
           <ul className="flex justify-between">
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm  font-medium transition-opacity duration-300 hover:opacity-4 text-black">
               Activities  
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
               Events  
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
               Experiences  
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
               Workshops  
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm text-whiteColor font-medium transition-opacity duration-300 hover:opacity-4 text-black">
+              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
               Coorprate Clubs  
               </Link>
             </li>

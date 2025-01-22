@@ -74,7 +74,6 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                 name="email"
                 type="email"
                 placeholder="Email"
-                icon="mail"
                 onChange={onChange}
                 value={value}
                 error={errors?.email?.message}
