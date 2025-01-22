@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
 import { ModalID } from "@/domain/components";
 import { RequestOTPPayload } from "@/domain/dto/input";
+import { MailOpen, Phone } from "lucide-react";
 
 type ForgotPasswordModalContentProps = {
   loading: boolean;
@@ -54,6 +55,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues,
@@ -63,43 +65,34 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
 
   const onSubmit = (data: FormData) => {
     requestOTP({
-      identifier: (data.otp_method === "email" ? data.email : data.phone_number) as string,
+      identifier: (data.otp_method === "email"
+        ? data.email
+        : data.phone_number) as string,
       otp_method: data.otp_method,
     });
   };
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="text-center mb-8">
+      <div className="text-center mb-4">
         <Image
           src="/assets/logo.svg"
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h2 className="text-xl font-semibold mb-2">Reset your password</h2>
+        <div className="text-center items-center mb-2 flex justify-center">
+          <h2 className="text-sm font-semibold border-b-2 border-primary ">
+            Input the email or phone number used during registration to reset
+            your password{" "}
+          </h2>
+        </div>
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
-          <Controller
-            name="otp_method"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <select
-                className="w-full p-2 border rounded-md"
-                value={value}
-                onChange={onChange}
-              >
-                <option value="">Select OTP Delivery Option</option>
-                <option value="email">Email</option>
-                <option value="phone">Phone Number</option>
-              </select>
-            )}
-          />
-
-          {watch("otp_method") === "email" && (
+          <div onClick={() => setValue("otp_method", "email")}>
             <Controller
               name="email"
               control={control}
@@ -112,12 +105,15 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   onChange={onChange}
                   value={value}
                   error={errors?.email?.message}
+                  icon={
+                    <MailOpen className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  }
                 />
               )}
             />
-          )}
+          </div>
 
-          {watch("otp_method") === "phone" && (
+          <div onClick={() => setValue("otp_method", "phone")}>
             <Controller
               name="phone_number"
               control={control}
@@ -130,14 +126,21 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   onChange={onChange}
                   value={value}
                   error={errors?.phone_number?.message}
+                  icon={
+                    <Phone className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  }
                 />
               )}
             />
-          )}
+          </div>
 
+          <div className="text-center"></div>
+        </div>
+
+        <div className="mt-20 text-center">
           <button
             type="submit"
-            className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-500"
+            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
           >
             {loading ? (
               <CircularProgress size={18} color="inherit" />
@@ -145,20 +148,17 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
               "Continue"
             )}
           </button>
+          <p className="text-sm text-black gap-1 font-thin">
+            Go back to{" "}
+            <button
+              onClick={() => setActiveModal(ModalID.login)}
+              className="text-blue-500 hover:text-blue-600"
+            >
+              Login
+            </button>
+          </p>
         </div>
       </form>
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 gap-1">
-          Go back to{" "}
-          <button
-            onClick={() => setActiveModal(ModalID.login)}
-            className="text-blue-500 hover:text-blue-600"
-          >
-            Login
-          </button>
-        </p>
-      </div>
     </div>
   );
 };

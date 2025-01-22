@@ -97,14 +97,25 @@ const EmailOtpVerificationModalContent: FC<
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h2 className="text-xl font-semibold mb-2">
-          An OTP code has been sent to ${hideMiddleCharacters(identifierToBeVerified)}
-        </h2>
+        <div className="text-center items-center mb-5">
+          <h2 className="text-sm font-semibold">Reset your password</h2>
+        </div>
+        <div className="flex justify-center">
+          <h2 className="text-sm font-thin border-b-2 border-primary w-[70%]">
+            An OTP code has been sent to $
+            {hideMiddleCharacters(identifierToBeVerified)}
+          </h2>
+        </div>
       </div>
-      <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <div className="w-full">
+      <form
+        className="mt-5"
+        noValidate
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div className="w-full text-center">
           <Controller
             name="otp"
             control={control}
@@ -118,16 +129,16 @@ const EmailOtpVerificationModalContent: FC<
               </InputOTP>
             )}
           />
-          {errors?.otp?.message && (
-            <div className="flex flex-row justify-center space-x-1 mt-3 md:mt-6 lg:mt-10 -mb-2 md:-mb-4">
+         {errors?.otp?.message && (
+            <div className="flex flex-row justify-center space-x-1 mt-3 md:mt-6 lg:mt-5 lg:mb-5 -mb-2 md:-mb-4 font-thin text-sm">
               <p className="text-red-500">{errors?.otp?.message}</p>
             </div>
           )}
 
-          {/* OTP Timer */}
-          <div className="flex flex-row justify-center space-x-1 mt-5 mb-5">
-            <span className="text-xs xl:text-sm text-textColor">
-              Resend Code
+           {/* OTP Timer */}
+           <div className="text-right space-x-1 mt-5 mb-5">
+            <span className="text-xs xl:text-sm text-black font-thin">
+              Resend code in
             </span>
             <span className="text-xs xl:text-sm text-mainColor">
               {timerDisplay}
@@ -135,34 +146,37 @@ const EmailOtpVerificationModalContent: FC<
           </div>
         </div>
 
-        <div className="flex flex-col w-full mt-4">
+        <div className="text-center">
           {!isResendDisabled && (
-            <div className="flex flex-col w-full mb-3">
-              <ButtonAuth
-                onClick={() => {
-                  resendOTP({
-                    identifier: identifierToBeVerified,
-                  } as RequestOTPPayload);
-                  handleResendClick();
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : (
-                  "Resend Code"
-                )}
-              </ButtonAuth>
-            </div>
-          )}
-          <ButtonAuth
-             type="submit"
+          <button
+            type="submit"
+            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
+            onClick={() => {
+              resendOTP({
+                identifier: identifierToBeVerified,
+              } as RequestOTPPayload);
+              handleResendClick();
+            }}
           >
             {loading ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
-              "Verify OTP"
+              "Resend Code"
             )}
-          </ButtonAuth>
+          </button>
+          )}
+          <div className="text-center mt-20">
+            <button
+              type="submit"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
+            >
+              {loading ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                "Continue"
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>

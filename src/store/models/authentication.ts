@@ -197,7 +197,7 @@ export const authentication = createModel<RootModel>()({
           dispatch.components.setActiveModal(ModalID.changePassword);
         }
       } catch (error: any) {
-        dispatch.alert.setFailureAlert(error?.message);
+        dispatch.alert.setFailureAlert(error?.data?.non_field_errors ||error?.message);
       }
     },
     async resetPassword(payload: ChangePasswordPayload, rootState) {
@@ -210,7 +210,7 @@ export const authentication = createModel<RootModel>()({
           dispatch.alert.setSuccessAlert(
             response?.data?.detail || "Password reset successfully!"
           );
-          dispatch.components.setActiveModal(ModalID.login);
+          dispatch.components.setActiveModal(ModalID.passwordResetSuccessfull);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

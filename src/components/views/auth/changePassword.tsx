@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
 import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
+import { KeyRound } from "lucide-react";
 
 type LoginModalContentProps = {
   loading: boolean;
@@ -28,7 +29,7 @@ type LoginModalContentProps = {
 const LoginModalContent: FC<LoginModalContentProps> = ({
   loading,
   resetPassword,
-  identifierToBeVerified
+  identifierToBeVerified,
 }) => {
   const defaultValues = {
     identifier: identifierToBeVerified || "",
@@ -41,14 +42,14 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
     password: string;
     confirm_password: string;
   }
-  
+
   const schema = yup.object().shape({
     identifier: yup.string().required("Identifier is required"),
     password: yup.string().required("Password is required"),
     confirm_password: yup
       .string()
       .required("Confirm your password")
-      .oneOf([yup.ref('password')], "Passwords must match"),
+      .oneOf([yup.ref("password")], "Passwords must match"),
   });
 
   const {
@@ -64,22 +65,28 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 
   const onSubmit = (data: FormData) => {
     const { identifier, password, confirm_password } = data;
-    resetPassword({ identifier, password, confirm_password } as ChangePasswordPayload);
+    resetPassword({
+      identifier,
+      password,
+      confirm_password,
+    } as ChangePasswordPayload);
   };
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="text-center mb-8">
+      <div className="text-center mb-3">
         <Image
           src="/assets/logo.svg"
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h2 className="text-xl font-semibold mb-2">
-          Please enter your new password below
-        </h2>
+        <div className="text-center items-center mb-2 flex justify-center">
+          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">
+            Please enter a new password bellow
+          </h2>
+        </div>
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -97,6 +104,9 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 onChange={onChange}
                 value={value}
                 error={errors?.password?.message}
+                icon={
+                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
@@ -114,21 +124,22 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 onChange={onChange}
                 value={value}
                 error={errors?.confirm_password?.message}
+                icon={
+                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
-          </div>
+        </div>
 
+        <div className="text-center mt-20">
           <button
             type="submit"
-            className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-500 mt-4"
+            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md hover:opacity-3"
           >
-            {loading ? (
-              <CircularProgress size={18} color="inherit" />
-            ) : (
-              "Save new Password"
-            )}
+            {loading ? <CircularProgress size={18} color="inherit" /> : "Save"}
           </button>
+        </div>
       </form>
     </div>
   );
@@ -136,7 +147,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
-  const {identifierToBeVerified } = state.authentication;
+  const { identifierToBeVerified } = state.authentication;
   return { loading, identifierToBeVerified };
 };
 
