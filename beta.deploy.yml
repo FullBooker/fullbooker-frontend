@@ -1,0 +1,54 @@
+name: beta deploy
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Install dependencies and build app
+        run: |
+          npm install
+          npm run build
+
+      - name: Read and update dev config
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: fullbooker/frontend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          sed -i -e "s/{{NEXT_API_BASE_URL}}/${{ secrets.DEV_NEXT_API_BASE_URL }}/" .github/workflows/lightsail_config.json
+          sed -i -e "s/{{SECRET_KEY}}/${{ secrets.DEV_SECRET_KEY }}/" .github/workflows/lightsail_config.json
+          sed -i -e "s#{{IMAGE}}#$REGISTRY/$REPOSITORY:$IMAGE_TAG#" .github/workflows/lightsail_config.json
+
+      - name: Build, tag, and push Docker image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: fullbooker/frontend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: Deploy container image
+        run: |
+          aws lightsail create-container-service-deployment --cli-input-json file://.github/workflows/lightsail_config.json --region ${{ vars.AWS_REGION }}
