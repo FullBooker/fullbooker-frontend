@@ -17,16 +17,14 @@ import ForgotPasswordModalContent from "@/components/views/auth/forgotPassword";
 import PhoneOtpVerificationModalContent from "@/components/views/auth/phoneOTPVerification";
 import ChangePasswordModalContent from "@/components/views/auth/changePassword";
 import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVerification";
+import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
   modalId: ModalID;
 };
 
-const DashboardLayout: FC<DashboardLayoutProps> = ({
-  children,
-  modalId,
-}) => {
+const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = usePathname();
@@ -135,12 +133,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
         }`}
       >
         <main
-          className={`h-fit mx-auto max-w-[1200px] w-full px-2 md:px-3 lg:px-4 overflow-x-hidden ${
+          className={`h-fit mx-auto w-full px-2 md:px-3 lg:px-4 overflow-x-hidden ${
             data
               ? "mt-7"
               : router === "/" || router.startsWith("/promotions/detail/")
-              ? "xl:ml-56"
-              : "xl:ml-56"
           } content-container`}
         >
           {/* Navbar */}
@@ -178,41 +174,48 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<LoginModalContent />}
         />
       )}
-       {modalId === ModalID.register && (
+      {modalId === ModalID.register && (
         <UniversalModal
           theme={themeMode}
           open={true}
           content={<RegisterModalContent />}
         />
       )}
-        {modalId === ModalID.forgotPassword && (
-          <UniversalModal
-            theme={themeMode}
-            open={true}
-            content={<ForgotPasswordModalContent />}
-          />
-        )}
-        {modalId === ModalID.phoneOTPVerification && (
-          <UniversalModal
-            theme={themeMode}
-            open={true}
-            content={<PhoneOtpVerificationModalContent />}
-          />
-        )}
-        {modalId === ModalID.emailOTPVerification && (
-          <UniversalModal
-            theme={themeMode}
-            open={true}
-            content={<EmailOtpVerificationModalContent />}
-          />
-        )}
-        {modalId === ModalID.changePassword && (
-          <UniversalModal
-            theme={themeMode}
-            open={true}
-            content={<ChangePasswordModalContent />}
-          />
-        )}
+      {modalId === ModalID.forgotPassword && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ForgotPasswordModalContent />}
+        />
+      )}
+      {modalId === ModalID.phoneOTPVerification && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<PhoneOtpVerificationModalContent />}
+        />
+      )}
+      {modalId === ModalID.emailOTPVerification && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<EmailOtpVerificationModalContent />}
+        />
+      )}
+      {modalId === ModalID.changePassword && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ChangePasswordModalContent />}
+        />
+      )}
+      {modalId === ModalID.passwordResetSuccessfull && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<PasswordResetSuccessfullModal />}
+        />
+      )}
     </div>
   );
 };

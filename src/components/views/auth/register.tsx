@@ -18,7 +18,17 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
 import { NotificationType } from "@/domain/notification";
-import { User, Lock, Mail } from "lucide-react";
+import {
+  User,
+  Lock,
+  Mail,
+  MailCheck,
+  KeyRound,
+  UserCheck,
+  Phone,
+  MailSearch,
+  MailOpen,
+} from "lucide-react";
 import { Facebook } from "lucide-react";
 import { Chrome } from "lucide-react";
 import { ModalID } from "@/domain/components";
@@ -129,15 +139,19 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="text-center mb-8">
+      <div className="text-center mb-3">
         <Image
           src="/assets/logo.svg"
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h1 className="text-2xl font-semibold mb-2">Create an account</h1>
+        <div className="text-center items-center mb-2 flex justify-center">
+          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">
+            Sign Up
+          </h2>
+        </div>
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -155,6 +169,9 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.first_name?.message}
                 name="first_name"
                 id="first_name"
+                icon={
+                  <UserCheck className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
@@ -172,6 +189,9 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.last_name?.message}
                 id="last_name"
                 name="last_name"
+                icon={
+                  <UserCheck className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
@@ -189,6 +209,9 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.email?.message}
                 id="email"
                 name="email"
+                icon={
+                  <MailOpen className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
@@ -206,6 +229,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.phone_number?.message}
                 id="phone_number"
                 name="phone_number"
+                icon={<Phone className="w-4 h-4 text-gray-500 fill-gray-500" />}
               />
             )}
           />
@@ -222,6 +246,10 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.password?.message}
                 id="password"
                 name="password"
+                is_password={true}
+                icon={
+                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
@@ -238,30 +266,40 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.confirm_password?.message}
                 id="confirm_password"
                 name="confirm_password"
+                is_password={true}
+                icon={
+                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
               />
             )}
           />
 
-          <button
-            type="submit"
-            className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-500"
-          >
-            {loading ? (
-              <CircularProgress size={18} color="inherit" />
-            ) : (
-              "Create an Account"
-            )}
-          </button>
-
-          <div className="relative py-3 flex items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-gray-600">Or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+          <div className="text-center mt-3">
+            <button
+              type="submit"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md"
+            >
+              {loading ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                "Create an Account"
+              )}
+            </button>
           </div>
 
+          <div className="relative my-6 mx-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-black"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-dark-500">Or</span>
+            </div>
+          </div>
+
+        
           <button
             type="button"
-            className="w-full border rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-50"
+            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
           >
             <Image
               src="/assets/google-icon.png"
@@ -269,29 +307,29 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
               width={20}
               height={20}
             />
-            Log in with Google
+            Sign in with Google
           </button>
 
           <button
             type="button"
-            className="w-full border rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-50"
+            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
           >
             <Image
               src="/assets/facebook-icon.png"
               alt="Facebook"
-              width={20}
-              height={20}
+              width={28}
+              height={28}
             />
-            Log in with Facebook
+            Sign in with Facebook
           </button>
         </div>
       </form>
 
-      <p className="text-center mt-6">
+      <p className="text-center mt-6 text-sm text-black font-thin">
         Already have an account?{" "}
         <button
           onClick={() => setActiveModal(ModalID.login)}
-          className="text-orange-500 hover:underline"
+          className="text-blue-500 hover:underline"
         >
           Login
         </button>

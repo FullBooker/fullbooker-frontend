@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
 import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
+import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
 
 type LoginModalContentProps = {
   loading: boolean;
@@ -85,15 +86,17 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="text-center mb-8">
+      <div className="text-center mb-3">
         <Image
           src="/assets/logo.svg"
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h2 className="text-xl font-semibold mb-2">Log in to your account</h2>
+        <div className="text-center items-center mb-2 flex justify-center">
+          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">Sign In</h2>
+        </div>
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -110,6 +113,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 placeholder="Phone Number"
                 onChange={onChange}
                 value={value}
+                icon={<User className="w-4 h-4 text-gray-500 fill-gray-500" />}
                 error={errors?.phone_number?.message}
               />
             )}
@@ -127,70 +131,85 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 placeholder="Password"
                 onChange={onChange}
                 value={value}
+                icon={
+                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                }
+                is_password={true}
                 error={errors?.password?.message}
               />
             )}
           />
 
-          <div className="text-right">
-            <button onClick={() => setActiveModal(ModalID.forgotPassword)} className="text-sm text-blue-500">
-              Forgot password? Reset here
+          <div className="text-center mb-3">
+            <button className="text-sm mb-10 font-thin">
+              Forgot password? Reset
+              <span
+                className="text-blue-500"
+                onClick={() => setActiveModal(ModalID.forgotPassword)}
+              >
+                {" "}
+                here
+              </span>
+            </button>
+            <button
+              type="submit"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md hover:opacity-3"
+            >
+              {loading ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                "Sign In"
+              )}
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-500"
-          >
-            {loading ? (
-              <CircularProgress size={18} color="inherit" />
-            ) : (
-              "Sign In"
-            )}
-          </button>
-
-          <div className="relative my-6">
+          <div className="relative my-6 mx-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-black"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or</span>
+              <span className="px-2 bg-white text-dark-500">Or</span>
             </div>
           </div>
 
           <button
             type="button"
-            className="w-full border rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-50"
+            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
           >
-            <Image src="/assets/google-icon.png" alt="Google" width={20} height={20} />
-            Log in with Google
+            <Image
+              src="/assets/google-icon.png"
+              alt="Google"
+              width={20}
+              height={20}
+            />
+            Sign in with Google
           </button>
 
           <button
             type="button"
-            className="w-full border rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-50"
+            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
           >
             <Image
               src="/assets/facebook-icon.png"
               alt="Facebook"
-              width={20}
-              height={20}
+              width={28}
+              height={28}
             />
-            Log in with Facebook
+            Sign in with Facebook
           </button>
         </div>
       </form>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
-          <button
-            onClick={() => setActiveModal(ModalID.register)}
-            className="text-orange-400 hover:text-orange-500"
-          >
-            Create an account
-          </button>
+      <div className="mt-10 text-center relative bottom-0">
+        <p className="text-sm text-black font-thin mb-4">
+          <span>Don't have an account?</span>
         </p>
+        <button
+          onClick={() => setActiveModal(ModalID.register)}
+          className="xs:w-full sm:w-full  lg:w-[80%] md:w-[80%] bg-primary text-white py-2 rounded-md"
+        >
+          Create an account
+        </button>
       </div>
     </div>
   );
@@ -207,7 +226,8 @@ const mapDispatchToProps = (dispatch: any) => ({
   signIn: (credentials: UserCredentials) =>
     dispatch.authentication.signIn(credentials),
   getUserProfile: () => dispatch.profile.getUserProfile(),
-  setActiveModal: (modalId: ModalID) => dispatch.components.setActiveModal(modalId)
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginModalContent);

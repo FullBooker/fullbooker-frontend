@@ -53,7 +53,7 @@ import { X } from "lucide-react";
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col w-full pt-4 pr-10 pb-4 pl-10">
+          <div className="flex flex-col w-full sm:pr-0 sm:pl-0 xs:pr-0 xs:pl-0">
             {content}
           </div>
 

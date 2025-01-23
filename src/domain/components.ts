@@ -7,4 +7,5 @@ export enum ModalID {
   changePassword = "CHANGE_PASSWORD",
   emailOTPVerification = "EMAIL_OTP_VERIFICATION",
   phoneOTPVerification = "PHONE_OTP_VERIFICATION",
+  passwordResetSuccessfull = "PASSWORD_RESET_SUCCESSFULL"
 }

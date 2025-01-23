@@ -329,7 +329,7 @@ const Navbar: FC<NavbarProps> = ({
               </button> */}
               <button
                 onClick={() => setActiveModal(ModalID.login)}
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium me-3"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-primary text-black font-medium me-3"
               >
                 Sign In
                 {/* <LogIn className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> */}

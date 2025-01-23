@@ -8,6 +8,7 @@ import Link from "next/link";
 import { InputOTP, InputOTPSlot } from "@/components/auth/input-otp";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
+  RequestOTPPayload,
   ResendPhoneOTPPayload,
   VerifyPhoneOTPPayload,
 } from "@/domain/dto/input";
@@ -20,18 +21,27 @@ import { NotificationType } from "@/domain/notification";
 import { FC, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import useOtpTimer from "@/lib/useOTPTimer";
+import { hideMiddleCharacters } from "@/utilities/helpers";
 
 type PhoneOtpVerificationModalContentProps = {
   loading: boolean;
   verifyOTP: (payload: VerifyPhoneOTPPayload) => void;
-  resendOTP: (payload: ResendPhoneOTPPayload) => void;
+  resendOTP: (payload: RequestOTPPayload) => void;
   type: NotificationType;
   message: string;
+  identifierToBeVerified: string;
 };
 
 const PhoneOtpVerificationModalContent: FC<
   PhoneOtpVerificationModalContentProps
-> = ({ loading, verifyOTP, type, message, resendOTP }) => {
+> = ({
+  loading,
+  verifyOTP,
+  type,
+  message,
+  resendOTP,
+  identifierToBeVerified,
+}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { timerDisplay, isResendDisabled, handleResendClick } = useOtpTimer();
@@ -91,72 +101,88 @@ const PhoneOtpVerificationModalContent: FC<
           alt="Fullbooker Logo"
           width={200}
           height={40}
-          className="mx-auto mb-6"
+          className="mx-auto"
         />
-        <h2 className="text-xl font-semibold mb-2">
-          An OTP code has been sent to +2547*****23
-        </h2>
+        <div className="text-center items-center mb-5">
+          <h2 className="text-sm font-semibold">Reset your password</h2>
+        </div>
+        <div className="flex justify-center">
+          <h2 className="text-sm font-thin border-b-2 border-primary w-[70%]">
+            An OTP code has been sent to{" "}
+            {hideMiddleCharacters(identifierToBeVerified)}
+          </h2>
+        </div>
       </div>
-      <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-          <div className="w-full">
-            <Controller
-              name="otp"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange, onBlur } }) => (
-                <InputOTP maxLength={5} value={value} onChange={onChange}>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                </InputOTP>
-              )}
-            />
-            {errors?.otp?.message && (
-              <div className="flex flex-row justify-center space-x-1 mt-3 md:mt-6 lg:mt-10 -mb-2 md:-mb-4">
-                <p className="text-red-500">{errors?.otp?.message}</p>
-              </div>
+      <form
+        className="mt-5"
+        noValidate
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div className="w-full">
+          <Controller
+            name="otp"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <InputOTP maxLength={5} value={value} onChange={onChange}>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+              </InputOTP>
             )}
-
-            {/* OTP Timer */}
-            <div className="flex flex-row justify-center space-x-1 mt-5 mb-5">
-              <span className="text-xs xl:text-sm text-textColor">
-                Resend Code
-              </span>
-              <span className="text-xs xl:text-sm text-mainColor">
-                {timerDisplay}
-              </span>
+          />
+          {errors?.otp?.message && (
+            <div className="flex flex-row justify-center space-x-1 mt-3 md:mt-6 lg:mt-5 lg:mb-5 -mb-2 md:-mb-4 font-thin text-sm">
+              <p className="text-red-500">{errors?.otp?.message}</p>
             </div>
-          </div>
+          )}
 
-          <div className="flex flex-col w-full">
-            {!isResendDisabled && (
-              <div className="flex flex-col w-full mb-3">
-                <ButtonAuth
-                  onClick={() => {
-                    resendOTP({
-                      phone: searchParams?.get("phone"),
-                    } as ResendPhoneOTPPayload);
-                    handleResendClick();
-                  }}
-                >
-                  {loading ? (
-                    <CircularProgress size={18} color="inherit" />
-                  ) : (
-                    "Resend Code"
-                  )}
-                </ButtonAuth>
-              </div>
+          {/* OTP Timer */}
+          <div className="text-right space-x-1 mt-5 mb-5">
+            <span className="text-xs xl:text-sm text-black font-thin">
+              Resend code in
+            </span>
+            <span className="text-xs xl:text-sm text-mainColor">
+              {timerDisplay}
+            </span>
+          </div>
+        </div>
+
+        <div className="text-center">
+          {!isResendDisabled && (
+          <button
+            type="submit"
+            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
+            onClick={() => {
+              resendOTP({
+                identifier: identifierToBeVerified,
+              } as RequestOTPPayload);
+              handleResendClick();
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              "Resend Code"
             )}
-            <ButtonAuth type="submit">
+          </button>
+          )}
+          <div className="text-center mt-20">
+            <button
+              type="submit"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
+            >
               {loading ? (
                 <CircularProgress size={18} color="inherit" />
               ) : (
-                "Verify"
+                "Continue"
               )}
-            </ButtonAuth>
+            </button>
           </div>
+        </div>
       </form>
     </div>
   );
@@ -165,14 +191,15 @@ const PhoneOtpVerificationModalContent: FC<
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
   const { message, type } = state.alert;
-  return { loading, message, type };
+  const { identifierToBeVerified } = state.authentication;
+  return { loading, message, type, identifierToBeVerified };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
   verifyOTP: (payload: VerifyPhoneOTPPayload) =>
     dispatch.authentication.verifyOTP(payload),
-  resendOTP: (payload: ResendPhoneOTPPayload) =>
-    dispatch.authentication.resendOTP(payload),
+  resendOTP: (payload: RequestOTPPayload) =>
+    dispatch.authentication.requestOTP(payload),
 });
 
 export default connect(
