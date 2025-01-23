@@ -68,23 +68,23 @@ export const authentication = createModel<RootModel>()({
       try {
         const response: any = await postRequest("/accounts/signup/", payload);
         if (response && response?.data?.user) {
-            const data: any = response?.data;
-            const token = data?.access_token;
-            const decodedJWT = jwtDecode<JwtPayload>(token);
-            const jwtExpiry = new Date((decodedJWT?.exp as number) * 1000);
-  
-            if (token) {
-              const currentTime = new Date().getTime();
-              const expiryTime = jwtExpiry.getTime();
-              const maxAge = Math.floor((expiryTime - currentTime) / 1000);
-  
-              saveToken(token, maxAge);
-  
-              localStorage.setItem("authData", JSON.stringify(data?.user));
-  
-              dispatch.authentication.setAuthStatusLoggedIn({
-                user: data?.user,
-              } as AuthData);
+          const data: any = response?.data;
+          const token = data?.access_token;
+          const decodedJWT = jwtDecode<JwtPayload>(token);
+          const jwtExpiry = new Date((decodedJWT?.exp as number) * 1000);
+
+          if (token) {
+            const currentTime = new Date().getTime();
+            const expiryTime = jwtExpiry.getTime();
+            const maxAge = Math.floor((expiryTime - currentTime) / 1000);
+
+            saveToken(token, maxAge);
+
+            localStorage.setItem("authData", JSON.stringify(data?.user));
+
+            dispatch.authentication.setAuthStatusLoggedIn({
+              user: data?.user,
+            } as AuthData);
           }
           dispatch.alert.setSuccessAlert(response?.data?.message);
           dispatch.components.setActiveModal(ModalID.none);
@@ -123,8 +123,10 @@ export const authentication = createModel<RootModel>()({
 
             dispatch.authentication.setAuthStatusLoggedIn({
               user: data?.user,
-            } as AuthData)
-            dispatch.alert.setSuccessAlert(response?.data?.message || "Login successful!");
+            } as AuthData);
+            dispatch.alert.setSuccessAlert(
+              response?.data?.message || "Login successful!"
+            );
             dispatch.components.setActiveModal(ModalID.none);
           }
         } else {
@@ -164,12 +166,22 @@ export const authentication = createModel<RootModel>()({
           payload
         );
         if (response && response?.data) {
-          dispatch.authentication.setIdentifierToBeVerified(payload?.identifier);
-          dispatch.alert.setSuccessAlert(response?.data?.detail || "OTP sent successfully!");
-          dispatch.components.setActiveModal(ModalID.emailOTPVerification);
+          dispatch.authentication.setIdentifierToBeVerified(
+            payload?.identifier
+          );
+          dispatch.alert.setSuccessAlert(
+            response?.data?.detail || "OTP sent successfully!"
+          );
+          dispatch.components.setActiveModal(
+            payload?.otp_method === "email"
+              ? ModalID.emailOTPVerification
+              : ModalID.phoneOTPVerification
+          );
         }
       } catch (error: any) {
-        dispatch.alert.setFailureAlert(error?.message);
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
       }
     },
     async verifyOTP(payload: VerifyOTPPayload, rootState) {
@@ -179,7 +191,9 @@ export const authentication = createModel<RootModel>()({
           payload
         );
         if (response && response?.data) {
-          dispatch.alert.setSuccessAlert(response?.data?.detail || "OTP verified successfully!");
+          dispatch.alert.setSuccessAlert(
+            response?.data?.detail || "OTP verified successfully!"
+          );
           dispatch.components.setActiveModal(ModalID.changePassword);
         }
       } catch (error: any) {
@@ -193,7 +207,9 @@ export const authentication = createModel<RootModel>()({
           payload
         );
         if (response && response?.data) {
-          dispatch.alert.setSuccessAlert(response?.data?.detail || "Password reset successfully!");
+          dispatch.alert.setSuccessAlert(
+            response?.data?.detail || "Password reset successfully!"
+          );
           dispatch.components.setActiveModal(ModalID.login);
         }
       } catch (error: any) {

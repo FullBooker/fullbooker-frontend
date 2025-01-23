@@ -9,6 +9,7 @@ export type NewUserPayload = {
 
 export type RequestOTPPayload = {
   identifier: string;
+  otp_method: string;
 };
 
 export type VerifyOTPPayload = {
