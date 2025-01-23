@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
 };
@@ -60,7 +60,7 @@ export default function RootLayout({
       <body className={`${poppins.className} bg-background`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
