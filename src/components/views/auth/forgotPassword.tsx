@@ -12,8 +12,6 @@ import { CircularProgress } from "@mui/material";
 import { ModalID } from "@/domain/components";
 import { RequestOTPPayload } from "@/domain/dto/input";
 
-type OTPMethod = "email" | "phone" | "";
-
 type ForgotPasswordModalContentProps = {
   loading: boolean;
   requestOTP: (payload: RequestOTPPayload) => void;
@@ -23,13 +21,13 @@ type ForgotPasswordModalContentProps = {
 const defaultValues = {
   email: "",
   phone_number: "",
-  otp_method: "",
+  otp_method: "email",
 };
 
 interface FormData {
-  email: string;
-  phone_number: string;
-  otp_method: string | OTPMethod;
+  email?: string;
+  phone_number?: string;
+  otp_method: any;
 }
 
 const schema = yup.object().shape({
@@ -57,7 +55,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     defaultValues,
     mode: "onBlur",
     resolver: yupResolver(schema),
@@ -65,7 +63,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
 
   const onSubmit = (data: FormData) => {
     requestOTP({
-      identifier: data.otp_method === "email" ? data.email : data.phone_number,
+      identifier: (data.otp_method === "email" ? data.email : data.phone_number) as string,
       otp_method: data.otp_method,
     });
   };
