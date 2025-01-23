@@ -1,0 +1,26 @@
+{
+    "serviceName": "fullbooker-dev-fe-sm",
+    "containers": {
+        "fullbooker-fe-sm": {
+            "image": "{{IMAGE}}",
+            "ports": {
+                "3000": "HTTP"
+            },
+            "environment": {
+                "NEXT_API_BASE_URL": "{{NEXT_API_BASE_URL}}"
+            }
+        }
+    },
+    "publicEndpoint": {
+        "containerName": "fullbooker-fe-sm",
+        "containerPort": 3000,
+        "healthCheck": {
+            "healthyThreshold": 2,
+            "unhealthyThreshold": 2,
+            "timeoutSeconds": 2,
+            "intervalSeconds": 5,
+            "path": "/",
+            "successCodes": "200-499"
+        }
+    }
+}
