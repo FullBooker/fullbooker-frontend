@@ -42,8 +42,8 @@ const Sidebar = ({
             <Link href="/">
               <div data-hide-on-theme="dark">
                 <Image
-                  src="/assets/logo_light.png"
-                  alt="MowinBet Logo"
+                  src="/assets/logo.svg"
+                  alt="Fullbooker Logo"
                   width={238}
                   height={39.29}
                   className="w-[190px] h-[55px]"
@@ -69,94 +69,6 @@ const Sidebar = ({
           </div>
         </div>
         <div className="flex flex-col items-center justify-end space-y-4 mb-4">
-        <div className="flex flex-col justify-center">
-          <Image
-            src="/assets/ic_payment_mpesa.png"
-            alt="Payment MPESA"
-            width={80}
-            height={30}
-            className="xl:w-[100px] xl:h-40px] mb-3"
-          />
-          <Image
-            src="/assets/ic_payment_airtel.png"
-            alt="Payment airtel"
-            width={80}
-            height={30}
-            className="xl:w-[100px] xl:h-40px]"
-          />
-        </div>
-
-        <div className="flex items-center gap-4 sm:mt-6">
-          <div className="items-center p-[10px] rounded-full h-fit bg-cardColor">
-            {/* When the theme is dark, hide this div */}
-            <div data-hide-on-theme="dark">
-              <Image
-                src="/assets/ic_instagram_light.png"
-                alt="instagram_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-
-            {/* When the theme is light, hide this div */}
-            <div data-hide-on-theme="light">
-              <Image
-                src="/assets/ic_instagram_dark.png"
-                alt="instagram_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-          </div>
-          <div className="items-center px-2 py-2 rounded-full h-fit bg-cardColor">
-            {/* When the theme is dark, hide this div */}
-            <div data-hide-on-theme="dark">
-              <Image
-                src="/assets/ic_tiktok_light.png"
-                alt="tiktok_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-
-            {/* When the theme is light, hide this div */}
-            <div data-hide-on-theme="light">
-              <Image
-                src="/assets/ic_tiktok_dark.png"
-                alt="tiktok_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-          </div>
-          <div className="items-center px-2 py-2 rounded-full h-fit bg-cardColor">
-            {/* When the theme is dark, hide this div */}
-            <div data-hide-on-theme="dark">
-              <Image
-                src="/assets/ic_twitter_light.png"
-                alt="twitter_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-
-            {/* When the theme is light, hide this div */}
-            <div data-hide-on-theme="light">
-              <Image
-                src="/assets/ic_twitter_dark.png"
-                alt="twitter_icon"
-                width={100}
-                height={100}
-                className="w-4 h-4 lg:w-5 lg:h-5 xl:w-7 xl:h-7"
-              />
-            </div>
-          </div>
-        </div>
       </div>
       </div>
     

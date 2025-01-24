@@ -21,13 +21,11 @@ import { NotificationType } from "@/domain/notification";
 import {
   User,
   Lock,
-  Mail,
   MailCheck,
   KeyRound,
   UserCheck,
   Phone,
-  MailSearch,
-  MailOpen,
+  Mail,
 } from "lucide-react";
 import { Facebook } from "lucide-react";
 import { Chrome } from "lucide-react";
@@ -148,7 +146,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">
+          <h2 className="text-sm font-semibold border-b-2 border-darkOrange w-[50%]">
             Sign Up
           </h2>
         </div>
@@ -210,7 +208,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 id="email"
                 name="email"
                 icon={
-                  <MailOpen className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <Mail className="w-4 h-4 text-white fill-gray-500" />
                 }
               />
             )}
@@ -229,7 +227,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.phone_number?.message}
                 id="phone_number"
                 name="phone_number"
-                icon={<Phone className="w-4 h-4 text-gray-500 fill-gray-500" />}
+                icon={<Phone className="w-4 h-4 text-white fill-gray-500" />}
               />
             )}
           />
@@ -248,7 +246,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 name="password"
                 is_password={true}
                 icon={
-                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
                 }
               />
             )}
@@ -268,7 +266,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 name="confirm_password"
                 is_password={true}
                 icon={
-                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
                 }
               />
             )}
@@ -277,7 +275,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
           <div className="text-center mt-3">
             <button
               type="submit"
-              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
             >
               {loading ? (
                 <CircularProgress size={18} color="inherit" />

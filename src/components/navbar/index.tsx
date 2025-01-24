@@ -91,96 +91,6 @@ const Navbar: FC<NavbarProps> = ({
   const searchParams = useSearchParams();
   const [authToken, setAuthToken] = useState<string | null>(getToken());
 
-  const titles = [
-    {
-      title: (
-        <span className="text-[12px] sm:text-xs md:text-sm">
-          Deposit <span className="font-bold text-mainColor">KSH 100</span>{" "}
-          Successful
-        </span>
-      ),
-      icon: (
-        <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5 text-mainColor" />
-      ),
-      href: "/transaction-history",
-      info: "Deposit",
-      date: new Date(),
-    },
-    {
-      title: (
-        <span className="text-[12px] sm:text-xs md:text-sm">
-          Deposit <span className="font-bold text-mainColor">Aviatrix</span>{" "}
-          Successful
-        </span>
-      ),
-      icon: (
-        <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5 text-mainColor" />
-      ),
-      href: "/transaction-history",
-      info: "Deposit",
-      date: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - 12
-      ),
-    },
-    {
-      title: (
-        <span className="text-[12px] sm:text-xs md:text-sm">
-          Deposit <span className="font-bold text-mainColor">F777 Fighter</span>{" "}
-          Successful
-        </span>
-      ),
-      icon: (
-        <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5 text-mainColor" />
-      ),
-      href: "/transaction-history",
-      info: "Deposit",
-      date: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - 25
-      ),
-    },
-    {
-      title: (
-        <span className="text-[12px] sm:text-xs md:text-sm">
-          Deposit{" "}
-          <span className="font-bold text-mainColor">Cricket Crash</span>{" "}
-          Successful
-        </span>
-      ),
-      icon: (
-        <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5 text-mainColor" />
-      ),
-      href: "/transaction-history",
-      info: "Deposit",
-      date: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - 30
-      ),
-    },
-    {
-      title: (
-        <span className="text-[12px] sm:text-xs md:text-sm">
-          Deposit <span className="font-bold text-mainColor">Limbo Cat</span>{" "}
-          Successful
-        </span>
-      ),
-      icon: (
-        <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5 text-mainColor" />
-      ),
-      href: "/transaction-history",
-      info: "Deposit",
-      date: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - 39
-      ),
-    },
-  ];
-
   const handleCloseLink = () => {
     setOpenProfile(false);
   };
@@ -201,27 +111,6 @@ const Navbar: FC<NavbarProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 
-  useEffect(() => {
-    if (authToken) {
-      getUserProfile();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // useEffect(() => {
-  //   if (isMobile) {
-  //     const newSearchParams = new URLSearchParams(searchParams.toString());
-  //     const dataValue = searchParams.get("data");
-
-  //     dataValue === "true"
-  //       ? newSearchParams.delete("data")
-  //       : newSearchParams.set("data", "true");
-
-  //     // Update the URL using the useNavigation hook
-  //     router.push(`${pathname}?${newSearchParams.toString()}`);
-  //   }
-  // }, []);
-
   return (
     <div
       className={`sticky top-0 z-40 bg-background ${
@@ -230,65 +119,47 @@ const Navbar: FC<NavbarProps> = ({
           : openNav && isMobile && themeMode === "light"
           ? "blur-sm bg-white opacity-30 z-40"
           : "bg-background"
-      }`}
+      } px-2 md:px-3 lg:px-4`}
     >
       <div
-        className={`flex gap-1 sm:gap-2 justify-between items-center py-4 ${
-          pathname === "/" || pathname.startsWith("/promotions/detail/")
-            ? "px-4 sm:px-7"
-            : ""
+        className={`flex gap-1 sm:gap-2 justify-between items-center py-4
+          px-4 sm:px-7
         }`}
       >
-        <div className="">
-        <Link href="/" className="">
-            <div data-hide-on-theme="dark">
-              <Image
-                src="/assets/logo.svg"
-                alt="Fullbooker Logo"
-                // layout="fill"
-                // objectFit="contain"
-                width={238}
-                height={39.29}
-                // className="w-[190px] h-[55px]"
-                // style={{
-                //   width: "100px",
-                //   height: "100px",
-                //   clipPath: "inset(0 50px 0 0)"
-                // }}
-              />
-            </div>
-
-            <div data-hide-on-theme="light">
-              <Image
-               src="/assets/logo.svg"
-                alt="Fullbooker Logo"
-                // layout="fill"
-                // objectFit="contain"
-                width={238}
-                height={39.29}
-                // className="w-[190px] h-[55px]"
-                // style={{
-                //   width: "100px",
-                //   height: "100px",
-                //   clipPath: "inset(0 200px 0 0)"
-                // }}
-              />
-            </div>
-          </Link>
-          <div
+        <div className="flex justify-between">
+        <div
             className={`flex flex-col xl:hidden px-[10px] py-[12px] md:px-3 md:py-[14px] sm:me-3 justify-center items-center ${
               themeMode === "light"
                 ? "border-[1px] border-strokeColor2"
                 : "border border-inputBorderColor"
-            } rounded-full flex-shrink-0 cursor-pointer`}
+            } rounded-full flex-shrink-0 cursor-pointer me-3`}
             onClick={onOpenSideNav}
           >
             <div className="rotate-90 -mb-1">
               <Tally3 className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
             </div>
           </div>
+        <Link href="/" className="">
+            <div className="sm:flex xs:flex lg:hidden md:hidden xl:hidden ">
+              <Image
+                src="/assets/logo.svg"
+                alt="Fullbooker Logo"
+                width={120}
+                height={34}
+              />
+            </div>
+            <div className="hidden xl:flex md:flex lg:flex">
+              <Image
+               src="/assets/logo.svg"
+                alt="Fullbooker Logo"  
+                width={238}
+                height={39.29}
+              />
+            </div>
+          </Link>
+         
         </div>
-        <div className="flex items-center">
+        <div className="hidden items-center lg:flex">
           <ul className="flex justify-between">
             <li>
               <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm  font-medium transition-opacity duration-300 hover:opacity-4 text-black">
@@ -475,7 +346,6 @@ const Navbar: FC<NavbarProps> = ({
           </div> */}
         </div>
       </div>
-      {!pathname.startsWith("/crash-game/detail/") && <BottomNavBar />}
     </div>
   );
 };

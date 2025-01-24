@@ -10,6 +10,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import {
   RequestOTPPayload,
   ResendPhoneOTPPayload,
+  VerifyOTPPayload,
   VerifyPhoneOTPPayload,
 } from "@/domain/dto/input";
 import { RootState } from "@/store";
@@ -25,7 +26,7 @@ import { hideMiddleCharacters } from "@/utilities/helpers";
 
 type PhoneOtpVerificationModalContentProps = {
   loading: boolean;
-  verifyOTP: (payload: VerifyPhoneOTPPayload) => void;
+  verifyOTP: (payload: VerifyOTPPayload) => void;
   resendOTP: (payload: RequestOTPPayload) => void;
   type: NotificationType;
   message: string;
@@ -46,20 +47,17 @@ const PhoneOtpVerificationModalContent: FC<
   const searchParams = useSearchParams();
   const { timerDisplay, isResendDisabled, handleResendClick } = useOtpTimer();
   const defaultValues = {
-    phone: searchParams?.get("phone") || "",
+    identifier: identifierToBeVerified || "",
     otp: "",
   };
 
   interface FormData {
-    phone: string;
+    identifier: string;
     otp: string;
   }
 
   const schema = yup.object().shape({
-    phone: yup
-      .string()
-      .min(10, "Phone number must be atleast 10 digits")
-      .required("Phone number is required"),
+    identifier: yup.string().required("Identifier is required"),
     otp: yup
       .string()
       .min(4, "OTP must be atleast 4 digits")
@@ -79,19 +77,9 @@ const PhoneOtpVerificationModalContent: FC<
   });
 
   const onSubmit = (data: FormData) => {
-    const { phone, otp } = data;
-    verifyOTP({ phone, otp } as VerifyPhoneOTPPayload);
+    const { identifier, otp } = data;
+    verifyOTP({ identifier, otp } as VerifyOTPPayload);
   };
-
-  useEffect(() => {
-    if (
-      type === NotificationType.success &&
-      message?.includes("Your phone number has been verified successfully")
-    ) {
-      router.push("/login");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, message]);
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -107,7 +95,7 @@ const PhoneOtpVerificationModalContent: FC<
           <h2 className="text-sm font-semibold">Reset your password</h2>
         </div>
         <div className="flex justify-center">
-          <h2 className="text-sm font-thin border-b-2 border-primary w-[70%]">
+          <h2 className="text-sm font-thin border-b-2 border-darkOrange w-[70%]">
             An OTP code has been sent to{" "}
             {hideMiddleCharacters(identifierToBeVerified)}
           </h2>
@@ -130,7 +118,6 @@ const PhoneOtpVerificationModalContent: FC<
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
                 <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
               </InputOTP>
             )}
           />
@@ -154,7 +141,6 @@ const PhoneOtpVerificationModalContent: FC<
         <div className="text-center">
           {!isResendDisabled && (
           <button
-            type="submit"
             className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
             onClick={() => {
               resendOTP({
