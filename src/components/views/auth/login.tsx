@@ -75,15 +75,6 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
     signIn({ phone_number, password } as UserCredentials);
   };
 
-  useEffect(() => {
-    if (getToken()) {
-      getUserProfile();
-      const redirectUrl = searchParams.get("redirect");
-      redirectUrl ? router.push(`/${redirectUrl}`) : router.push("/");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, authData]);
-
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-3">
@@ -95,7 +86,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">Sign In</h2>
+          <h2 className="text-sm font-semibold border-b-2 border-darkOrange w-[50%]">Sign In</h2>
         </div>
       </div>
 
@@ -113,7 +104,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 placeholder="Phone Number"
                 onChange={onChange}
                 value={value}
-                icon={<User className="w-4 h-4 text-gray-500 fill-gray-500" />}
+                icon={<Phone className="w-4 h-4 text-white fill-gray-500" />}
                 error={errors?.phone_number?.message}
               />
             )}
@@ -132,7 +123,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 onChange={onChange}
                 value={value}
                 icon={
-                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
                 }
                 is_password={true}
                 error={errors?.password?.message}
@@ -153,7 +144,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
             </button>
             <button
               type="submit"
-              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md hover:opacity-3"
+              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
             >
               {loading ? (
                 <CircularProgress size={18} color="inherit" />
@@ -206,7 +197,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
         </p>
         <button
           onClick={() => setActiveModal(ModalID.register)}
-          className="xs:w-full sm:w-full  lg:w-[80%] md:w-[80%] bg-primary text-white py-2 rounded-md"
+          className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
         >
           Create an account
         </button>

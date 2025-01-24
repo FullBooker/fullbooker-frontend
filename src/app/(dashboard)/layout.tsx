@@ -108,20 +108,16 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
   }, [theme]);
 
   return (
-    <div className="flex h-fit w-full overflow-x-hidden">
+    <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
       {/* Sidebar */}
-      {/* <div className="h-fit" ref={sidebarRef}>
-          {!data ? (
-            <Sidebar
-              theme={themeMode}
-              open={open}
-              onClose={() => setOpen(false)}
-              isMobile={isMobile}
-            />
-          ) : (
-            <></>
-          )}
-        </div> */}
+      <div className="h-fit lg:hidden xl:hidden md:flex xs:hidden" ref={sidebarRef}>
+        <Sidebar
+          theme={themeMode}
+          open={open}
+          onClose={() => setOpen(false)}
+          isMobile={isMobile}
+        />
+      </div>
 
       <div
         className={`h-full w-full overflow-x-hidden ${
@@ -133,7 +129,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
         }`}
       >
         <main
-          className={`h-fit mx-auto w-full px-2 md:px-3 lg:px-4 overflow-x-hidden ${
+          className={`h-fit mx-auto w-full overflow-x-hidden ${
             data
               ? "mt-7"
               : router === "/" || router.startsWith("/promotions/detail/")
@@ -150,7 +146,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
             <></>
           )}
 
-          <div className="h-full">{children}</div>
+          <div className="h-full ">{children}</div>
 
           {themeMode === "dark" ? (
             <Image

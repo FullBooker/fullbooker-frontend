@@ -38,7 +38,7 @@ const PasswordResetSuccessfullModal: FC<
 
       <div className="text-center mt-20">
         <button
-          className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md hover:opacity-3"
+          className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
           onClick={() => setActiveModal(ModalID.login)}
         >
           Sign In

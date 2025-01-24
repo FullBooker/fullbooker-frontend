@@ -79,16 +79,6 @@ const EmailOtpVerificationModalContent: FC<
     verifyOTP({ identifier, otp } as VerifyOTPPayload);
   };
 
-  useEffect(() => {
-    if (
-      type === NotificationType.success &&
-      message?.includes("Your phone number has been verified successfully")
-    ) {
-      router.push("/login");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, message]);
-
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
@@ -103,7 +93,7 @@ const EmailOtpVerificationModalContent: FC<
           <h2 className="text-sm font-semibold">Reset your password</h2>
         </div>
         <div className="flex justify-center">
-          <h2 className="text-sm font-thin border-b-2 border-primary w-[70%]">
+          <h2 className="text-sm font-thin border-b-2 border-darkOrange w-[70%]">
             An OTP code has been sent to $
             {hideMiddleCharacters(identifierToBeVerified)}
           </h2>

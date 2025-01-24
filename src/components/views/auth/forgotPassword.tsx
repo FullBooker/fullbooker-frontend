@@ -11,7 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
 import { ModalID } from "@/domain/components";
 import { RequestOTPPayload } from "@/domain/dto/input";
-import { MailOpen, Phone } from "lucide-react";
+import { ArrowRight, ChevronRight, Mail, Phone } from "lucide-react";
 
 type ForgotPasswordModalContentProps = {
   loading: boolean;
@@ -83,16 +83,15 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text-sm font-semibold border-b-2 border-primary ">
-            Input the email or phone number used during registration to reset
-            your password{" "}
+          <h2 className="text-sm font-semibold border-b-2 border-darkOrange">
+            Reset your password
           </h2>
         </div>
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
-          <div onClick={() => setValue("otp_method", "email")}>
+          {watch("otp_method") === "email" && (
             <Controller
               name="email"
               control={control}
@@ -106,14 +105,14 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   value={value}
                   error={errors?.email?.message}
                   icon={
-                    <MailOpen className="w-4 h-4 text-gray-500 fill-gray-500" />
+                    <Mail className="w-4 h-4 text-white fill-gray-500" />
                   }
                 />
               )}
             />
-          </div>
+          )}
 
-          <div onClick={() => setValue("otp_method", "phone")}>
+          {watch("otp_method") === "phone" && (
             <Controller
               name="phone_number"
               control={control}
@@ -127,14 +126,29 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   value={value}
                   error={errors?.phone_number?.message}
                   icon={
-                    <Phone className="w-4 h-4 text-gray-500 fill-gray-500" />
+                    <Phone className="w-4 h-4 text-white fill-gray-500" />
                   }
                 />
               )}
             />
-          </div>
+          )}
 
-          <div className="text-center"></div>
+          <div
+            className="text-center flex justify-center items-center cursor-pointer underline text-blue-500"
+            onClick={() =>
+              setValue(
+                "otp_method",
+                watch("otp_method") === "phone" ? "email" : "phone"
+              )
+            }
+          >
+            <p className="font-thin text-sm">
+              Use {""}
+              {watch("otp_method") === "phone"
+                ? "email address"
+                : "phone number"} instead?
+            </p>
+          </div>
         </div>
 
         <div className="mt-20 text-center">

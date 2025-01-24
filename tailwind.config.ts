@@ -53,6 +53,7 @@ const config = {
         lightRedColor: 'hsl(var(--light-red-color))',
         greenColor: 'hsl(var(--green-color))',
         footerTextColor: "hsl(var(--footer-link))",
+        darkOrange: "#AE4808",
 
         cardColor: "hsl(var(--card-color))",
         inputBorderColor: "hsl(var(--input-border-color))",

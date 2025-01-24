@@ -69,9 +69,9 @@ const FormInputAuth: React.FC<FormInputAuthProps> = ({
             onClick={togglePasswordVisibility}
           >
             {showPassword ? (
-              <EyeOff className="w-2 h-5 sm:w-3 sm:h-6 lg:w-3 lg:h-7 xl:w-5 xl:h-8 text-primary" />
+              <EyeOff className="w-4 h-4 text-primary" />
             ) : (
-              <Eye className="w-2 h-5 sm:w-3 sm:h-6 lg:w-3 lg:h-7 xl:w-5 xl:h-8a text-primary" />
+              <Eye className="w-4 h-4 text-primary" />
             )}
           </div>
         )}

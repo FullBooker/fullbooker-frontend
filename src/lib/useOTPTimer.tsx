@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const useOtpTimer = () => {
-  const [timer, setTimer] = useState(300); // Initial timer value: 5 minutes
+  const [timer, setTimer] = useState(120); // Initial timer value: 5 minutes
   const [timerDisplay, setTimerDisplay] = useState("");
   const [isResendDisabled, setIsResendDisabled] = useState(true);
 
@@ -40,7 +40,7 @@ const useOtpTimer = () => {
   }, [timer]);
 
   const handleResendClick = () => {
-    setTimer(300); // Reset the timer to 5 minutes
+    setTimer(120); // Reset the timer to 5 minutes
     setIsResendDisabled(true); // Disable the button again
   };
 

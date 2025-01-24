@@ -6,7 +6,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className=" bottom-0 w-full bg-white">
+    <footer className=" bottom-0 w-full bg-white flex justify-center">
       <div className="max-w-[1200px] px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description Column */}
@@ -24,19 +24,19 @@ const Footer = () => {
               Ticket booking made easier and simpler
             </p>
             <div className="flex gap-4 mt-4">
-              <Link href="#" className="text-gray-400 hover:text-mainColor">
+              <Link href="#" className="text-primary hover:text-mainColor">
                 <Facebook className="w-5 h-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-mainColor">
+              <Link href="#" className="text-primary hover:text-mainColor">
                 <Twitter className="w-5 h-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-mainColor">
+              <Link href="#" className="text-primary hover:text-mainColor">
                 <Instagram className="w-5 h-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-mainColor">
+              <Link href="#" className="text-primary hover:text-mainColor">
                 <Linkedin className="w-5 h-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-mainColor">
+              <Link href="#" className="text-primary hover:text-mainColor">
                 <Youtube className="w-5 h-5" />
               </Link>
             </div>
@@ -112,14 +112,16 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-600">
-              Copyright © 2024 BRIX Templates | All Rights Reserved
+            <p className="text-sm text-black">
+              Copyright © {new Date().getFullYear()} Fullbooker
             </p>
-            <div className="flex gap-4">
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+            <div className="flex gap-3">
+              <p className="text-sm text-black">All Rights Reserved |</p>
+              <Link href="#" className="text-sm text-blue-500 hover:text-mainColor underline">
                 Terms and Conditions
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <p className="text-sm text-black">|</p>
+              <Link href="#" className="text-sm text-blue-500 hover:text-mainColor underline">
                 Privacy Policy
               </Link>
             </div>

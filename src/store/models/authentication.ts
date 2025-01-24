@@ -142,16 +142,16 @@ export const authentication = createModel<RootModel>()({
       const autToken = getToken();
       try {
         dispatch.authentication.setAuthStatusLoggedOut();
-        const response: any = await postRequest(
-          "/api/v1/user/auth/logout",
-          credentials
-        );
-        if (response && response?.data?.success) {
+        // const response: any = await postRequest(
+        //   "/api/v1/user/auth/logout",
+        //   credentials
+        // );
+        // if (response && response?.data?.success) {
           removeToken();
           localStorage.removeItem("authData");
-        } else {
-          dispatch.alert.setFailureAlert(response?.data?.message);
-        }
+        // } else {
+        //   dispatch.alert.setFailureAlert(response?.data?.message);
+        // }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
       } finally {

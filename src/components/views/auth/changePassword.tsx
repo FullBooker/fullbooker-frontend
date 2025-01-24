@@ -83,8 +83,8 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text-sm font-semibold border-b-2 border-primary w-[50%]">
-            Please enter a new password bellow
+          <h2 className="text-sm font-semibold border-b-2 border-darkOrange w-[50%]">
+            Please enter a new password below
           </h2>
         </div>
       </div>
@@ -105,8 +105,9 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 value={value}
                 error={errors?.password?.message}
                 icon={
-                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
                 }
+                is_password={true}
               />
             )}
           />
@@ -125,8 +126,9 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 value={value}
                 error={errors?.confirm_password?.message}
                 icon={
-                  <KeyRound className="w-4 h-4 text-gray-500 fill-gray-500" />
+                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
                 }
+                is_password={true}
               />
             )}
           />
@@ -135,7 +137,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
         <div className="text-center mt-20">
           <button
             type="submit"
-            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] bg-primary  text-white py-2 rounded-md hover:opacity-3"
+            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md hover:opacity-3"
           >
             {loading ? <CircularProgress size={18} color="inherit" /> : "Save"}
           </button>
