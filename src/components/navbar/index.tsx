@@ -51,6 +51,7 @@ import BottomNavBar from "../bottomNavbar";
 import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
+import { SwitchToHostPayload } from "@/domain/dto/input";
 
 type NavbarProps = {
   openNav: boolean;
@@ -65,6 +66,7 @@ type NavbarProps = {
   showBalance: boolean;
   toggleBalanceVisibility: (showBalance: boolean) => void;
   setActiveModal: (modalId: ModalID) => void;
+  switchToHost: (payload: SwitchToHostPayload) => void;
 };
 
 const Navbar: FC<NavbarProps> = ({
@@ -80,6 +82,7 @@ const Navbar: FC<NavbarProps> = ({
   showBalance,
   toggleBalanceVisibility,
   setActiveModal,
+  switchToHost,
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -127,7 +130,7 @@ const Navbar: FC<NavbarProps> = ({
         }`}
       >
         <div className="flex justify-between">
-        <div
+          <div
             className={`flex flex-col xl:hidden px-[10px] py-[12px] md:px-3 md:py-[14px] sm:me-3 justify-center items-center ${
               themeMode === "light"
                 ? "border-[1px] border-strokeColor2"
@@ -139,7 +142,7 @@ const Navbar: FC<NavbarProps> = ({
               <Tally3 className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
             </div>
           </div>
-        <Link href="/" className="">
+          <Link href="/" className="">
             <div className="sm:flex xs:flex lg:hidden md:hidden xl:hidden ">
               <Image
                 src="/assets/logo.svg"
@@ -150,185 +153,210 @@ const Navbar: FC<NavbarProps> = ({
             </div>
             <div className="hidden xl:flex md:flex lg:flex">
               <Image
-               src="/assets/logo.svg"
-                alt="Fullbooker Logo"  
+                src="/assets/logo.svg"
+                alt="Fullbooker Logo"
                 width={238}
                 height={39.29}
               />
             </div>
           </Link>
-         
         </div>
         <div className="hidden items-center lg:flex">
           <ul className="flex justify-between">
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm  font-medium transition-opacity duration-300 hover:opacity-4 text-black">
-              Activities  
+              <Link
+                href="/main-menu/promotions"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm  font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+              >
+                Activities
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
-              Events  
+              <Link
+                href="/main-menu/promotions"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+              >
+                Events
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
-              Experiences  
+              <Link
+                href="/main-menu/promotions"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+              >
+                Experiences
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
-              Workshops  
+              <Link
+                href="/main-menu/promotions"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+              >
+                Workshops
               </Link>
             </li>
             <li>
-              <Link href="/main-menu/promotions" className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black">
-              Coorprate Clubs  
+              <Link
+                href="/main-menu/promotions"
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+              >
+                Coorprate Clubs
               </Link>
             </li>
           </ul>
-          </div>
+        </div>
         <div className="flex items-center gap-1">
-          {!authToken && (
+          <div className="flex items-center gap-1">
             <div className="flex md:flex gap-2">
-              {/* <button
-                onClick={() => setActiveModal(ModalID.register)}
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor font-medium"
-              >
-                Become a Host
-                <UserPlus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-              </button> */}
               <button
-                onClick={() => setActiveModal(ModalID.login)}
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-primary text-black font-medium me-3"
+                onClick={() => {
+                  if (authToken) {
+                    switchToHost({
+                      user: authData?.user?.id,
+                    } as SwitchToHostPayload);
+                  } else {
+                    const newSearchParams = new URLSearchParams(
+                      searchParams.toString()
+                    );
+                    newSearchParams.set("user_flow", "vendor");
+                    router.push(`${pathname}?${newSearchParams.toString()}`);
+                    setActiveModal(ModalID.login);
+                  }
+                }}
+                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-secondary font-medium"
               >
-                Sign In
-                {/* <LogIn className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> */}
+                {loading ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : authToken ? (
+                  "Switch to hosting"
+                ) : (
+                  "Become a Host"
+                )}
               </button>
+              {!authToken && (
+                <button
+                  onClick={() => setActiveModal(ModalID.login)}
+                  className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-primary text-black font-medium me-3"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
-          )}
-          {/* Profile & Dropdown */}
-          {authToken && (
-            <Profile
-              button={
-                <div className="flex gap-1 lg:gap-3 justify-center content-center items-center cursor-pointer me-1 sm:me-1 xl:me-2">
-                  <div className="w-[37px] h-[37px] sm:w-10 sm:h-10 md:w-11 md:h-11 xl:w-11 xl:h-11 lg:w-10 lg:h-10 ">
-                    <CustomAvatar
-                      name={getInitials(
-                        `${authData?.user?.first_name} ${authData?.user?.last_name}`
-                      )}
-                    />
-                  </div>
-                  <div className="hidden md:block h-fit">
-                    <ChevronDown
-                      className={`${
-                        !openProfile ? "block" : "hidden"
-                      } w-5 h-fit lg:w-6 lg:h-6 xl:w-7 xl:h-7`}
-                    />
-                    {openProfile && (
-                      <ChevronUp className="w-5 h-fit lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
-                    )}
-                  </div>
-                </div>
-              }
-              openState={openProfile}
-              setOpenState={setOpenProfile}
-              classNames={
-                "py-2 top-[44px] -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[140px] lg:top-[54px] lg:-left-[130px] xl:top-[56px] xl:-left-[105px] w-max"
-              }
-            >
-              <div
-                className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
-                  themeMode === "light"
-                    ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
-                    : "border-[1px] border-inputBorderColor"
-                }`}
-              >
-                <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center">
-                  {authToken && (
-                    <>
-                      <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
-                        {authData?.user?.phone_number && (
-                          <span className="text-[13px] sm:text-base lg:text-lg">
-                            {`${hideMiddleCharacters(authData?.user?.phone_number)}`}
-                          </span>
+            {/* Profile & Dropdown */}
+            {authToken && (
+              <Profile
+                button={
+                  <div className="flex gap-1 lg:gap-3 justify-center content-center items-center cursor-pointer me-1 sm:me-1 xl:me-2 ml-2">
+                    <div className="w-[37px] h-[37px] sm:w-10 sm:h-10 md:w-11 md:h-11 xl:w-11 xl:h-11 lg:w-10 lg:h-10 ">
+                      <CustomAvatar
+                        name={getInitials(
+                          `${authData?.user?.first_name} ${authData?.user?.last_name}`
                         )}
-                        <span
-                          className={`text-[11px] sm:text-sm ${
-                            themeMode === "light"
-                              ? "text-textColor2"
-                              : "text-textColor"
-                          }`}
-                        >
-                          {authData?.user?.first_name
-                            ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
-                            : ""}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                  <div className="w-full flex flex-col gap-2 sm:gap-3">
-                    <ProfileItem
-                      theme={themeMode}
-                      icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      text="View My Profile"
-                      href={
-                        authToken
-                          ? "/profile"
-                          : `/login?redirect=${pathname?.slice(1)}`
-                      }
-                      onItemClick={handleCloseLink}
-                    />
-                    
+                      />
+                    </div>
                   </div>
-                  <div className="-mt-1 -mb-1 h-[1.5px] w-full bg-gray-200 dark:bg-white/20 " />
-                  <div className="flex flex-col gap-3 w-full hover:opacity-40">
-                    {authToken ? (
-                      <button
-                        className={`w-full flex items-center justify-between gap-2 py-[10px] px-[8px] sm:py-[14px] sm:px-[12px] rounded-[10px] sm:rounded-[15px] ${
-                          themeMode === "light"
-                            ? ""
-                            : "border-[1.5px] border-inputBorderColor"
-                        } bg-gradient-to-br from-[#121211] to-[#21211F] hover:bg-gradient-to-bl`}
-                        onClick={() => sigOut()}
-                      >
-                        <span className="text-whiteColor text-[10px] sm:text-xs font-medium">
-                          {loading ? (
-                            <CircularProgress size={18} color="inherit" />
-                          ) : (
-                            "Logout"
-                          )}
-                        </span>
-                        <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-whiteColor" />
-                      </button>
-                    ) : (
+                }
+                openState={openProfile}
+                setOpenState={setOpenProfile}
+                classNames={
+                  "py-2 top-[44px] -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[180px] lg:top-[54px] lg:-left-[180px] xl:top-[56px] xl:-left-[180px] w-max"
+                }
+              >
+                <div
+                  className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
+                    themeMode === "light"
+                      ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
+                      : "border-[1px] border-inputBorderColor"
+                  }`}
+                >
+                  <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center">
+                    {authToken && (
                       <>
-                        <ButtonAuth
-                          type="submit"
-                          onClick={() =>
-                            router.push(`/login?redirect=${pathname?.slice(1)}`)
-                          }
-                        >
-                          Login
-                        </ButtonAuth>
-                        <ButtonAuth
-                          type="submit"
-                          onClick={() =>
-                            router.push(
-                              `/register?redirect=${pathname?.slice(1)}`
-                            )
-                          }
-                        >
-                          Sign Up
-                        </ButtonAuth>
+                        <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
+                          {authData?.user?.phone_number && (
+                            <span className="text-[13px] sm:text-base lg:text-lg">
+                              {`${hideMiddleCharacters(
+                                authData?.user?.phone_number
+                              )}`}
+                            </span>
+                          )}
+                          <span
+                            className={`text-[11px] sm:text-sm ${
+                              themeMode === "light"
+                                ? "text-textColor2"
+                                : "text-textColor"
+                            }`}
+                          >
+                            {authData?.user?.first_name
+                              ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+                              : ""}
+                          </span>
+                        </div>
                       </>
                     )}
+                    <div className="w-full flex flex-col gap-2 sm:gap-3">
+                      <ProfileItem
+                        theme={themeMode}
+                        icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5" />}
+                        text="View My Profile"
+                        href={
+                          authToken
+                            ? "/profile"
+                            : `/login?redirect=${pathname?.slice(1)}`
+                        }
+                        onItemClick={handleCloseLink}
+                      />
+                    </div>
+                    <div className="-mt-1 -mb-1 h-[1.5px] w-full bg-gray-200 dark:bg-white/20 " />
+                    <div className="flex flex-col gap-3 w-full hover:opacity-40">
+                      {authToken ? (
+                        <button
+                          className={`w-full flex items-center justify-between gap-2 py-[10px] px-[8px] sm:py-[14px] sm:px-[12px] rounded-[10px] sm:rounded-[15px] ${
+                            themeMode === "light"
+                              ? ""
+                              : "border-[1.5px] border-inputBorderColor"
+                          } bg-gradient-to-br from-[#121211] to-[#21211F] hover:bg-gradient-to-bl`}
+                          onClick={() => sigOut()}
+                        >
+                          <span className="text-whiteColor text-[10px] sm:text-xs font-medium">
+                            {loading ? (
+                              <CircularProgress size={18} color="inherit" />
+                            ) : (
+                              "Logout"
+                            )}
+                          </span>
+                          <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-whiteColor" />
+                        </button>
+                      ) : (
+                        <>
+                          <ButtonAuth
+                            type="submit"
+                            onClick={() =>
+                              router.push(
+                                `/login?redirect=${pathname?.slice(1)}`
+                              )
+                            }
+                          >
+                            Login
+                          </ButtonAuth>
+                          <ButtonAuth
+                            type="submit"
+                            onClick={() =>
+                              router.push(
+                                `/register?redirect=${pathname?.slice(1)}`
+                              )
+                            }
+                          >
+                            Sign Up
+                          </ButtonAuth>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Profile>
-          )}
-          {/* <div
+              </Profile>
+            )}
+            {/* <div
             className={`flex items-center px-[10px] py-[10px] md:px-3 md:py-3 ${
               themeMode === "light"
                 ? "border-[1px] border-strokeColor2"
@@ -344,6 +372,7 @@ const Navbar: FC<NavbarProps> = ({
               <SunMedium className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
             )}
           </div> */}
+          </div>
         </div>
       </div>
     </div>
@@ -362,7 +391,10 @@ const mapDispatchToProps = (dispatch: any) => ({
   getUserProfile: () => dispatch.profile.getUserProfile(),
   toggleBalanceVisibility: (showBalance: boolean) =>
     dispatch.profile.toggleBalanceVisibility(showBalance),
-  setActiveModal: (modalId: ModalID) => dispatch.components.setActiveModal(modalId)
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
+  switchToHost: (payload: SwitchToHostPayload) =>
+    dispatch.authentication.switchToHost(payload),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

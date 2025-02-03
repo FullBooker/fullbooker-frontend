@@ -1,3 +1,5 @@
+import { MediaType } from "../constants";
+
 export type NewUserPayload = {
   phone_number: string;
   email: string;
@@ -52,3 +54,69 @@ export type UpdateUserProfilePayload = {
   city: string | null;
   address: string | null;
 };
+
+export type SwitchToHostPayload = {
+  user: string;
+};
+
+export type NewProductPayload = {
+  id?: string;
+  product?: string;
+  active: boolean;
+  name: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  locations: Array<any>
+};
+
+export type UpdateProductPayload = {
+  id: string;
+  active: boolean;
+  name: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+};
+
+export type VendorProductsFilters = {
+  page: number;
+  limit: number;
+};
+
+export type ProductMediaPayload = {
+  media_type: MediaType;
+  file: any;
+  product_id: string;
+};
+
+export type AddProductLocationPayload = {
+  product: string;
+  lat: number;
+  long: number;
+};
+
+export type UpdateProductLocationPayload = {
+  product: string;
+  lat: number;
+  long: number;
+};
+
+export interface OpenDay {
+  day: string;
+  opening_at: string;
+  closing_at: string;
+}
+
+interface ClosedDate {
+  date: string;
+}
+
+export interface ProductAvailabilityPayload {
+  product: string;
+  start: string;
+  end: string;
+  duration: number;
+  open_days: OpenDay[];
+  closed_dates?: ClosedDate[];
+}

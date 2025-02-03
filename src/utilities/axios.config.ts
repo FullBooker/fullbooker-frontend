@@ -4,7 +4,7 @@ import { store } from "../store";
 
 //Create axios instance
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_API_BASE_URL || "https://fullbooker-dev-be-sm.nbh4jqg707y8y.eu-central-1.cs.amazonlightsail.com",
+  baseURL: process.env.NEXT_API_BASE_URL || "https://api.dev.fullbooker.co.ke",
   timeout: 10000,
   withCredentials: false,
 });
@@ -19,7 +19,7 @@ axiosClient.interceptors.response.use(
       return Promise.reject({
         status: error.response?.status,
         message: error.response?.data?.message || error.message,
-        data: error.response?.data
+        data: error.response?.data,
       });
     }
   }
@@ -34,74 +34,60 @@ export const axiosRequests = {
 
 //Set up axios verbs
 export async function getRequest(URL: string) {
-  const response = await axiosClient.get(
-    URL,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: authHeader(),
-      },
-    }
-  );
+  const response = await axiosClient.get(URL, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: authHeader(),
+    },
+  });
   return response;
 }
 
-export async function postRequest(URL: string, payload: any) {
-  const response = await axiosClient.post(
-    URL,
-    payload,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: authHeader(),
-      },
-    }
-  );
+export async function postRequest(
+  URL: string,
+  payload: any,
+  hasFile?: boolean
+) {
+  const response = await axiosClient.post(URL, payload, {
+    headers: {
+      "Content-Type": hasFile ? "multipart/form-data" : "application/json",
+      Accept: "application/json",
+      Authorization: authHeader(),
+    },
+  });
   return response;
 }
 
 export async function patchRequest(URL: string, payload: any) {
-  const response = await axiosClient.patch(
-    URL,
-    payload,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: authHeader(),
-      },
-    }
-  );
+  const response = await axiosClient.patch(URL, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: authHeader(),
+    },
+  });
   return response;
 }
 
 export async function putRequest(URL: string, payload: any) {
-  const response = await axiosClient.put(
-    URL,
-    payload,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: authHeader(),
-      },
-    }
-  );
+  const response = await axiosClient.put(URL, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: authHeader(),
+    },
+  });
   return response;
 }
 
 export async function deleteRequest(URL: string) {
-  const response = await axiosClient.delete(
-    URL,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: authHeader(),
-      },
-    }
-  );
+  const response = await axiosClient.delete(URL, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: authHeader(),
+    },
+  });
   return response;
 }

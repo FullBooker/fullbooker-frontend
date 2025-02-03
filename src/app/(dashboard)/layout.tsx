@@ -18,16 +18,25 @@ import PhoneOtpVerificationModalContent from "@/components/views/auth/phoneOTPVe
 import ChangePasswordModalContent from "@/components/views/auth/changePassword";
 import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVerification";
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
+import { NotificationType } from "@/domain/notification";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
   modalId: ModalID;
+  message: String;
+  type: NotificationType;
 };
 
-const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
+const DashboardLayout: FC<DashboardLayoutProps> = ({
+  children,
+  modalId,
+  message,
+  type,
+}) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = usePathname();
+  const navigation = useRouter();
   const { theme = "light" } = useTheme();
   const [data, setData] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState("light");
@@ -107,10 +116,32 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
     setThemeMode(theme);
   }, [theme]);
 
+  useEffect(() => {
+    const flow = searchParams.get("user_flow");
+    if (
+      flow &&
+      flow === "vendor" &&
+      type === NotificationType.success &&
+      message === "Switched to hosting successfully!"
+    ) {
+      navigation.push("/vendor");
+    }
+
+    if (
+      type === NotificationType.success &&
+      message === "Switched to hosting successfully!"
+    ) {
+      navigation.push("/vendor");
+    }
+  }, [message, type]);
+
   return (
     <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
       {/* Sidebar */}
-      <div className="h-fit lg:hidden xl:hidden md:flex xs:hidden" ref={sidebarRef}>
+      <div
+        className="h-fit lg:hidden xl:hidden md:flex xs:hidden"
+        ref={sidebarRef}
+      >
         <Sidebar
           theme={themeMode}
           open={open}
@@ -217,8 +248,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, modalId }) => {
 };
 
 const mapStateToProps = (state: RootState) => {
+  const { message, type } = state.alert;
   const { modalId } = state.components;
-  return { modalId };
+  return { modalId, message, type };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({});

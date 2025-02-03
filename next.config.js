@@ -6,6 +6,7 @@ const nextConfig = {
     domains: [
       "int.onlyplay.net",
       "mowinbet-file-storage.s3.af-south-1.amazonaws.com",
+      "dev-fullbooker-static.s3.amazonaws.com"
     ],
   },
   eslint: {
