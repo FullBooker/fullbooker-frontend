@@ -29,7 +29,7 @@ jobs:
               env:
                 REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                 REPOSITORY: fullbooker/frontend
-                IMAGE_TAG: ${{ github.sha }}
+                IMAGE_TAG: 'latest'
               run: |
                 sed -i -e "s#{{NEXT_API_BASE_URL}}#${{ vars.DEV_NEXT_API_BASE_URL }}#" .github/workflows/lightsail_config.json
                 sed -i -e "s#{{IMAGE}}#$REGISTRY/$REPOSITORY:$IMAGE_TAG#" .github/workflows/lightsail_config.json
@@ -38,7 +38,7 @@ jobs:
               env:
                 REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                 REPOSITORY: fullbooker/frontend
-                IMAGE_TAG: ${{ github.sha }}
+                IMAGE_TAG: 'latest'
               run: |
                 docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
                 docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
