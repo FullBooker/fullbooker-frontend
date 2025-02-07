@@ -35,12 +35,12 @@ const defaultValues = {
   password: "",
 };
 
-interface FormData {
+export interface FormData {
   phone_number: string;
   password: string;
 }
 
-const schema = yup.object().shape({
+export const schema = yup.object().shape({
   phone_number: yup
     .string()
     .min(10, "Phone number must be atleast 10 digits")

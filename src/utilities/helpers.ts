@@ -47,3 +47,8 @@ export const getInitials = (string: string) =>
   string
     ?.split(/\s/)
     .reduce((response, word) => (response += word.slice(0, 1)), "");
+
+export const getQueryParam = (param: string): string | null => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+};

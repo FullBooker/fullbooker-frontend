@@ -8,12 +8,14 @@ export const saveToken = (token: string, maxAgeInSeconds: number): void => {
   // Encrypt the token using AES encryption
   const encryptedToken = encryptToken(token, ENCRYPTION_SECRET);
   // Calculate the expiration time in days
-  const maxAgeInDays = Math.ceil(maxAgeInSeconds / (60 * 60 * 24));
+  const maxAgeInMinutes = Math.ceil(maxAgeInSeconds / 60);
+  const maxAgeIn15MinIntervals = Math.ceil(maxAgeInMinutes / 15);
+
   // Store the encrypted token in a secure cookie //chnage to true in production
   // remember this Dun
   Cookies.set(TOKEN_KEY, encryptedToken.toString(), {
     secure: process.env.NODE_ENV === "development" ? false : true,
-    expires: maxAgeInDays,
+    expires: maxAgeIn15MinIntervals,
   });
 };
 

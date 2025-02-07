@@ -1,0 +1,232 @@
+import { VendorDetails } from "@/domain/dto/output";
+import type { RootModel } from ".";
+import { createModel } from "@rematch/core";
+import {
+  AddProductLocationPayload,
+  NewProductPayload,
+  ProductAvailabilityPayload,
+  ProductMediaPayload,
+  UpdateProductLocationPayload,
+  UpdateProductPayload,
+  VendorProductsFilters,
+} from "@/domain/dto/input";
+import { MediaType, ProductType, ViewType } from "@/domain/constants";
+import {
+  buildQueryString,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "@/utilities";
+import { Product, ProductMedia } from "@/domain/product";
+
+type VendorState = {
+  vendorDetails: VendorDetails;
+  newProduct: NewProductPayload | null;
+  activeStep: number;
+  vendorProducts: Array<Product>;
+  productPageViewType: ViewType;
+  productType: ProductType;
+  productMedia: Array<ProductMedia>;
+};
+
+export const vendor = createModel<RootModel>()({
+  state: {
+    vendorDetails: {} as VendorDetails,
+    newProduct: null,
+    activeStep: 0,
+    vendorProducts: [],
+    productPageViewType: ViewType.productsListView,
+    productType: ProductType.default,
+    productMedia: [],
+  } as VendorState,
+  reducers: {
+    setVendorDetails(state: VendorState, vendorDetails: VendorDetails) {
+      return {
+        ...state,
+        vendorDetails,
+      };
+    },
+    setNewProductDetails(state: VendorState, newProduct: NewProductPayload) {
+      return {
+        ...state,
+        newProduct,
+      };
+    },
+    setActiveStep(state: VendorState, activeStep: number) {
+      return {
+        ...state,
+        activeStep,
+      };
+    },
+    setVendorProducts(state: VendorState, vendorProducts: Array<Product>) {
+      return {
+        ...state,
+        vendorProducts,
+      };
+    },
+    setProductPageViewType(state: VendorState, productPageViewType: ViewType) {
+      return {
+        ...state,
+        productPageViewType,
+      };
+    },
+    setProductType(state: VendorState, productType: ProductType) {
+      return {
+        ...state,
+        productType,
+      };
+    },
+    setProductMedia(state: VendorState, productMedia: Array<ProductMedia>) {
+      return {
+        ...state,
+        productMedia,
+      };
+    },
+  },
+  effects: (dispatch: any) => ({
+    async registerProduct(payload: NewProductPayload, rootState) {
+      try {
+        const response: any = await postRequest("/products/", payload);
+        if (response && response?.data) {
+          const previousStep = rootState.vendor.activeStep;
+          dispatch.vendor.setNewProductDetails(response?.data);
+          dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async updateProduct(payload: UpdateProductPayload, rootState) {
+      try {
+        const response: any = await putRequest(
+          `/products/${payload?.id}/`,
+          payload
+        );
+        if (response && response?.data) {
+          const previousStep = rootState.vendor.activeStep;
+          dispatch.vendor.setNewProductDetails(response?.data);
+          dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async getVendorProducts(payload: VendorProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload ? `/products/?${buildQueryString(payload)}` : "/products/"
+        );
+
+        if (response && response?.data) {
+          if (response?.data?.length > 0) {
+            dispatch.vendor.setProductPageViewType(ViewType.productsListView);
+          }
+          dispatch.vendor.setVendorProducts(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getVendorProductById(id: string, rootState) {
+      try {
+        const response: any = await getRequest(`/products/${id}/`);
+
+        if (response && response?.data) {
+          dispatch.vendor.setNewProductDetails(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async uploadProductMedia(payload: ProductMediaPayload, rootState) {
+      try {
+        const response: any = await postRequest("/media/", payload, true);
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product_id);
+          dispatch.vendor.getProductMedia(payload?.product_id);
+          dispatch.alert.setSuccessAlert(
+            `${
+              payload?.media_type === MediaType.image ? "Photo" : "Video"
+            } uploaded successfully!`
+          );
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async getProductMedia(productId: string, rootState) {
+      try {
+        const response: any = await getRequest(
+          `/media/?product_id=${productId}`
+        );
+        if (response && response?.data) {
+          dispatch.vendor.setProductMedia(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async addProductLocation(payload: AddProductLocationPayload, rootState) {
+      try {
+        const response: any = await postRequest("/location/", payload);
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product location added successfully!"
+          );
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async updateProductLocation(
+      payload: UpdateProductLocationPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await putRequest(
+          `/location/${payload?.product}/`,
+          payload
+        );
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product location updated successfully!"
+          );
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async addProductAvailability(
+      payload: ProductAvailabilityPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await postRequest("/availability/", payload);
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product availability added successfully!"
+          );
+          const previousStep = rootState.vendor.activeStep;
+          dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+  }),
+});

@@ -1,11 +1,12 @@
 import { AuthData } from "@/domain/dto/output";
 import type { RootModel } from ".";
-import { postRequest, putRequest } from "../../utilities";
+import { getQueryParam, postRequest, putRequest } from "../../utilities";
 import {
   ForgotPasswordPayload,
   RequestOTPPayload,
   ResendPhoneOTPPayload,
   ResetPasswordPayload,
+  SwitchToHostPayload,
   UpdatePasswordPayload,
   VerifyOTPPayload,
   VerifyPhoneOTPPayload,
@@ -88,6 +89,12 @@ export const authentication = createModel<RootModel>()({
           }
           dispatch.alert.setSuccessAlert(response?.data?.message);
           dispatch.components.setActiveModal(ModalID.none);
+          const flow = getQueryParam("user_flow");
+          if (flow && flow === "vendor") {
+            dispatch.authentication.switchToHost({
+              user: data?.user?.id,
+            } as SwitchToHostPayload);
+          }
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
@@ -128,6 +135,12 @@ export const authentication = createModel<RootModel>()({
               response?.data?.message || "Login successful!"
             );
             dispatch.components.setActiveModal(ModalID.none);
+            const flow = getQueryParam("user_flow");
+            if (flow && flow === "vendor") {
+              dispatch.authentication.switchToHost({
+                user: data?.user?.id,
+              } as SwitchToHostPayload);
+            }
           }
         } else {
           dispatch.alert.setFailureAlert("Incorrect password or email!");
@@ -147,8 +160,8 @@ export const authentication = createModel<RootModel>()({
         //   credentials
         // );
         // if (response && response?.data?.success) {
-          removeToken();
-          localStorage.removeItem("authData");
+        removeToken();
+        localStorage.removeItem("authData");
         // } else {
         //   dispatch.alert.setFailureAlert(response?.data?.message);
         // }
@@ -197,7 +210,9 @@ export const authentication = createModel<RootModel>()({
           dispatch.components.setActiveModal(ModalID.changePassword);
         }
       } catch (error: any) {
-        dispatch.alert.setFailureAlert(error?.data?.non_field_errors ||error?.message);
+        dispatch.alert.setFailureAlert(
+          error?.data?.non_field_errors || error?.message
+        );
       }
     },
     async resetPassword(payload: ChangePasswordPayload, rootState) {
@@ -214,6 +229,19 @@ export const authentication = createModel<RootModel>()({
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async switchToHost(payload: SwitchToHostPayload, rootState) {
+      try {
+        const response: any = await postRequest("/hosts/", payload);
+        if (response && response?.data) {
+          dispatch.vendor.setVendorDetails(response?.data);
+          dispatch.alert.setSuccessAlert("Switched to hosting successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.non_field_errors || error?.message
+        );
       }
     },
   }),
