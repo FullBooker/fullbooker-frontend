@@ -48,23 +48,32 @@ const LocationSearch: FC<LocationSearchProps> = ({
     });
   };
   useEffect(() => {
-    const apiKey =
-      (process.env.NEXT_API_GOOGLE_MAPS_API_KEY as string);
+    const apiKey = process.env.NEXT_API_GOOGLE_MAPS_API_KEY as string;
     loadGoogleMapsScript(apiKey).then(() => {
       if (window.google) {
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        const autocompleteInstance = new window.google.maps.places.Autocomplete(
           document.getElementById("autocomplete"),
           {
             types: ["geocode"],
           }
         );
-        autocompleteRef.current.addListener("place_changed", handlePlaceSelect);
+        autocompleteRef.current = autocompleteInstance;
+        autocompleteInstance.addListener("place_changed", handlePlaceSelect);
       }
     });
   }, []);
 
   const handlePlaceSelect = () => {
-    const place = autocompleteRef.current.getPlace();
+    const autocompleteInstance = new window.google.maps.places.Autocomplete(
+      document.getElementById("autocomplete") as HTMLInputElement,
+      {
+        types: ["geocode"],
+      }
+    );
+
+    autocompleteRef.current = autocompleteInstance;
+
+    const place = autocompleteInstance?.getPlace();
     if (place.geometry) {
       if (newProduct?.locations?.length === 0) {
         addProductLocation({
