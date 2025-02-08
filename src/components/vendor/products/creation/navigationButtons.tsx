@@ -1,4 +1,4 @@
-import { ProductType } from "@/domain/constants";
+import { ProductType, ViewType } from "@/domain/constants";
 import { NewProductPayload } from "@/domain/dto/input";
 import { ProductCategory } from "@/domain/dto/output";
 import { RootState } from "@/store";
@@ -14,6 +14,7 @@ type NavigationButtonsProps = {
   disableNext?: boolean;
   productCategories: Array<ProductCategory>;
   productType: ProductType;
+  setProductPageViewType: (viewType: ViewType) => void;
 };
 
 const NavigationButtons: FC<NavigationButtonsProps> = ({
@@ -24,6 +25,7 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
   disableNext,
   productCategories,
   productType,
+  setProductPageViewType,
 }) => {
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -33,12 +35,15 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
     setActiveStep(activeStep - 1);
   };
   return (
-    <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10">
+    <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10 mt-8 md:mt-4">
       <button
         type="button"
         className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-secondary text-black py-2 rounded-md mb-2 font-medium"
-        onClick={() => handleBack()}
-        disabled={activeStep === 0}
+        onClick={() =>
+          activeStep === 0
+            ? setProductPageViewType(ViewType.productsListView)
+            : handleBack()
+        }
       >
         Back
       </button>
@@ -74,6 +79,8 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
+  setProductPageViewType: (viewType: ViewType) =>
+    dispatch.vendor.setProductPageViewType(viewType),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationButtons);

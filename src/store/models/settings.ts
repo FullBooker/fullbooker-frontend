@@ -1,4 +1,9 @@
-import { DayOfWeek, ProductCategory, VendorDetails } from "@/domain/dto/output";
+import {
+  Currency,
+  DayOfWeek,
+  ProductCategory,
+  VendorDetails,
+} from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import { NewProductPayload } from "@/domain/dto/input";
@@ -7,12 +12,14 @@ import { getRequest } from "@/utilities";
 type SettingsState = {
   productCategories: Array<ProductCategory>;
   daysOfWeek: Array<DayOfWeek>;
+  currencies: Array<Currency>;
 };
 
 export const settings = createModel<RootModel>()({
   state: {
     productCategories: [],
     daysOfWeek: [],
+    currencies: [],
   } as SettingsState,
   reducers: {
     setProductCategories(
@@ -28,6 +35,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         daysOfWeek,
+      };
+    },
+    setCurrencies(state: SettingsState, currencies: Array<Currency>) {
+      return {
+        ...state,
+        currencies,
       };
     },
   },
@@ -49,6 +62,17 @@ export const settings = createModel<RootModel>()({
 
         if (response && response?.data) {
           dispatch.settings.setDaysOfWeek(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getCurrencies(payload, rootState) {
+      try {
+        const response: any = await getRequest("/currencies/");
+
+        if (response && response?.data) {
+          dispatch.settings.setCurrencies(response?.data);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

@@ -67,7 +67,13 @@ export type NewProductPayload = {
   description: string;
   category: string;
   subcategory?: string;
-  locations: Array<any>
+  locations: Array<any>;
+  availability?: {
+    start?: string;
+    end?: string;
+    start_time?: string;
+    end_time?: string;
+  };
 };
 
 export type UpdateProductPayload = {
@@ -115,8 +121,16 @@ interface ClosedDate {
 export interface ProductAvailabilityPayload {
   product: string;
   start: string;
+  start_time?: string;
+  end_time?: string;
   end: string;
   duration: number;
   open_days: OpenDay[];
   closed_dates?: ClosedDate[];
 }
+
+export type DeleteProductMediaPayload = {
+  file_id: any;
+  media_type: MediaType;
+  product_id: string;
+};

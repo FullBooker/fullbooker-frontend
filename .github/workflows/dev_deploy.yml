@@ -31,8 +31,8 @@ jobs:
                 REPOSITORY: fullbooker/frontend
                 IMAGE_TAG: 'latest'
               run: |
-                sed -i -e "s#{{NEXT_API_BASE_URL}}#${{ vars.DEV_NEXT_API_BASE_URL }}#" .github/workflows/lightsail_config.json
-                sed -i -e "s#{{NEXT_API_GOOGLE_MAPS_API_KEY}}#${{ vars.NEXT_API_GOOGLE_MAPS_API_KEY }}#" .github/workflows/lightsail_config.json
+                sed -i -e "s#{{NEXT_PUBLIC_API_BASE_URL}}#${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }}#" .github/workflows/lightsail_config.json
+                sed -i -e "s#{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}#${{ vars.NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY }}#" .github/workflows/lightsail_config.json
                 sed -i -e "s#{{IMAGE}}#$REGISTRY/$REPOSITORY:$IMAGE_TAG#" .github/workflows/lightsail_config.json
 
             - name: build, tag and push docker image to amazon ecr

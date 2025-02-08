@@ -5,7 +5,11 @@ import { RootState } from "@/store";
 import { connect } from "react-redux";
 import NavigationButtons from "./navigationButtons";
 import { Images, Video } from "lucide-react";
-import { NewProductPayload, ProductMediaPayload } from "@/domain/dto/input";
+import {
+  DeleteProductMediaPayload,
+  NewProductPayload,
+  ProductMediaPayload,
+} from "@/domain/dto/input";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,6 +23,7 @@ type ProductMediaProps = {
   uploadProductMedia: (payload: ProductMediaPayload) => void;
   productMedia: Array<ProductMedia>;
   getProductMedia: (productId: string) => void;
+  deleteProductMedia: (payload: DeleteProductMediaPayload) => void;
 };
 
 const ProductMediaComponent: FC<ProductMediaProps> = ({
@@ -27,6 +32,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
   uploadProductMedia,
   productMedia,
   getProductMedia,
+  deleteProductMedia,
 }) => {
   interface FormData {
     photos: string[];
@@ -75,23 +81,40 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
   };
 
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const videoUrl = URL.createObjectURL(file);
-      setVideo(videoUrl);
-      setValue("video", videoUrl);
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (!file.type.startsWith("video/")) {
+      alert("Please upload a valid video file.");
+      return;
     }
+
+    const videoUrl = URL.createObjectURL(file);
+    setVideo(videoUrl);
+    setValue("video", videoUrl);
+
+    uploadProductMedia({
+      product_id: newProduct?.id,
+      file,
+      media_type: MediaType.video,
+    } as ProductMediaPayload);
   };
 
-  const deletePhoto = (index: number) => {
-    const updatedPhotos = photos.filter((_, i) => i !== index);
-    setPhotos(updatedPhotos);
-    setValue("photos", updatedPhotos);
+  const deletePhoto = (id: string) => {
+    deleteProductMedia({
+      file_id: id,
+      media_type: MediaType.image,
+      product_id: newProduct?.id,
+    } as DeleteProductMediaPayload);
   };
 
-  const deleteVideo = () => {
-    setVideo(null);
-    setValue("video", "");
+  const deleteVideo = (id: string) => {
+    deleteProductMedia({
+      file_id: id,
+      media_type: MediaType.video,
+      product_id: newProduct?.id,
+    } as DeleteProductMediaPayload);
   };
 
   const onSubmit = (data: FormData) => {
@@ -141,7 +164,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                   </p>
                 </div>
               ) : (
-                <>
+                <div className="grid grid-cols-3 gap-1">
                   {productMedia
                     ?.filter(
                       (media: ProductMedia) =>
@@ -158,14 +181,14 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                         />
                         <button
                           type="button"
-                          onClick={() => deletePhoto(index)}
+                          onClick={() => deletePhoto(photo.id)}
                           className="absolute bottom-2 left-2 px-2 py-1 rounded-full text-xs text-center bg-white"
                         >
                           Delete Photo
                         </button>
                       </div>
                     ))}
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -214,7 +237,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                     />
                     <button
                       type="button"
-                      onClick={deleteVideo}
+                      onClick={() => deleteVideo(video?.id)}
                       className="absolute bottom-2 left-2 text-white bg-opacity-50 px-2 py-1 rounded text-xs"
                     >
                       Delete Video
@@ -247,6 +270,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.vendor.uploadProductMedia(payload),
   getProductMedia: (productId: string) =>
     dispatch.vendor.getProductMedia(productId),
+  deleteProductMedia: (payload: DeleteProductMediaPayload) =>
+    dispatch.vendor.deleteProductMedia(payload),
 });
 
 export default connect(

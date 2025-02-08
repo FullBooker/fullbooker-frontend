@@ -22,6 +22,9 @@ import { ProductCategory } from "@/domain/dto/output";
 import { Product } from "@/domain/product";
 import VendorProductsListView from "@/components/vendor/products/list";
 import { ProductType, ViewType } from "@/domain/constants";
+import { ModalID } from "@/domain/components";
+import UniversalModal from "@/components/modal/UniversalModal";
+import ContinueWithProductCreation from "@/components/vendor/products/shared/continue-with-creation";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 6,
@@ -47,6 +50,9 @@ export type NewProductPageProps = {
   getVendorProducts: (payload?: VendorProductsFilters) => void;
   productPageViewType: ViewType;
   productType: ProductType;
+  getProductCategories: () => void;
+  setActiveModal: (modalId: ModalID) => void;
+  modalId: ModalID;
 };
 
 const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
@@ -57,11 +63,21 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
   getVendorProducts,
   productPageViewType,
   productType,
+  getProductCategories,
+  setActiveModal,
+  modalId,
 }) => {
   const [filters, setFilters] = useState<VendorProductsFilters>({
     page: 1,
     limit: 10,
   });
+  const { theme = "light" } = useTheme();
+  const [data, setData] = useState<string | null>(null);
+  const [themeMode, setThemeMode] = useState("light");
+
+  useEffect(() => {
+    setThemeMode(theme);
+  }, [theme]);
 
   useEffect(() => {
     if (!activeStep) {
@@ -71,6 +87,11 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
 
   useEffect(() => {
     getVendorProducts();
+    getProductCategories();
+
+    if (newProduct) {
+      setActiveModal(ModalID.continueWithProductCreation);
+    }
   }, []);
 
   const getActiveStepContent = () => {
@@ -111,6 +132,13 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
       ) : (
         <VendorProductsListView />
       )}
+      {modalId === ModalID.continueWithProductCreation && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ContinueWithProductCreation />}
+        />
+      )}
     </div>
   );
 };
@@ -121,12 +149,14 @@ const mapStateToProps = (state: RootState) => {
   const { newProduct, activeStep, productPageViewType, productType } =
     state.vendor;
   const { productCategories } = state.settings;
+  const { modalId } = state.components;
   return {
     newProduct,
     activeStep,
     productCategories,
     productPageViewType,
     productType,
+    modalId,
   };
 };
 
@@ -134,6 +164,9 @@ const mapDispatchToProps = (dispatch: any) => ({
   setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
   getVendorProducts: (payload: VendorProductsFilters) =>
     dispatch.vendor.getVendorProducts(payload),
+  getProductCategories: () => dispatch.settings.getProductCategories(),
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
 });
 
 export default connect(

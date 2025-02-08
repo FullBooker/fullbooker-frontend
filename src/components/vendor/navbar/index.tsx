@@ -18,7 +18,7 @@ const Navbar: FC<NavbarProps> = ({ authData }) => {
     <div className="flex justify-between items-center px-1 py-2 md:px-6 md:py-3 lg:px-6 lg:py-3 xl:px-6 xl:py-3 bg-white shadow-sm">
       {/* Left Section */}
       <div className="flex items-center space-x-2">
-        <h1 className="text-lg font-medium me-3">HI {authData?.user?.first_name}</h1>
+        <h1 className="text-lg font-medium me-3">Hi {authData?.user?.first_name}</h1>
         <span className="text-gray-400 text-sm">» {formattedDate}</span>
       </div>
 
