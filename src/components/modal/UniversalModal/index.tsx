@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 import { X } from "lucide-react";
 
   type UniversalModalProps = {
-    theme: string | undefined;
+    theme?: string | undefined;
     title: string;
     description: string;
     type: "Deposit" | "Withdraw";

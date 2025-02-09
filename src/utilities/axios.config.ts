@@ -4,7 +4,7 @@ import { store } from "../store";
 
 //Create axios instance
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_API_BASE_URL || "https://api.dev.fullbooker.co.ke",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 10000,
   withCredentials: false,
 });
@@ -14,6 +14,7 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
+      store.dispatch.authentication.signOut({});
       return;
     } else {
       return Promise.reject({

@@ -51,15 +51,18 @@ import "react-loading-skeleton/dist/skeleton.css";
 import TablePaginationComponent from "@/components/ui/pagination";
 import { ModalID } from "@/domain/components";
 import VendorLayout from "./layout";
-import { withAuth } from '../../components/views/dash/authGuard';
-
+import { withAuth } from "../../components/views/dash/authGuard";
+import ComingSoon from "@/components/vendor/products/shared/coming-soon";
 
 type VendorPageProps = {
   isLoggedIn: boolean;
   setActiveModal: (modalId: ModalID) => void;
 };
 
-const VendorPage: FC<VendorPageProps> & {layout: any} = ({ isLoggedIn, setActiveModal }) => {
+const VendorPage: FC<VendorPageProps> & { layout: any } = ({
+  isLoggedIn,
+  setActiveModal,
+}) => {
   const { theme = "light" } = useTheme();
   const [themeMode, setThemeMode] = useState("light");
   const [api, setApi] = useState<CarouselApi>();
@@ -90,10 +93,14 @@ const VendorPage: FC<VendorPageProps> & {layout: any} = ({ isLoggedIn, setActive
     setThemeMode(theme);
   }, [theme]);
 
-  return <div className="flex flex-col h-fit bg-white"></div>;
+  return (
+    <div className="bg-white">
+      <ComingSoon />
+    </div>
+  );
 };
 
-VendorPage.layout = VendorLayout
+VendorPage.layout = VendorLayout;
 
 const mapStateToProps = (state: RootState) => {
   const { isLoggedIn } = state.authentication;
@@ -105,4 +112,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.components.setActiveModal(modalId),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withAuth(VendorPage));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withAuth(VendorPage));

@@ -3,6 +3,7 @@ import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import {
   AddProductLocationPayload,
+  DeleteProductMediaPayload,
   NewProductPayload,
   ProductAvailabilityPayload,
   ProductMediaPayload,
@@ -13,6 +14,7 @@ import {
 import { MediaType, ProductType, ViewType } from "@/domain/constants";
 import {
   buildQueryString,
+  deleteRequest,
   getRequest,
   postRequest,
   putRequest,
@@ -221,6 +223,24 @@ export const vendor = createModel<RootModel>()({
           );
           const previousStep = rootState.vendor.activeStep;
           dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async deleteProductMedia(payload: DeleteProductMediaPayload, rootState) {
+      try {
+        const response: any = await deleteRequest(`/media/${payload?.file_id}/`);
+        if (response) {
+          dispatch.vendor.getVendorProductById(payload?.product_id);
+          dispatch.vendor.getProductMedia(payload?.product_id);
+          dispatch.alert.setSuccessAlert(
+            `${
+              payload?.media_type === MediaType.image ? "Photo" : "Video"
+            } deleted successfully!`
+          );
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(

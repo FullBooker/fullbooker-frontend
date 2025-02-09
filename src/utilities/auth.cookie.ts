@@ -5,17 +5,12 @@ export const TOKEN_KEY = "fullbooker-auth";
 const ENCRYPTION_SECRET = "base64:ssrzj+9i94HpNXm0zgXyijec3DxbDdETLOCq7Xagyvo=";
 
 export const saveToken = (token: string, maxAgeInSeconds: number): void => {
-  // Encrypt the token using AES encryption
   const encryptedToken = encryptToken(token, ENCRYPTION_SECRET);
-  // Calculate the expiration time in days
-  const maxAgeInMinutes = Math.ceil(maxAgeInSeconds / 60);
-  const maxAgeIn15MinIntervals = Math.ceil(maxAgeInMinutes / 15);
+  const maxAgeInDays = maxAgeInSeconds / (60 * 60 * 24);
 
-  // Store the encrypted token in a secure cookie //chnage to true in production
-  // remember this Dun
   Cookies.set(TOKEN_KEY, encryptedToken.toString(), {
     secure: process.env.NODE_ENV === "development" ? false : true,
-    expires: maxAgeIn15MinIntervals,
+    expires: maxAgeInDays,
   });
 };
 

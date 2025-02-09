@@ -50,3 +50,12 @@ export interface DayOfWeek {
   active: boolean;
   name: string;
 }
+
+export interface Currency {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  active: boolean;
+  name: string;
+  code: string;
+}
