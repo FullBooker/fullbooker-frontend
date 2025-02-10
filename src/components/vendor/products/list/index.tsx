@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState } from "react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { VendorProductsFilters } from "@/domain/dto/input";
-import { Product } from "@/domain/product";
-import { ViewType } from "@/domain/constants";
+import { NewProductPayload, VendorProductsFilters } from "@/domain/dto/input";
+import { Product, ProductPricing } from "@/domain/product";
+import { ProductType, ViewType } from "@/domain/constants";
 import { ProductCategory } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
@@ -15,6 +15,9 @@ type VendorProductsListViewProps = {
   vendorProducts: Array<Product>;
   setProductPageViewType: (viewType: ViewType) => void;
   productCategories: Array<ProductCategory>;
+  setNewProductDetails: (payload: NewProductPayload) => void;
+  setActiveStep: (payload: number) => void;
+  setProductType: (payload: ProductType) => void;
 };
 
 const VendorProductsListView: FC<VendorProductsListViewProps> = ({
@@ -23,6 +26,9 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
   vendorProducts,
   setProductPageViewType,
   productCategories,
+  setNewProductDetails,
+  setActiveStep,
+  setProductType,
 }) => {
   const [filters, setFilters] = useState<VendorProductsFilters>({
     page: 1,
@@ -44,6 +50,19 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const handleViewOrEditProduct = (product: any) => {
+    setNewProductDetails(product);
+    setProductType(
+      productCategories
+        ?.find((category: ProductCategory) => category === product?.category)
+        ?.name?.includes("Event")
+        ? ProductType.event
+        : ProductType.others
+    );
+    setActiveStep(1);
+    setProductPageViewType(ViewType.onboardingView);
+  };
 
   return (
     <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
@@ -88,7 +107,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                     </h2>
                     <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                       <thead className="border">
-                        <tr className="text-left border-">
+                        <tr className="text-left border-b">
                           <th className="p-3 pl-0 border font-medium">
                             Tracking Number
                           </th>
@@ -117,13 +136,28 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                             )
                             .map((product: Product, idx: number) => (
                               <tr key={idx} className="border-b">
-                                <td className="p-3 pl-0 border-r font-thin">
+                                <td
+                                  className="p-3 pl-0 border-r font-thin cursor-pointer"
+                                  onClick={() =>
+                                    handleViewOrEditProduct(product)
+                                  }
+                                >
                                   {product?.number}
                                 </td>
-                                <td className="p-3 border-r text-center font-thin">
+                                <td
+                                  className="p-3 border-r text-center font-thin cursor-pointer"
+                                  onClick={() =>
+                                    handleViewOrEditProduct(product)
+                                  }
+                                >
                                   {product?.name}
                                 </td>
-                                <td className="p-3 text-blue-600 border-r text-center font-thin">
+                                <td
+                                  className="p-3 text-blue-600 border-r text-center font-thin cursor-pointer"
+                                  onClick={() =>
+                                    handleViewOrEditProduct(product)
+                                  }
+                                >
                                   {product?.pricing[0]?.cost &&
                                     addCommaSeparators(
                                       parseInt(product?.pricing[0]?.cost)
@@ -134,13 +168,29 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                                     product?.active
                                       ? "text-green-600"
                                       : "text-red-600"
-                                  } border-r text-center font-base`}
+                                  } border-r text-center font-base cursor-pointer`}
+                                  onClick={() =>
+                                    handleViewOrEditProduct(product)
+                                  }
                                 >
                                   {product?.active ? "Active" : "Inactive"}
                                 </td>
-                                <td className="p-3 text-center">
-                                  <button className="bg-orange-200 text-orange-700 px-4 py-0 rounded">
+                                <td className="p-3 text-center flex justify-center space-x-2">
+                                  <button
+                                    className="bg-orange-200 text-orange-700 px-4 py-0 rounded"
+                                    onClick={() =>
+                                      handleViewOrEditProduct(product)
+                                    }
+                                  >
                                     Edit
+                                  </button>
+                                  <button
+                                    className="bg-red-500 text-white px-4 py-0 rounded"
+                                    // onClick={() =>
+                                    //   handleViewOrEditProduct(product)
+                                    // }
+                                  >
+                                    Delete
                                   </button>
                                 </td>
                               </tr>
@@ -192,6 +242,10 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.vendor.getVendorProducts(payload),
   setProductPageViewType: (viewType: ViewType) =>
     dispatch.vendor.setProductPageViewType(viewType),
+  setNewProductDetails: (payload: any) =>
+    dispatch.vendor.setNewProductDetails(payload),
+  setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
+  setProductType: (payload: ProductType) => dispatch.vendor.setProductType(payload),
 });
 
 export default connect(
