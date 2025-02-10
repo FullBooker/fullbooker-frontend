@@ -19,6 +19,7 @@ import { CircularProgress } from "@mui/material";
 import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
+import { NotificationType } from "@/domain/notification";
 
 type LoginModalContentProps = {
   loading: boolean;
@@ -28,6 +29,7 @@ type LoginModalContentProps = {
   authData: any;
   getUserProfile: () => void;
   setActiveModal: (modalId: ModalID) => void;
+  type: NotificationType;
 };
 
 const defaultValues = {
@@ -56,6 +58,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   authData,
   getUserProfile,
   setActiveModal,
+  type,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -75,6 +78,20 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
     signIn({ phone_number, password } as UserCredentials);
   };
 
+  useEffect(() => {
+    return () => {
+      const redirect = searchParams?.get("redirect");
+      if (
+        type === NotificationType.success &&
+        message === "Login successful!"
+      ) {
+        if (redirect) {
+          router.push(`/${redirect}`);
+        }
+      }
+    };
+  }, [type, message]);
+
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-3">
@@ -86,7 +103,9 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text-sm font-semibold border-b-2 border-darkOrange w-[50%]">Sign In</h2>
+          <h2 className="text-sm font-semibold border-b-2 border-darkOrange w-[50%]">
+            Sign In
+          </h2>
         </div>
       </div>
 
@@ -122,9 +141,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 placeholder="Password"
                 onChange={onChange}
                 value={value}
-                icon={
-                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<KeyRound className="w-4 h-4 text-white fill-gray-500" />}
                 is_password={true}
                 error={errors?.password?.message}
               />
@@ -209,8 +226,8 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
   const { isLoggedIn, authData } = state.authentication;
-  const { message } = state.alert;
-  return { loading, isLoggedIn, message, authData };
+  const { message, type } = state.alert;
+  return { loading, isLoggedIn, message, authData, type };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

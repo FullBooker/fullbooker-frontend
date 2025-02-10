@@ -2,9 +2,11 @@ import { VendorDetails } from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import {
+  ActivateProductPayload,
   AddProductLocationPayload,
   DeleteProductMediaPayload,
   NewProductPayload,
+  PauseProductPayload,
   ProductAvailabilityPayload,
   ProductMediaPayload,
   ProductPricingPayload,
@@ -17,10 +19,12 @@ import {
   buildQueryString,
   deleteRequest,
   getRequest,
+  patchRequest,
   postRequest,
   putRequest,
 } from "@/utilities";
 import { Product, ProductMedia } from "@/domain/product";
+import { ModalID } from "@/domain/components";
 
 type VendorState = {
   vendorDetails: VendorDetails;
@@ -233,7 +237,9 @@ export const vendor = createModel<RootModel>()({
     },
     async deleteProductMedia(payload: DeleteProductMediaPayload, rootState) {
       try {
-        const response: any = await deleteRequest(`/media/${payload?.file_id}/`);
+        const response: any = await deleteRequest(
+          `/media/${payload?.file_id}/`
+        );
         if (response) {
           dispatch.vendor.getVendorProductById(payload?.product_id);
           dispatch.vendor.getProductMedia(payload?.product_id);
@@ -249,17 +255,67 @@ export const vendor = createModel<RootModel>()({
         );
       }
     },
-    async addProductPricing(
-      payload: ProductPricingPayload,
-      rootState
-    ) {
+    async addProductPricing(payload: ProductPricingPayload, rootState) {
       try {
         const response: any = await postRequest("/pricing/", payload);
         if (response && response?.data) {
           dispatch.vendor.getVendorProductById(payload?.product);
-          dispatch.alert.setSuccessAlert(
-            "Product pricing added successfully!"
-          );
+          dispatch.alert.setSuccessAlert("Product pricing added successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async deleteProduct(productId: string, rootState) {
+      try {
+        const response: any = await deleteRequest(`/products/${productId}/`);
+        if (response && response?.status === 204) {
+          dispatch.components.setActiveModal(ModalID.none);
+          dispatch.vendor.setNewProductDetails(null);
+          dispatch.vendor.setProductPageViewType(ViewType.productsListView);
+          dispatch.alert.setSuccessAlert("Product deleted successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async pauseProduct(payload: PauseProductPayload, rootState) {
+      try {
+        const response: any = await patchRequest(
+          `/products/${payload?.product}/`,
+          {
+            active: payload?.active,
+          }
+        );
+        if (response && response?.data) {
+          dispatch.components.setActiveModal(ModalID.none);
+          dispatch.vendor.setNewProductDetails(null);
+          dispatch.vendor.setProductPageViewType(ViewType.productsListView);
+          dispatch.alert.setSuccessAlert("Product paused successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async activateProduct(payload: ActivateProductPayload, rootState) {
+      try {
+        const response: any = await patchRequest(
+          `/products/${payload?.product}/`,
+          {
+            active: payload?.active,
+          }
+        );
+        if (response && response?.data) {
+          dispatch.components.setActiveModal(ModalID.none);
+          dispatch.vendor.setNewProductDetails(null);
+          dispatch.vendor.setProductPageViewType(ViewType.productsListView);
+          dispatch.alert.setSuccessAlert("Product activated successfully!");
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(

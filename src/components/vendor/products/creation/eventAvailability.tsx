@@ -15,6 +15,7 @@ import {
   ProductAvailabilityPayload,
 } from "@/domain/dto/input";
 import LocationSearch from "./locationSearch";
+import ReverseGeocoding from "./locationPointer";
 
 type EventAvailabilityProps = {
   getDaysOfWeek: () => void;
@@ -78,6 +79,16 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
   const [selectedLocation, setSelectedLocation] =
     useState<google.maps.places.PlaceResult | null>(null);
 
+  function extractCoordinates(coordinateString: string) {
+    const parts = coordinateString?.split("POINT (");
+    if (parts.length < 2) return null;
+    const coordinates = parts[1].replace(")", "").trim().split(" ");
+    return {
+      latitude: parseFloat(coordinates[1]),
+      longitude: parseFloat(coordinates[0]),
+    };
+  }
+
   return (
     <div className="px-0 md:px-5">
       <p className="font-base mt-4 ml-5 text-center mb-3">
@@ -87,14 +98,14 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">
           <LocationSearch setSelectedLocation={setSelectedLocation} />
 
-          <div className="border rounded-sm border-primary p-4 col-span-2">
+          <div className="border rounded-sm border-primary px-3 md:px-4 py-4 col-span-2">
             <h3 className="font-base mb-3">When will this event happen?</h3>
-            <div className="flex justify-between items-center gap-4">
+            <div className="flex justify-between items-center gap-1 md:gap-4">
               <div className="flex flex-col w-full">
                 <label className="text-sm font-light mb-1">
                   Event Starts on
                 </label>
-                <div className="flex items-center py-2 spa">
+                <div className="flex items-center py-2 w-full">
                   <CalendarDays className="text-primary w-6 h-6 me-1" />
                   <Controller
                     name="start"
@@ -103,7 +114,7 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
                     render={({ field }) => (
                       <input
                         {...field}
-                        className="ml-2 focus:outline-none border rounded p-1 text-sm font-light w-full"
+                        className="focus:outline-none border rounded p-1 text-sm font-light w-full"
                         type="date"
                       />
                     )}
@@ -115,7 +126,7 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
               </div>
               <div className="flex flex-col w-full">
                 <label className="text-sm font-light mb-1">Event ends on</label>
-                <div className="flex items-center py-2">
+                <div className="flex items-center py-2 w-full">
                   <CalendarDays className="text-primary w-6 h-6 me-1" />
                   <Controller
                     name="end"
@@ -124,7 +135,7 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
                     render={({ field }) => (
                       <input
                         {...field}
-                        className="ml-2 focus:outline-none border rounded p-1 text-sm font-light w-full"
+                        className="focus:outline-none border rounded p-1 text-sm font-light w-full"
                         type="date"
                       />
                     )}
@@ -193,7 +204,25 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
               <div className="flex justify-between">
                 <span className="font-base">Location:</span>
                 <span className="font-light">
-                  {selectedLocation && selectedLocation?.formatted_address}
+                  {(selectedLocation &&
+                    selectedLocation?.formatted_address) || (
+                    <ReverseGeocoding
+                      lat={
+                        extractCoordinates(
+                          newProduct?.locations[
+                            newProduct?.locations?.length - 1
+                          ]?.coordinates
+                        )?.latitude as number
+                      }
+                      lng={
+                        extractCoordinates(
+                          newProduct?.locations[
+                            newProduct?.locations?.length - 1
+                          ]?.coordinates
+                        )?.longitude as number
+                      }
+                    />
+                  )}
                 </span>
               </div>
               <div className="flex justify-between">

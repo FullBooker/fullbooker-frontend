@@ -67,6 +67,16 @@ const LocationSearch: FC<LocationSearchProps> = ({
     }
   }, [selectedPlace]);
 
+  function extractCoordinates(coordinateString: string) {
+    const parts = coordinateString?.split("POINT (");
+    if (parts.length < 2) return null;
+    const coordinates = parts[1].replace(")", "").trim().split(" ");
+    return {
+      latitude: parseFloat(coordinates[1]),
+      longitude: parseFloat(coordinates[0]),
+    };
+  }
+
   return (
     <div className="relative items-center rounded-md mb-4 row-span-4">
       <APIProvider
@@ -80,12 +90,21 @@ const LocationSearch: FC<LocationSearchProps> = ({
         <Map
           mapId={"bf51a910020fa25a"}
           defaultZoom={3}
-          defaultCenter={{ lat: 1.286389, lng: 36.817223 }}
+          defaultCenter={
+            newProduct?.locations?.length > 0
+              ? {
+                  lat: extractCoordinates(newProduct?.locations[newProduct?.locations?.length - 1]?.coordinates)
+                    ?.latitude as number,
+                  lng: extractCoordinates(newProduct?.locations[newProduct?.locations?.length - 1]?.coordinates)
+                    ?.longitude as number,
+                }
+              : { lat: 1.286389, lng: 36.817223 }
+          }
           gestureHandling={"greedy"}
           disableDefaultUI={true}
           style={{
             height: isMobile ? "150px" : "85%",
-            width: "100%"
+            width: "100%",
           }}
         >
           <AdvancedMarker ref={markerRef} position={null} />

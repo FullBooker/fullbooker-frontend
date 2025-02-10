@@ -71,6 +71,7 @@ const DayPassPricing: FC<DayPassPricingProps> = ({
     resolver: yupResolver(schema),
     defaultValues: {
       currency: currency,
+      bulkDiscount: 0
     },
     mode: "onBlur",
   });

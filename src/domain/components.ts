@@ -9,5 +9,8 @@ export enum ModalID {
   phoneOTPVerification = "PHONE_OTP_VERIFICATION",
   passwordResetSuccessfull = "PASSWORD_RESET_SUCCESSFULL",
   continueWithProductCreation = "CONTINUE_WITH_PRODUCT_CREATION",
-  sessionExpired = "SESSION_EXPIRED"
+  sessionExpired = "SESSION_EXPIRED",
+  deleteProductConfirmation = "DELETE_PRODUCT_CONFIRMATION",
+  pauseProductConfirmation = "PAUSE_PRODUCT_CONFIRMATION",
+  activateProductConfirmation = "ACTIVATE_PRODUCT_CONFIRMATION",
 }

@@ -217,7 +217,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
             <div className="gap-4 mt-4">
               {productMedia?.filter(
                 (media: ProductMedia) => media?.media_type === MediaType.video
-              ) && (
+              )?.length === 0 && (
                 <div className="flex justify-center">
                   <p className="font-base text-red-500">
                     No video selected yet!

@@ -20,6 +20,8 @@ type ProductClassificationProps = {
   setNewProductDetails: (payload: NewProductPayload) => void;
   newProduct: NewProductPayload;
   setProductType: (payload: ProductType) => void;
+  setActiveStep: (payload: number) => void;
+  activeStep: number;
 };
 
 const ProductClassification: FC<ProductClassificationProps> = ({
@@ -29,6 +31,8 @@ const ProductClassification: FC<ProductClassificationProps> = ({
   newProduct,
   setNewProductDetails,
   setProductType,
+  setActiveStep,
+  activeStep,
 }) => {
   const defaultValues = {
     category: newProduct?.category || "",
@@ -64,6 +68,7 @@ const ProductClassification: FC<ProductClassificationProps> = ({
       category: category,
       subcategory: subcategory,
     } as NewProductPayload);
+    setActiveStep(activeStep + 1);
   };
 
   useEffect(() => {
@@ -130,13 +135,7 @@ const ProductClassification: FC<ProductClassificationProps> = ({
                             <select
                               className="w-full border-none outline-none"
                               value={value}
-                              onChange={(e) => {
-                                onChange(e);
-                                setNewProductDetails({
-                                  ...newProduct,
-                                  subcategory: value,
-                                } as NewProductPayload);
-                              }}
+                              onChange={onChange}
                             >
                               <option></option>
                               {category?.subcategories?.map(
@@ -155,18 +154,18 @@ const ProductClassification: FC<ProductClassificationProps> = ({
                 )}
               </>
             )}
-          </div>
-          <div className="flex items-center">
-            {errors?.category?.message && (
-              <p className="text-red-500">{errors?.category?.message}</p>
-            )}
-            {errors?.subcategory?.message && (
-              <p className="text-red-500">{errors?.subcategory?.message}</p>
-            )}
+            <div className="flex items-center">
+              {errors?.category?.message && (
+                <p className="text-red-500 me-1">{errors?.category?.message}</p>
+              )}
+              {errors?.subcategory?.message && (
+                <p className="text-red-500">{errors?.subcategory?.message}</p>
+              )}
+            </div>
           </div>
         </div>
         <div className="px-2 md:px-10 mt-4 md:mt-10">
-          <NavigationButtons disableNet={Object.keys(errors).length > 0} />
+          <NavigationButtons disableNext={true} />
         </div>
       </form>
     </div>
@@ -176,11 +175,12 @@ const ProductClassification: FC<ProductClassificationProps> = ({
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.settings;
   const { productCategories } = state.settings;
-  const { newProduct } = state.vendor;
+  const { newProduct, activeStep } = state.vendor;
   return {
     productCategories,
     loading,
     newProduct,
+    activeStep,
   };
 };
 
@@ -190,6 +190,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.vendor.setNewProductDetails(payload),
   setProductType: (payload: ProductType) =>
     dispatch.vendor.setProductType(payload),
+  setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
 });
 
 export default connect(

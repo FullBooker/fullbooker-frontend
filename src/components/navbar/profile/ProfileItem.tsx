@@ -23,7 +23,7 @@ const ProfileItem = (props: {
     >
       <div className="flex gap-2 items-center">
         {icon}
-        <span className="text-[10px] sm:text-xs font-medium">{text}</span>
+        <span className={`text-[10px] sm:text-xs font-medium ${theme === "light" ? "tex-black" : "text-white"}`}>{text}</span>
       </div>
       <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
     </Link>

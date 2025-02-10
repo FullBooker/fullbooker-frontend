@@ -12,10 +12,12 @@ import AccordionActions from "@mui/material/AccordionActions";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import { ChevronDown } from "lucide-react";
-import RegularTicketPricing from "./pricing/events/regular";
+import EarlyBirdTicketPricing from "./pricing/events/earlyBird";
 import StandardTicketPricing from "./pricing/events/standard";
 import VIPTicketPricing from "./pricing/events/vip";
 import VVIPTicketPricing from "./pricing/events/vvip";
+import StandardAtTheGateTicketPricing from "./pricing/events/standardAtTheGate";
+import LastMinuteTicketPricing from "./pricing/events/lastMinute";
 
 type EventsPricingProps = {
   getCurrencies: () => void;
@@ -71,10 +73,10 @@ const EventsPricing: FC<EventsPricingProps> = ({
               aria-controls="panel1-content"
               id="panel1-header"
             >
-              <Typography component="span">Regular</Typography>
+              <Typography component="span">Early Bird</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <RegularTicketPricing currency={currency}/>
+              <EarlyBirdTicketPricing currency={currency}/>
             </AccordionDetails>
           </Accordion>
 
@@ -88,6 +90,32 @@ const EventsPricing: FC<EventsPricingProps> = ({
             </AccordionSummary>
             <AccordionDetails>
               <StandardTicketPricing currency={currency}/>
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ChevronDown className="w-10 h-10" />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography component="span">Standard at the Gate</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <StandardAtTheGateTicketPricing currency={currency}/>
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ChevronDown className="w-10 h-10" />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography component="span">Last Minute</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <LastMinuteTicketPricing currency={currency}/>
             </AccordionDetails>
           </Accordion>
 

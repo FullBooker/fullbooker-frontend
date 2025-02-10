@@ -16,12 +16,12 @@ import { AuthData } from "@/domain/dto/output";
 import { UserProfile } from "@/domain/profile";
 import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
-import Profile from "@/components/navbar/profile/Profile";
+import Profile from "@/components/vendor/profile/Profile";
 import CustomAvatar from "@/components/navbar/components/customAvatar";
 import { getInitials, hideMiddleCharacters } from "@/utilities";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import ProfileItem from "@/components/navbar/profile/ProfileItem";
+import ProfileItem from "@/components/vendor/profile/ProfileItem";
 import { CircularProgress } from "@mui/material";
 import ButtonAuth from "@/components/auth/ButtonAuth";
 import Image from "next/image";
@@ -151,7 +151,11 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
                       <>
                         <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
                           {authData?.user?.phone_number && (
-                            <span className="text-[13px] sm:text-base lg:text-lg">
+                            <span
+                              className={`text-[13px] sm:text-base lg:text-lg ${
+                                theme === "light" ? "text-black" : "text-white"
+                              }`}
+                            >
                               {`${hideMiddleCharacters(
                                 authData?.user?.phone_number
                               )}`}
@@ -160,8 +164,8 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
                           <span
                             className={`text-[11px] sm:text-sm ${
                               themeMode === "light"
-                                ? "text-textColor2"
-                                : "text-textColor"
+                                ? "text-black"
+                                : "text-white"
                             }`}
                           >
                             {authData?.user?.first_name
