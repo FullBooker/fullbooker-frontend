@@ -6,6 +6,7 @@ import { CircularProgress } from "@mui/material";
 import React, { FC, useEffect } from "react";
 import { connect } from "react-redux";
 
+
 type NavigationButtonsProps = {
   loading: boolean;
   activeStep: number;
@@ -15,6 +16,8 @@ type NavigationButtonsProps = {
   productCategories: Array<ProductCategory>;
   productType: ProductType;
   setProductPageViewType: (viewType: ViewType) => void;
+  setNewProductDetails: (payload: any) => void;
+  setProductType: (payload: ProductType) => void;
 };
 
 const NavigationButtons: FC<NavigationButtonsProps> = ({
@@ -26,6 +29,8 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
   productCategories,
   productType,
   setProductPageViewType,
+  setNewProductDetails,
+  setProductType
 }) => {
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -34,6 +39,14 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+  const publishProduct = () => {
+    setNewProductDetails(null);
+    setProductType(ProductType.default)
+    setProductPageViewType(ViewType.productsListView);
+    setActiveStep(0);
+  };
+
   return (
     <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10 mt-8 md:mt-4">
       <button
@@ -47,19 +60,47 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
       >
         Back
       </button>
-      <button
-        type="submit"
-        className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
-        disabled={
-          loading ||
-          (productType === ProductType.event
-            ? activeStep === 6
-            : activeStep === 5)
-        }
-        onClick={() => (disableNext ? {} : handleNext())}
-      >
-        {loading ? <CircularProgress size={18} color="inherit" /> : "Continue"}
-      </button>
+      {productType === ProductType.others &&
+      activeStep === 5 &&
+      newProduct?.pricing?.length > 0 ? (
+        <button
+          type="submit"
+          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
+          disabled={loading}
+          onClick={() => publishProduct()}
+        >
+          {loading ? <CircularProgress size={18} color="inherit" /> : "Publish"}
+        </button>
+      ) : productType === ProductType.others &&
+        activeStep === 5 &&
+        newProduct?.pricing?.length > 0 ? (
+        <button
+          type="submit"
+          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
+          disabled={loading}
+          onClick={() => publishProduct()}
+        >
+          {loading ? <CircularProgress size={18} color="inherit" /> : "Publish"}
+        </button>
+      ) : (
+        <button
+          type="submit"
+          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
+          disabled={
+            loading ||
+            (productType === ProductType.event
+              ? activeStep === 6
+              : activeStep === 5)
+          }
+          onClick={() => (disableNext ? {} : handleNext())}
+        >
+          {loading ? (
+            <CircularProgress size={18} color="inherit" />
+          ) : (
+            "Continue"
+          )}
+        </button>
+      )}
     </div>
   );
 };
@@ -81,6 +122,9 @@ const mapDispatchToProps = (dispatch: any) => ({
   setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
   setProductPageViewType: (viewType: ViewType) =>
     dispatch.vendor.setProductPageViewType(viewType),
+  setNewProductDetails: (payload: any) =>
+    dispatch.vendor.setNewProductDetails(payload),
+  setProductType: (payload: ProductType) => dispatch.vendor.setProductType(payload),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationButtons);

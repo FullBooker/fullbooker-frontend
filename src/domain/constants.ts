@@ -15,5 +15,11 @@ export enum ProductType {
 }
 
 export enum PricingType {
-  session = "session"
+  session = "session",
+  dayPass = "day_pass",
+  monthly_subscription = "monthly_subscription",
+  regular = "regular",
+  vip = "vip",
+  vvip = "vvip",
+  standard = "standard",
 }

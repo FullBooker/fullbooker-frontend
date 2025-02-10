@@ -29,6 +29,7 @@ export interface Product {
   availability: string | null;
   pricing: Array<ProductPricing>;
   image: string | null;
+  locations: Array<any>;
 }
 
 export interface ProductMedia {
