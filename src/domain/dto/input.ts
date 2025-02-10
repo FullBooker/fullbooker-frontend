@@ -1,4 +1,5 @@
-import { MediaType } from "../constants";
+import { MediaType, PricingType } from "../constants";
+import { ProductPricing } from "../product";
 
 export type NewUserPayload = {
   phone_number: string;
@@ -74,6 +75,7 @@ export type NewProductPayload = {
     start_time?: string;
     end_time?: string;
   };
+  pricing: Array<ProductPricing>
 };
 
 export type UpdateProductPayload = {
@@ -134,3 +136,11 @@ export type DeleteProductMediaPayload = {
   media_type: MediaType;
   product_id: string;
 };
+
+export interface ProductPricingPayload {
+  product: string;
+  currency: string;
+  cost: number;
+  type: PricingType | string;
+  maximum_number_of_tickets: number;
+}

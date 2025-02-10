@@ -19,12 +19,14 @@ import ChangePasswordModalContent from "@/components/views/auth/changePassword";
 import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVerification";
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 import { NotificationType } from "@/domain/notification";
+import SessionExpiredModal from "@/components/views/auth/sessionExpired";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
   modalId: ModalID;
   message: String;
   type: NotificationType;
+  sessionHasExpired: boolean;
 };
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({
@@ -32,6 +34,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   modalId,
   message,
   type,
+  sessionHasExpired,
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -243,14 +246,22 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<PasswordResetSuccessfullModal />}
         />
       )}
+      {modalId === ModalID.sessionExpired && sessionHasExpired && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<SessionExpiredModal />}
+        />
+      )}
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
   const { message, type } = state.alert;
+  const { sessionHasExpired } = state.authentication;
   const { modalId } = state.components;
-  return { modalId, message, type };
+  return { modalId, message, type, sessionHasExpired };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({});

@@ -9,14 +9,12 @@ import { Currency } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 
 type EventsPricingProps = {
-  productType: ProductType;
   getCurrencies: () => void;
   currencies: Array<Currency>;
   fetchingCurrencies: boolean;
 };
 
 const EventsPricing: FC<EventsPricingProps> = ({
-  productType,
   getCurrencies,
   currencies,
   fetchingCurrencies,
@@ -27,15 +25,9 @@ const EventsPricing: FC<EventsPricingProps> = ({
 
   return (
     <div>
-      {productType === ProductType.event ? (
         <p className="font-base mt-4 mb-3 mr-1 md:mr-6 text-right">
           Cost per ticket category
         </p>
-      ) : (
-        <p className="font-base mt-4 ml-0 md:ml-5 lg:ml-5 mb-3 xl:ml-5 text-center">
-          How will you charge for your Activity?
-        </p>
-      )}
       <div className="gap-4">
         <div className="px-1 md:px-6 bg-white space-y-6">
           <div className="flex items-center pb-4 border border-primary px-4 p-2">
@@ -180,10 +172,8 @@ const EventsPricing: FC<EventsPricingProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const fetchingCurrencies = state.loading.models.settings;
-  const { productType } = state.vendor;
   const { currencies } = state.settings;
   return {
-    productType,
     currencies,
     fetchingCurrencies,
   };

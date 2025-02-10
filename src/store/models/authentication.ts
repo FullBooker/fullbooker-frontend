@@ -34,6 +34,7 @@ type Authentication = {
   isLoggedIn: boolean;
   authData: AuthData | any;
   identifierToBeVerified: string;
+  sessionHasExpired: boolean;
 };
 
 export const authentication = createModel<RootModel>()({
@@ -41,6 +42,7 @@ export const authentication = createModel<RootModel>()({
     isLoggedIn: getToken() ? true : false,
     authData: {},
     identifierToBeVerified: "",
+    sessionHasExpired: false,
   } as Authentication,
   reducers: {
     setAuthStatusLoggedIn(state: Authentication, user: any) {
@@ -61,6 +63,12 @@ export const authentication = createModel<RootModel>()({
       return {
         ...state,
         identifierToBeVerified: identifier,
+      };
+    },
+    setSessionHasExpired(state: Authentication, sessionHasExpired: boolean) {
+      return {
+        ...state,
+        sessionHasExpired,
       };
     },
   },

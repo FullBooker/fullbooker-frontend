@@ -13,3 +13,7 @@ export enum ProductType {
   others = "OTHERS",
   default = "NONE"
 }
+
+export enum PricingType {
+  session = "session"
+}

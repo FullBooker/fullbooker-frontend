@@ -7,6 +7,7 @@ import {
   NewProductPayload,
   ProductAvailabilityPayload,
   ProductMediaPayload,
+  ProductPricingPayload,
   UpdateProductLocationPayload,
   UpdateProductPayload,
   VendorProductsFilters,
@@ -240,6 +241,24 @@ export const vendor = createModel<RootModel>()({
             `${
               payload?.media_type === MediaType.image ? "Photo" : "Video"
             } deleted successfully!`
+          );
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async addProductPricing(
+      payload: ProductPricingPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await postRequest("/pricing/", payload);
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product pricing added successfully!"
           );
         }
       } catch (error: any) {

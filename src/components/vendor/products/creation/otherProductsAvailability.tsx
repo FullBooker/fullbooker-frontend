@@ -131,8 +131,6 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
     setValue("closed_dates", updatedDates);
   };
 
-  console.log("ERRORS: ", errors)
-
   return (
     <div className="px-0 md:px-5">
       <p className="font-base mt-4 ml-5 text-center mb-3">
@@ -330,24 +328,30 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                 <h4 className="font-semibold text-sm text-center border-b border-primary">
                   Activity Not Open on
                 </h4>
-               <div className="px-4 py-4 space-y-2">
-               {watch("closed_dates") &&
-                  (watch("closed_dates") as Array<any>)?.map(
-                    (date: any, index: number) => (
-                      <div className="flex justify-center items-center">
-                        <p key={index} className="flex justify-center text-sm me-2">
-                          {date?.date}
-                        </p>
-                        <span
-                          className="cursor-pointer flex justify-center"
-                          onClick={() => removeClosedDate(index)}
+                <div className="px-4 py-4 space-y-2">
+                  {watch("closed_dates") &&
+                    (watch("closed_dates") as Array<any>)?.map(
+                      (date: any, index: number) => (
+                        <div
+                          key={index}
+                          className="flex justify-center items-center"
                         >
-                          <Trash className="w-5 h-5 text-red-500" />
-                        </span>
-                      </div>
-                    )
-                  )}
-               </div>
+                          <p
+                            key={index}
+                            className="flex justify-center text-sm me-2"
+                          >
+                            {date?.date}
+                          </p>
+                          <span
+                            className="cursor-pointer flex justify-center"
+                            onClick={() => removeClosedDate(index)}
+                          >
+                            <Trash className="w-5 h-5 text-red-500" />
+                          </span>
+                        </div>
+                      )
+                    )}
+                </div>
               </div>
               {errors.closed_dates && (
                 <p className="text-red-500 text-sm">

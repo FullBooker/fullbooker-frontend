@@ -7,6 +7,7 @@ import { ViewType } from "@/domain/constants";
 import { ProductCategory } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
+import { addCommaSeparators } from "@/utilities";
 
 type VendorProductsListViewProps = {
   loading: boolean;
@@ -43,7 +44,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
   return (
     <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
       <h2 className="text-lg font-medium text-center mb-3">My Products</h2>
@@ -123,7 +124,10 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                                   {product?.name}
                                 </td>
                                 <td className="p-3 text-blue-600 border-r text-center font-thin">
-                                  {product?.pricing[0]}
+                                  {product?.pricing[0]?.cost &&
+                                    addCommaSeparators(
+                                      parseInt(product?.pricing[0]?.cost)
+                                    )}
                                 </td>
                                 <td
                                   className={`p-3 font-semibold ${
