@@ -20,7 +20,6 @@ jobs:
                 role-to-assume: ${{ secrets.AWS_OIDC_ARN }}
                 aws-region: ${{ vars.AWS_REGION }}
 
-
             - name: login to amazon ecr
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
@@ -30,10 +29,11 @@ jobs:
                 REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                 REPOSITORY: fullbooker/frontend
                 IMAGE_TAG: 'latest'
+                CONFIG: '.github/workflows/lightsail_config.json'
               run: |
-                sed -i -e "s#{{NEXT_PUBLIC_API_BASE_URL}}#${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }}#" .github/workflows/lightsail_config.json
-                sed -i -e "s#{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}#${{ secrets.DEV_NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY }}#" .github/workflows/lightsail_config.json
-                sed -i -e "s#{{IMAGE}}#$REGISTRY/$REPOSITORY:$IMAGE_TAG#" .github/workflows/lightsail_config.json
+                sed -i -e "s#{{NEXT_PUBLIC_API_BASE_URL}}#${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }}#" $CONFIG
+                sed -i -e "s#{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}#${{ secrets.DEV_NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY }}#" $CONFIG
+                sed -i -e "s#{{IMAGE}}#$REGISTRY/$REPOSITORY:$IMAGE_TAG#" $CONFIG
 
             - name: build, tag and push docker image to amazon ecr
               env:
@@ -41,9 +41,13 @@ jobs:
                 REPOSITORY: fullbooker/frontend
                 IMAGE_TAG: 'latest'
               run: |
-                docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+                docker build --build-arg NEXT_PUBLIC_API_BASE_URL=${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }} \
+                  --build-arg NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY=${{ secrets.DEV_NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY }} \
+                  -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
                 docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
             - name: deploy container image
+              env:
+                CONFIG: '.github/workflows/lightsail_config.json'
               run: |
-                aws lightsail create-container-service-deployment --cli-input-json file://.github/workflows/lightsail_config.json --region ${{ vars.AWS_REGION }}
+                aws lightsail create-container-service-deployment --cli-input-json file://$CONFIG --region ${{ vars.AWS_REGION }}
