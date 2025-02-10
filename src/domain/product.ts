@@ -1,4 +1,19 @@
-import { MediaType } from "./constants";
+import { MediaType, PricingType } from "./constants";
+
+export interface ProductPricing  {
+  id: string;
+  created_at: string;
+  updated_at: string; 
+  active: boolean;
+  host: string;
+  name: string | null;
+  product: string;
+  currency: string;
+  cost: string; 
+  type: PricingType | string;
+  ticket_tier: string | null;
+  maximum_number_of_tickets: number;
+}
 
 export interface Product {
   id: string;
@@ -12,7 +27,7 @@ export interface Product {
   category: string;
   subcategory: string;
   availability: string | null;
-  pricing: any[];
+  pricing: Array<ProductPricing>;
   image: string | null;
 }
 
