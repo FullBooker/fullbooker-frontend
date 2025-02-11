@@ -55,7 +55,7 @@ const OthersPricing: FC<OthersPricingProps> = ({
                   onChange={(e) => setSelectedCurrency(e.target.value)}
                 >
                   <option value="">Select currency</option>
-                  {currencies.map((currency) => (
+                  {currencies?.map((currency) => (
                     <option key={currency.id} value={currency.id}>
                       {currency.name}
                     </option>
