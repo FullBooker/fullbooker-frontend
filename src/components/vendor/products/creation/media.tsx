@@ -118,8 +118,6 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
   };
 
   const onSubmit = (data: FormData) => {
-    console.log("Submitted Media:", data);
-    // Proceed to the next step
   };
 
   useEffect(() => {
@@ -170,7 +168,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                       (media: ProductMedia) =>
                         media?.media_type === MediaType.image
                     )
-                    .map((photo: ProductMedia, index: number) => (
+                    ?.map((photo: ProductMedia, index: number) => (
                       <div key={index} className="relative mb-2">
                         <Image
                           src={photo?.file}
@@ -228,7 +226,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                 ?.filter(
                   (media: ProductMedia) => media?.media_type === MediaType.video
                 )
-                .map((video: ProductMedia, index: number) => (
+                ?.map((video: ProductMedia, index: number) => (
                   <div className="relative" key={index}>
                     <video
                       src={video?.file}
