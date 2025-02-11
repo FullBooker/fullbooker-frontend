@@ -68,6 +68,15 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
     ),
   });
 
+  function convertMinutesToHoursAndMinutes(minutes: number) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return {
+      hours: hours,
+      minutes: remainingMinutes,
+    };
+  }
+
   const {
     control,
     handleSubmit,
@@ -77,6 +86,18 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      durationHours: newProduct?.availability?.duration
+        ? convertMinutesToHoursAndMinutes(
+            newProduct?.availability?.duration
+          )?.hours?.toString()
+        : "",
+      durationMinutes: newProduct?.availability?.duration
+        ? convertMinutesToHoursAndMinutes(
+            newProduct?.availability?.duration
+          )?.minutes?.toString()
+        : "",
+    },
     mode: "onBlur",
   });
 
@@ -130,7 +151,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
 
     setValue("closed_dates", updatedDates);
   };
-
+  
   return (
     <div className="px-0 md:px-5">
       <p className="font-base mt-4 ml-5 text-center mb-3">

@@ -13,6 +13,7 @@ import ProductMedia from "@/components/vendor/products/creation/media";
 import ProductInfo from "@/components/vendor/products/creation/description";
 import ProductPricing from "@/components/vendor/products/creation/pricing";
 import ProductPricingSummary from "@/components/vendor/products/creation/pricingSummary";
+import ProductPublishing from "@/components/vendor/products/creation/publish";
 import { styled } from "@mui/material/styles";
 import LinearProgress, {
   linearProgressClasses,
@@ -25,6 +26,9 @@ import { ProductType, ViewType } from "@/domain/constants";
 import { ModalID } from "@/domain/components";
 import UniversalModal from "@/components/modal/UniversalModal";
 import ContinueWithProductCreation from "@/components/vendor/products/shared/continue-with-creation";
+import ProductDeletionConfirmation from "@/components/vendor/products/shared/deleteProductConfirmation";
+import PauseProductConfirmation from "@/components/vendor/products/shared/pauseProductConfirmation";
+import ActivateProductConfirmation from "@/components/vendor/products/shared/activateProductConfirmation";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 6,
@@ -86,9 +90,6 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
   }, [activeStep]);
 
   useEffect(() => {
-    getVendorProducts();
-    getProductCategories();
-
     if (newProduct) {
       setActiveModal(ModalID.continueWithProductCreation);
     }
@@ -109,7 +110,13 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
       case 5:
         return <ProductPricing />;
       case 6:
-        return <ProductPricingSummary />;
+        return productType === ProductType.event ? (
+          <ProductPricingSummary />
+        ) : (
+          <ProductPublishing />
+        );
+      case 7:
+        return <ProductPublishing />;
       default:
         return null;
     }
@@ -120,7 +127,7 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
       {productPageViewType === ViewType.onboardingView ? (
         <div>
           {getActiveStepContent()}
-          <div className="px-2 md:px-10 mt-4 md:mt-10">
+          <div className="px-2 md:px-10 mt-4 md:mt-10 mb-8 md:mb-20">
             <BorderLinearProgress
               variant="determinate"
               value={Math.round(
@@ -137,6 +144,27 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
           theme={themeMode}
           open={true}
           content={<ContinueWithProductCreation />}
+        />
+      )}
+      {modalId === ModalID.deleteProductConfirmation && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ProductDeletionConfirmation />}
+        />
+      )}
+      {modalId === ModalID.pauseProductConfirmation && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<PauseProductConfirmation />}
+        />
+      )}
+      {modalId === ModalID.activateProductConfirmation && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ActivateProductConfirmation />}
         />
       )}
     </div>

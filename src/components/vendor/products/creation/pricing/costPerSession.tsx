@@ -71,6 +71,7 @@ const PricePerSession: FC<PricePerSessionProps> = ({
     resolver: yupResolver(schema),
     defaultValues: {
       currency: currency,
+      bulkDiscount: 0
     },
     mode: "onBlur",
   });

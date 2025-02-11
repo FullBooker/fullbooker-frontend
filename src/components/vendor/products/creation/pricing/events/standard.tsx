@@ -3,7 +3,7 @@
 import React, { FC, useEffect } from "react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { PricingType, ProductType } from "@/domain/constants";
+import { PricingTickerTier, PricingType } from "@/domain/constants";
 import { Currency } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import * as yup from "yup";
@@ -71,6 +71,7 @@ const StandardTicketPricing: FC<StandardTicketPricingProps> = ({
     resolver: yupResolver(schema),
     defaultValues: {
       currency: currency,
+      bulkDiscount: 0
     },
     mode: "onBlur",
   });
@@ -83,7 +84,8 @@ const StandardTicketPricing: FC<StandardTicketPricingProps> = ({
         data?.pricePerSession -
         data?.bulkDiscount +
         (0.05 * data?.pricePerSession - data?.bulkDiscount),
-      type: PricingType.standard,
+      type: PricingType.ticket,
+      ticket_tier: PricingTickerTier.standard,
       maximum_number_of_tickets: data?.maximum_number_of_tickets,
     } as ProductPricingPayload);
   };
@@ -98,7 +100,7 @@ const StandardTicketPricing: FC<StandardTicketPricingProps> = ({
         <div className="space-y-2 w-full">
           <form onSubmit={handleSubmit(onSubmitCostPerSession)}>
             <label className="flex justify-between">
-            <p className="font-light me-1">Cost per ticket</p>
+              <p className="font-light me-1">Cost per ticket</p>
               <div className="w-full">
                 <Controller
                   name="pricePerSession"

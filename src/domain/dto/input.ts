@@ -1,4 +1,4 @@
-import { MediaType, PricingType } from "../constants";
+import { MediaType, PricingTickerTier, PricingType } from "../constants";
 import { ProductPricing } from "../product";
 
 export type NewUserPayload = {
@@ -70,6 +70,7 @@ export type NewProductPayload = {
   subcategory?: string;
   locations: Array<any>;
   availability?: {
+    duration?: number,
     start?: string;
     end?: string;
     start_time?: string;
@@ -141,6 +142,17 @@ export interface ProductPricingPayload {
   product: string;
   currency: string;
   cost: number;
-  type: PricingType | string;
+  type?: PricingType | string;
+  ticket_tier?: PricingTickerTier | string;
   maximum_number_of_tickets: number;
+}
+
+export interface PauseProductPayload {
+  product: string;
+  active: boolean;
+}
+
+export interface ActivateProductPayload {
+  product: string;
+  active: boolean;
 }

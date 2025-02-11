@@ -12,7 +12,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { addCommaSeparators } from "@/utilities";
 import { NewProductPayload, ProductPricingPayload } from "@/domain/dto/input";
 
-type VVIPTicketPricingProps = {
+type EarlyBirdTicketPricingProps = {
   getCurrencies: () => void;
   currencies: Array<Currency>;
   fetchingCurrencies: boolean;
@@ -22,7 +22,7 @@ type VVIPTicketPricingProps = {
   currency: string;
 };
 
-const VVIPTicketPricing: FC<VVIPTicketPricingProps> = ({
+const EarlyBirdTicketPricing: FC<EarlyBirdTicketPricingProps> = ({
   getCurrencies,
   currencies,
   fetchingCurrencies,
@@ -85,7 +85,7 @@ const VVIPTicketPricing: FC<VVIPTicketPricingProps> = ({
         data?.bulkDiscount +
         (0.05 * data?.pricePerSession - data?.bulkDiscount),
       type: PricingType.ticket,
-      ticket_tier: PricingTickerTier.vvip,
+      ticket_tier: PricingTickerTier.early_bird,
       maximum_number_of_tickets: data?.maximum_number_of_tickets,
     } as ProductPricingPayload);
   };
@@ -100,7 +100,7 @@ const VVIPTicketPricing: FC<VVIPTicketPricingProps> = ({
         <div className="space-y-2 w-full">
           <form onSubmit={handleSubmit(onSubmitCostPerSession)}>
             <label className="flex justify-between">
-              <p className="font-light me-1">Cost per ticket</p>
+            <p className="font-light me-1">Cost per ticket</p>
               <div className="w-full">
                 <Controller
                   name="pricePerSession"
@@ -250,4 +250,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.vendor.addProductPricing(payload),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(VVIPTicketPricing);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(EarlyBirdTicketPricing);

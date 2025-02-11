@@ -3,7 +3,7 @@
 import React, { FC, useEffect } from "react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { PricingType, ProductType } from "@/domain/constants";
+import { PricingTickerTier, PricingType } from "@/domain/constants";
 import { Currency } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import * as yup from "yup";
@@ -12,7 +12,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { addCommaSeparators } from "@/utilities";
 import { NewProductPayload, ProductPricingPayload } from "@/domain/dto/input";
 
-type RegularTicketPricingProps = {
+type LastMinuteTicketPricingProps = {
   getCurrencies: () => void;
   currencies: Array<Currency>;
   fetchingCurrencies: boolean;
@@ -22,7 +22,7 @@ type RegularTicketPricingProps = {
   currency: string;
 };
 
-const RegularTicketPricing: FC<RegularTicketPricingProps> = ({
+const LastMinuteTicketPricing: FC<LastMinuteTicketPricingProps> = ({
   getCurrencies,
   currencies,
   fetchingCurrencies,
@@ -71,6 +71,7 @@ const RegularTicketPricing: FC<RegularTicketPricingProps> = ({
     resolver: yupResolver(schema),
     defaultValues: {
       currency: currency,
+      bulkDiscount: 0
     },
     mode: "onBlur",
   });
@@ -83,7 +84,8 @@ const RegularTicketPricing: FC<RegularTicketPricingProps> = ({
         data?.pricePerSession -
         data?.bulkDiscount +
         (0.05 * data?.pricePerSession - data?.bulkDiscount),
-      type: PricingType.regular,
+      type: PricingType.ticket,
+      ticket_tier: PricingTickerTier.last_minute,
       maximum_number_of_tickets: data?.maximum_number_of_tickets,
     } as ProductPricingPayload);
   };
@@ -98,7 +100,7 @@ const RegularTicketPricing: FC<RegularTicketPricingProps> = ({
         <div className="space-y-2 w-full">
           <form onSubmit={handleSubmit(onSubmitCostPerSession)}>
             <label className="flex justify-between">
-            <p className="font-light me-1">Cost per ticket</p>
+              <p className="font-light me-1">Cost per ticket</p>
               <div className="w-full">
                 <Controller
                   name="pricePerSession"
@@ -251,4 +253,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(RegularTicketPricing);
+)(LastMinuteTicketPricing);

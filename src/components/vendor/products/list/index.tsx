@@ -11,13 +11,14 @@ import { addCommaSeparators } from "@/utilities";
 
 type VendorProductsListViewProps = {
   loading: boolean;
-  getVendorProducts: (payload: VendorProductsFilters) => void;
+  getVendorProducts: (payload?: VendorProductsFilters) => void;
   vendorProducts: Array<Product>;
   setProductPageViewType: (viewType: ViewType) => void;
   productCategories: Array<ProductCategory>;
   setNewProductDetails: (payload: NewProductPayload) => void;
   setActiveStep: (payload: number) => void;
   setProductType: (payload: ProductType) => void;
+  getProductCategories: () => void;
 };
 
 const VendorProductsListView: FC<VendorProductsListViewProps> = ({
@@ -29,6 +30,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
   setNewProductDetails,
   setActiveStep,
   setProductType,
+  getProductCategories,
 }) => {
   const [filters, setFilters] = useState<VendorProductsFilters>({
     page: 1,
@@ -55,14 +57,29 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
     setNewProductDetails(product);
     setProductType(
       productCategories
-        ?.find((category: ProductCategory) => category === product?.category)
-        ?.name?.includes("Event")
+        ?.find((category: ProductCategory) => category.id === product?.category)
+        ?.name?.includes("Events")
         ? ProductType.event
         : ProductType.others
     );
     setActiveStep(1);
     setProductPageViewType(ViewType.onboardingView);
   };
+
+  const categoryHasProducts = (category: string) => {
+    let products = 0;
+    vendorProducts?.map((product: Product) => {
+      if (product.category === category) {
+        products++;
+      }
+    });
+    return products > 0;
+  };
+
+  useEffect(() => {
+    getProductCategories();
+    getVendorProducts();
+  }, []);
 
   return (
     <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
@@ -99,8 +116,9 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
             </div>
           ) : (
             <div>
-              {productCategories?.map(
-                (category: ProductCategory, index: number) => (
+              {productCategories
+                ?.filter((cat: ProductCategory) => categoryHasProducts(cat.id))
+                ?.map((category: ProductCategory, index: number) => (
                   <div key={index} className="mb-6">
                     <h2 className="text-lg font-medium  w-full border-b">
                       {category?.name}
@@ -184,14 +202,6 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                                   >
                                     Edit
                                   </button>
-                                  <button
-                                    className="bg-red-500 text-white px-4 py-0 rounded"
-                                    // onClick={() =>
-                                    //   handleViewOrEditProduct(product)
-                                    // }
-                                  >
-                                    Delete
-                                  </button>
                                 </td>
                               </tr>
                             ))}
@@ -206,8 +216,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                       )}
                     </table>
                   </div>
-                )
-              )}
+                ))}
               <div className="flex justify-end">
                 <button
                   className=" bg-primary px-6 py-2 rounded-lg mt-4 text-black"
@@ -226,7 +235,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
   );
 };
 
-const mapStateToProps = (state: RootState) => {
+export const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.vendor;
   const { vendorProducts } = state.vendor;
   const { productCategories } = state.settings;
@@ -240,12 +249,14 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: any) => ({
   getVendorProducts: (payload: VendorProductsFilters) =>
     dispatch.vendor.getVendorProducts(payload),
+  getProductCategories: () => dispatch.settings.getProductCategories(),
   setProductPageViewType: (viewType: ViewType) =>
     dispatch.vendor.setProductPageViewType(viewType),
   setNewProductDetails: (payload: any) =>
     dispatch.vendor.setNewProductDetails(payload),
   setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
-  setProductType: (payload: ProductType) => dispatch.vendor.setProductType(payload),
+  setProductType: (payload: ProductType) =>
+    dispatch.vendor.setProductType(payload),
 });
 
 export default connect(

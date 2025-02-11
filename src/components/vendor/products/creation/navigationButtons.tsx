@@ -41,10 +41,11 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
   };
 
   const publishProduct = () => {
-    setNewProductDetails(null);
-    setProductType(ProductType.default)
-    setProductPageViewType(ViewType.productsListView);
-    setActiveStep(0);
+    handleNext()
+    // setNewProductDetails(null);
+    // setProductType(ProductType.default)
+    // setProductPageViewType(ViewType.productsListView);
+    // setActiveStep(a);
   };
 
   return (
@@ -71,8 +72,8 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
         >
           {loading ? <CircularProgress size={18} color="inherit" /> : "Publish"}
         </button>
-      ) : productType === ProductType.others &&
-        activeStep === 5 &&
+      ) : productType === ProductType.event &&
+        activeStep === 6 &&
         newProduct?.pricing?.length > 0 ? (
         <button
           type="submit"

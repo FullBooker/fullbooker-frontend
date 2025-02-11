@@ -9,21 +9,22 @@ import { ModalID } from "@/domain/components";
 import { KeyRound } from "lucide-react";
 import { ViewType } from "@/domain/constants";
 import { NewProductPayload } from "@/domain/dto/input";
+import { CircularProgress } from "@mui/material";
 
-type ContinueProductCreationModalContentProps = {
+type ProductDeletionConfirmationModalContentProps = {
   setActiveModal: (modalId: ModalID) => void;
-  setProductPageViewType: (viewType: ViewType) => void;
-  setNewProductDetails: (payload: any) => void;
-  setActiveStep: (activeStep: number) => void;
+  deleteProduct: (productId: string) => void;
+  newProduct: NewProductPayload;
+  loading: boolean;
 };
 
-const ContinueProductCreationModal: FC<
-  ContinueProductCreationModalContentProps
+const ProductDeletionConfirmationModal: FC<
+  ProductDeletionConfirmationModalContentProps
 > = ({
   setActiveModal,
-  setProductPageViewType,
-  setNewProductDetails,
-  setActiveStep,
+  deleteProduct,
+  newProduct,
+  loading
 }) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -45,20 +46,16 @@ const ContinueProductCreationModal: FC<
     <div className="w-full max-w-md mx-auto">
       <div className="text-center">
         <Image
-          src="/assets/continue.jpg"
+          src="/assets/delete.jpg"
           alt="Fullbooker Logo"
           width={isMobile ? 250 : 400}
           height={isMobile ? 250 : 400}
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
-          <h2 className="text font-bold">Finish Setting Up your Product</h2>
-        </div>
-        <div className="text-center items-center mb-2 flex justify-center">
-          <p className="text-sm font-light">
-            We noticed that you were in the middle of setting up your product.
-            Would you like to continue where you left off or start fresh?
-          </p>
+          <h2 className="text font-bold">
+            Are you sure you want to delete this product?
+          </h2>
         </div>
       </div>
       <div className="flex justify-between mt-4 gap-4">
@@ -66,8 +63,6 @@ const ContinueProductCreationModal: FC<
           className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-black py-2 rounded-md"
           onClick={() => {
             setActiveModal(ModalID.none);
-            setActiveStep(0);
-            setNewProductDetails(null);
           }}
         >
           Cancel
@@ -75,11 +70,14 @@ const ContinueProductCreationModal: FC<
         <button
           className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-black py-2 rounded-md"
           onClick={() => {
-            setActiveModal(ModalID.none);
-            setProductPageViewType(ViewType.onboardingView);
+            deleteProduct(newProduct?.id as string);
           }}
         >
-          Continue
+        {loading ? (
+            <CircularProgress size={18} color="inherit" />
+          ) : (
+            "Continue"
+          )}
         </button>
       </div>
     </div>
@@ -87,24 +85,22 @@ const ContinueProductCreationModal: FC<
 };
 
 const mapStateToProps = (state: RootState) => {
+  const loading = state.loading.models.vendor;
   const { newProduct } = state.vendor;
   return {
     newProduct,
+    loading,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
-  setProductPageViewType: (viewType: ViewType) =>
-    dispatch.vendor.setProductPageViewType(viewType),
-  setNewProductDetails: (payload: any) =>
-    dispatch.vendor.setNewProductDetails(payload),
-  setActiveStep: (activeStep: number) =>
-    dispatch.vendor.setActiveStep(activeStep),
+  deleteProduct: (productId: string) =>
+    dispatch.vendor.deleteProduct(productId),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ContinueProductCreationModal);
+)(ProductDeletionConfirmationModal);
