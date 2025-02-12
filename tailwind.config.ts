@@ -44,6 +44,7 @@ const config = {
         },
         mainColor: "hsl(var(--main-color))",
         primary: "hsl(var(--primary))",
+        success: "hsl(var(--success))",
         secondary: "hsl(var(--secondary))",
         whiteColor: "hsl(var(--white-color))",
         textColor: "hsl(var(--text-color))",

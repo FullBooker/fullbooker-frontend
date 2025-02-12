@@ -52,3 +52,17 @@ export const getQueryParam = (param: string): string | null => {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(param);
 };
+
+export const extractCoordinates = (coordinateString: string) => {
+  const parts = coordinateString?.split("POINT (");
+  if (parts?.length < 2) return null;
+  const coordinates = parts[1]?.replace(")", "")?.trim()?.split(" ");
+  return {
+    latitude: parseFloat(coordinates[1]),
+    longitude: parseFloat(coordinates[0]),
+  };
+};
+
+export const generateSlug = (name: string): string => {
+  return name?.trim().replace(/\s+/g, "-").toLowerCase();
+};

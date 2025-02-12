@@ -15,6 +15,16 @@ export interface ProductPricing  {
   maximum_number_of_tickets: number;
 }
 
+interface ProductLocation {
+  id: string;
+  active: boolean;
+  coordinates: string;
+  created_at: string;
+  updated_at: string;
+  host: string;
+  product: string; 
+}
+
 export interface Product {
   id: string;
   created_at: string;
@@ -28,8 +38,8 @@ export interface Product {
   subcategory: string;
   availability: string | null;
   pricing: Array<ProductPricing>;
-  image: string | null;
-  locations: Array<any>;
+  image: ProductMedia
+  locations: Array<ProductLocation>;
 }
 
 export interface ProductMedia {
