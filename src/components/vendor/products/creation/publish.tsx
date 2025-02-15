@@ -292,6 +292,7 @@ const ProductPublishing: FC<ProductPublishingProps> = ({
                     className="rounded-lg shadow-lg"
                     width={149}
                     height={164}
+                    unoptimized={true}
                   />
                   <button
                     type="button"
