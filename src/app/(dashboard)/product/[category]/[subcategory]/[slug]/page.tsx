@@ -26,6 +26,7 @@ import ProductGallery from "@/components/products/singleProduct/gallery";
 import { addCommaSeparators, extractCoordinates } from "@/utilities";
 import LocationIdentifier from "@/components/shared/locationidentifier";
 import TicketDetails from "@/components/products/singleProduct/ticketDetails";
+import ProductsByVendor from "@/components/products/singleProduct/productsByVendor";
 
 type SingleProductPageProps = {
   productMedia: Array<ProductMedia>;
@@ -122,6 +123,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
         hidden={value !== index}
         id={`full-width-tabpanel-${index}`}
         aria-labelledby={`full-width-tab-${index}`}
+        className="bg-white"
         {...other}
       >
         {value === index && (
@@ -310,60 +312,37 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
               </div>
             </div>
           ) : (
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              indicatorColor="secondary"
-              textColor="inherit"
-              variant="fullWidth"
-              aria-label="full width tabs example"
-              centered
-            >
-              <Tab label="Booking details" {...a11yProps(0)} />
-              <Tab label="Bulk Booking" {...a11yProps(1)} />
-              <Tab
-                label={`${
-                  isMobile
-                    ? "Similar Events"
-                    : "See more events by the same host"
-                }`}
-                {...a11yProps(2)}
+            <div>
+               {/* Ticket Details */}
+              <TicketDetails
+                product={product}
+                productsRequestProcessing={productsRequestProcessing}
               />
-            </Tabs>
-          )}
 
-          <TabPanel value={value} index={0} dir={theme.direction}>
-            <TicketDetails
-              product={product}
-              productsRequestProcessing={productsRequestProcessing}
-            />
+              {/* Map Section */}
+              <div className="mt-6 border-t border-b border-gray-400 py-8 h-[200px] md:h-[550px]" ref={mapRef}>
+                {product?.locations?.length > 0 && (
+                  <ProductLocation
+                    coordinates={product?.locations[0]?.coordinates}
+                    productsRequestProcessing={productsRequestProcessing}
+                  />
+                )}
+              </div>
 
-            {/* Map Section */}
-            <div className="mt-6" ref={mapRef}>
-              {product?.locations?.length > 0 && (
-                <ProductLocation
-                  coordinates={product?.locations[0]?.coordinates}
-                  productsRequestProcessing={productsRequestProcessing}
-                />
-              )}
+              {/* Reviews Section */}
+              <ProductReviews
+                productsRequestProcessing={productsRequestProcessing}
+              />
+
+              {/* Host Details */}
+              <HostDetails
+                productsRequestProcessing={productsRequestProcessing}
+              />
+
+              {/* More products by vendor */}
+              <ProductsByVendor />
             </div>
-
-            {/* Reviews Section */}
-            <ProductReviews
-              productsRequestProcessing={productsRequestProcessing}
-            />
-
-            {/* Host Details */}
-            <HostDetails
-              productsRequestProcessing={productsRequestProcessing}
-            />
-          </TabPanel>
-          <TabPanel value={value} index={1} dir={theme.direction}>
-            Item Two
-          </TabPanel>
-          <TabPanel value={value} index={2} dir={theme.direction}>
-            Item Three
-          </TabPanel>
+          )}
         </div>
       </div>
     </div>
@@ -373,7 +352,8 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 SingleProductPage.layout = DashBoardLayout;
 
 const mapStateToProps = (state: RootState) => {
-  const productsRequestProcessing = state.loading.models.products;
+  const productsRequestProcessing =
+    state.loading.effects.products.getProductById;
   const { product, productMedia } = state.products;
   const { productCategories, currencies } = state.settings;
   return {

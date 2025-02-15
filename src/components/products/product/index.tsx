@@ -93,6 +93,7 @@ const SingleProduct: FC<SingleProductProps> = ({
           width={300}
           height={300}
           className="w-full h-[300px] object-cover rounded-lg"
+          unoptimized={true}
         />
         {/* Tag */}
         <div className="absolute top-2 left-2 bg-white text-black text-sm font-medium px-12 py-1 rounded">

@@ -56,6 +56,8 @@ import { ProductsFilters } from "@/domain/dto/input";
 import { Product } from "@/domain/product";
 import { Currency, ProductCategory } from "@/domain/dto/output";
 import ProductCategories from "@/components/products/categories";
+import { getToken } from "@/utilities/auth.cookie";
+import Button from "@/components/shared/button";
 
 type HomePageProps = {
   isLoggedIn: boolean;
@@ -225,12 +227,19 @@ const HomePage: FC<HomePageProps> = ({
       <div className="py-8 px-2 md:px-3 lg:px-4 bg-white text-center">
         <div className=" px-4 sm:px-7">
           <p className="mb-10">Explore more events and activities</p>
-          <button
-            className="sm:w-full xs:w-full lg:w-[10%] md:w-[25%] w-full bg-primary text-black py-2 rounded-md mb-2"
-            onClick={() => setActiveModal(ModalID.login)}
-          >
-            Sign In/Sign Up
-          </button>
+          {!getToken() && (
+            <Button
+              width="w-full lg:w-[10%] md:w-[25%]"
+              bg="bg-primary"
+              borderRadius="rounded-md"
+              margin="mb-2"
+              text="text-black"
+              padding="py-2"
+              onClick={() => setActiveModal(ModalID.login)}
+            >
+              Sign In/Sign Up
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
-import { AuthData } from "@/domain/dto/output";
+import { AuthData, User } from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { getQueryParam, postRequest, putRequest } from "../../utilities";
 import {
   ForgotPasswordPayload,
+  GoogleSocialSigninPayload,
   RequestOTPPayload,
   ResendPhoneOTPPayload,
   ResetPasswordPayload,
@@ -249,6 +250,57 @@ export const authentication = createModel<RootModel>()({
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
           error?.data?.non_field_errors || error?.message
+        );
+      }
+    },
+    async googleSocialSignin(
+      credentials: GoogleSocialSigninPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await postRequest(
+          "/accounts/google/",
+          credentials
+        );
+
+        if (response && response?.data) {
+          const data: any = response?.data;
+          const token = data?.access;
+          const decodedJWT = jwtDecode<JwtPayload>(token);
+          const jwtExpiry = new Date((decodedJWT?.exp as number) * 1000);
+
+          if (token) {
+            const currentTime = new Date().getTime();
+            const expiryTime = jwtExpiry.getTime();
+            const maxAge = Math.floor((expiryTime - currentTime) / 1000);
+
+            saveToken(token, maxAge);
+
+            localStorage.setItem("authData", JSON.stringify(data?.user));
+
+            dispatch.authentication.setAuthStatusLoggedIn({
+              user: {
+                ...data?.user,
+                id: data?.user?.pk,
+              } as User,
+            } as AuthData);
+            dispatch.alert.setSuccessAlert(
+              response?.data?.message || "Login successful!"
+            );
+            dispatch.components.setActiveModal(ModalID.none);
+            const flow = getQueryParam("user_flow");
+            if (flow && flow === "vendor") {
+              dispatch.authentication.switchToHost({
+                user: data?.user?.id,
+              } as SwitchToHostPayload);
+            }
+          }
+        } else {
+          dispatch.alert.setFailureAlert("Incorrect password or email!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.non_field_errors?.[0] || error?.message
         );
       }
     },

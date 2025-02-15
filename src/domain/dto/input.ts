@@ -162,3 +162,7 @@ export interface ActivateProductPayload {
   product: string;
   active: boolean;
 }
+
+export type GoogleSocialSigninPayload = {
+  access_token: string;
+};

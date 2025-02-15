@@ -50,6 +50,19 @@ export const products = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
+    async getProductsByVendor(payload: ProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload ? `/products/?${buildQueryString(payload)}` : "/products/"
+        );
+
+        if (response && response?.data) {
+          dispatch.products.setProducts(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
     async getProductById(id: string, rootState) {
       try {
         const response: any = await getRequest(`/products/${id}/`);

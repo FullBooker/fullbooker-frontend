@@ -80,7 +80,9 @@ const SessionExpiredModal: FC<SessionExpiredModalContentProps> = ({
   );
 };
 
-const mapStateToProps = (state: RootState) => {};
+const mapStateToProps = (state: RootState) => {
+  return { state };
+};
 
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>

@@ -22,7 +22,7 @@ const HostDetails: FC<HostDetailsProps> = ({
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedDate, setSelectedDate] = useState<any>();
-  
+
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -84,92 +84,89 @@ const HostDetails: FC<HostDetailsProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[60%_40%] w-full space-x-0 md:space-x-6">
-          {/* Ticket Selection */}
-          <div className="mt-6 w-full">
-            <h3 className="text-lg font-semibold mb-2">Ticket 1</h3>
-            <div className="w-full border-gray-500 border-b pb-1">
-              <div className="space-y-2">
-                <p>Ticket: </p>
-                <p>Name: </p>
-                <p>ID Number: </p>
-                <p>Phone Number: </p>
-              </div>
-              <div className="flex justify-end mt-2 mb-2">
-                <button className="mt-2 text-blue-500 text-right">
-                  Add more tickets +
-                </button>
-              </div>
-            </div>
-            <div className="py-3">
-              <Image
-                src={`${product?.image?.file || "/assets/quad.png"}`}
-                alt={"Event"}
-                width={300}
-                height={300}
-                className="w-full h-[300px] object-cover rounded-lg"
-              />
-            </div>
-          </div>
-          <div className="w-full">
-            {/* Date Selection */}
-            <div className="mt-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Select Date</h3>
-                <div>
-                  <ChevronDownCircle className="w-6 h-6 md:h-6 md:w-6" />
+        <div className="border-t border-gray-400 py-8">
+           <h3 className="text-lg font-semibold mb-3">Ticket Details</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[60%_40%] w-full space-x-0 md:space-x-6">
+            {/* Ticket Selection */}
+            <div className="mt-6 w-full">
+              <h3 className="text-lg font-semibold mb-2">Ticket 1</h3>
+              <div className="w-full border-gray-500 border-b pb-1">
+                <div className="space-y-2">
+                  <p>Ticket: </p>
+                  <p>Name: </p>
+                  <p>ID Number: </p>
+                  <p>Phone Number: </p>
+                </div>
+                <div className="flex justify-end mt-2 mb-2">
+                  <button className="mt-2 text-blue-500 text-right">
+                    Add more tickets +
+                  </button>
                 </div>
               </div>
-              <div className="w-full">
-                <Calendar className="bg-white px-4 py-4 rounded-2xl shadow-lg w-full" />
+              <div className="py-3">
+              
               </div>
             </div>
-
-            {/* Pricing Summary */}
-            <div className="mt-6 bg-white rounded-2xl shadow-lg space-y-4 px-4 md:px-8 py-4 pb-8">
-              <div data-hide-on-theme="dark" className="flex justify-center">
-                <Image
-                  src="/assets/logo.svg"
-                  alt="Fullbooker Logo"
-                  width={238}
-                  height={39.29}
-                  className="w-[190px] h-[55px]"
-                />
+            <div className="w-full">
+              {/* Date Selection */}
+              <div className="mt-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Select Date</h3>
+                  <div>
+                    <ChevronDownCircle className="w-6 h-6 md:h-6 md:w-6" />
+                  </div>
+                </div>
+                <div className="w-full">
+                  <Calendar className="bg-white px-4 py-4 rounded-2xl shadow-lg w-full" />
+                </div>
               </div>
 
-              <div data-hide-on-theme="light" className="flex justify-center">
-                <Image
-                  src="/assets/logo_dark.png"
-                  alt="MowinBet Logo"
-                  width={238}
-                  height={39.29}
-                  className="w-[190px] h-[55px]"
-                />
+              {/* Pricing Summary */}
+              <div className="mt-6 bg-white rounded-2xl shadow-lg space-y-4 px-4 md:px-8 py-4 pb-8">
+                <div data-hide-on-theme="dark" className="flex justify-center">
+                  <Image
+                    src="/assets/logo.svg"
+                    alt="Fullbooker Logo"
+                    width={238}
+                    height={39.29}
+                    className="w-[190px] h-[55px]"
+                  />
+                </div>
+
+                <div data-hide-on-theme="light" className="flex justify-center">
+                  <Image
+                    src="/assets/logo_dark.png"
+                    alt="MowinBet Logo"
+                    width={238}
+                    height={39.29}
+                    className="w-[190px] h-[55px]"
+                  />
+                </div>
+                <p className="flex justify-between">
+                  Ticket price:{" "}
+                  <span className="font-semibold">KES 3,150.00</span>
+                </p>
+                <p className="flex justify-between">
+                  Number of Tickets: <span className="font-semibold">1.00</span>
+                </p>
+                <p className="flex justify-between">
+                  TAX: <span className="font-semibold">540.00</span>
+                </p>
+                <p className="flex justify-between">
+                  Total:{" "}
+                  <span className="text-green-500 font-bold">KES 3,690.00</span>
+                </p>
+                <Link href={"/products/checkout"}>
+                  <Button
+                    extraClasses=""
+                    margin="mt-4"
+                    borderRadius="rounded-lg"
+                    text="w-full font-medium"
+                  >
+                    Proceed to checkout
+                  </Button>
+                </Link>
               </div>
-              <p className="flex justify-between">
-                Ticket price:{" "}
-                <span className="font-semibold">KES 3,150.00</span>
-              </p>
-              <p className="flex justify-between">
-                Number of Tickets: <span className="font-semibold">1.00</span>
-              </p>
-              <p className="flex justify-between">
-                TAX: <span className="font-semibold">540.00</span>
-              </p>
-              <p className="flex justify-between">
-                Total:{" "}
-                <span className="text-green-500 font-bold">KES 3,690.00</span>
-              </p>
-              <Link href={"/products/checkout"}>
-                <Button
-                  extraClasses=""
-                  margin="mt-4"
-                  borderRadius="rounded-lg"
-                  text="w-full font-medium"
-                >
-                  Proceed to checkout
-                </Button>
-              </Link>
             </div>
           </div>
         </div>

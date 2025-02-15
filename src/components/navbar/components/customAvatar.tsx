@@ -15,7 +15,7 @@ const NameAvatar = ({ name }: { name: string }) => {
   const initials = stringToInitials(name);
 
   return (
-    <Avatar sx={{ bgcolor: '#3f51b5', color: '#fff' }}>
+    <Avatar sx={{ bgcolor: '#3f51b5', color: '#fff' }} className='w-6 h-8'>
       {initials}
     </Avatar>
   );
