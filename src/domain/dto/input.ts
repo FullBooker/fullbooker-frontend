@@ -88,6 +88,12 @@ export type UpdateProductPayload = {
   subcategory?: string;
 };
 
+export type ProductsFilters = {
+  page: number;
+  limit: number;
+};
+
+
 export type VendorProductsFilters = {
   page: number;
   limit: number;

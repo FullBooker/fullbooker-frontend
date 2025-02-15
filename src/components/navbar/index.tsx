@@ -36,12 +36,13 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { AuthData } from "@/domain/dto/output";
+import { AuthData, ProductCategory, Subcategory } from "@/domain/dto/output";
 import { FC } from "react";
 import ButtonAuth from "../auth/ButtonAuth";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import {
   addCommaSeparators,
+  generateSlug,
   getInitials,
   hideMiddleCharacters,
 } from "@/utilities";
@@ -52,6 +53,7 @@ import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
+import NavLinkDropDownItem from "../shared/naveLinkDropdown";
 
 type NavbarProps = {
   openNav: boolean;
@@ -67,6 +69,7 @@ type NavbarProps = {
   toggleBalanceVisibility: (showBalance: boolean) => void;
   setActiveModal: (modalId: ModalID) => void;
   switchToHost: (payload: SwitchToHostPayload) => void;
+  productCategories: Array<ProductCategory>;
 };
 
 const Navbar: FC<NavbarProps> = ({
@@ -83,6 +86,7 @@ const Navbar: FC<NavbarProps> = ({
   toggleBalanceVisibility,
   setActiveModal,
   switchToHost,
+  productCategories,
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -163,46 +167,165 @@ const Navbar: FC<NavbarProps> = ({
         </div>
         <div className="hidden items-center lg:flex">
           <ul className="flex justify-between">
-            <li>
-              <Link
-                href="/main-menu/promotions"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm  font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-              >
-                Activities
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/main-menu/promotions"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-              >
-                Events
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/main-menu/promotions"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-              >
-                Experiences
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/main-menu/promotions"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-              >
-                Workshops
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/main-menu/promotions"
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-              >
-                Coorprate Clubs
-              </Link>
-            </li>
+            {productCategories?.map(
+              (category: ProductCategory, index: number) => (
+                <li key={index}>
+                  <Link
+                    href="/main-menu/promotions"
+                    // className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
+                  ></Link>
+                  <div className="relative inline-block text-left">
+                    <NavLinkDropDownItem
+                      label={category?.name}
+                      href={`/products/${generateSlug(category?.name)}`}
+                    >
+                      {category?.subcategories?.length > 0 && (
+                        <div>
+                          {category?.subcategories?.map(
+                            (
+                              subCategory: Subcategory,
+                              subCategoryIndex: number
+                            ) => (
+                              <NavLinkDropDownItem
+                                key={subCategoryIndex}
+                                label={subCategory?.name}
+                                href={`/products/${generateSlug(
+                                  category?.name
+                                )}/${generateSlug(subCategory?.name)}`}
+                              >
+                                {subCategory?.children?.length > 0 && (
+                                  <div>
+                                    {subCategory?.children?.map(
+                                      (
+                                        subCategoryChildTierOne: Subcategory,
+                                        subCategoryChildTierOneIndex: number
+                                      ) => (
+                                        <NavLinkDropDownItem
+                                          key={subCategoryChildTierOneIndex}
+                                          label={subCategoryChildTierOne?.name}
+                                          href={`/products/${generateSlug(
+                                            category?.name
+                                          )}/${generateSlug(
+                                            subCategory?.name
+                                          )}/${generateSlug(
+                                            subCategoryChildTierOne?.name
+                                          )}`}
+                                        >
+                                          {subCategoryChildTierOne?.children
+                                            ?.length > 0 && (
+                                            <div>
+                                              {subCategoryChildTierOne?.children?.map(
+                                                (
+                                                  subCategoryChildTierTwo: Subcategory,
+                                                  subCategoryChildTierTwoIndex: number
+                                                ) => (
+                                                  <NavLinkDropDownItem
+                                                    key={
+                                                      subCategoryChildTierTwoIndex
+                                                    }
+                                                    label={
+                                                      subCategoryChildTierTwo?.name
+                                                    }
+                                                    href={`/products/${generateSlug(
+                                                      category?.name
+                                                    )}/${generateSlug(
+                                                      subCategory?.name
+                                                    )}/${generateSlug(
+                                                      subCategoryChildTierOne?.name
+                                                    )}
+                                                    /${generateSlug(
+                                                      subCategoryChildTierTwo?.name
+                                                    )}`}
+                                                  >
+                                                    {subCategoryChildTierTwo
+                                                      ?.children?.length >
+                                                      0 && (
+                                                      <div>
+                                                        {subCategoryChildTierTwo?.children?.map(
+                                                          (
+                                                            subCategoryChildTierThree: Subcategory,
+                                                            subCategoryChildTierThreeIndex: number
+                                                          ) => (
+                                                            <NavLinkDropDownItem
+                                                              key={
+                                                                subCategoryChildTierThreeIndex
+                                                              }
+                                                              label={
+                                                                subCategoryChildTierThree?.name
+                                                              }
+                                                              href={`/products/${generateSlug(
+                                                                category?.name
+                                                              )}/${generateSlug(
+                                                                subCategory?.name
+                                                              )}/${generateSlug(
+                                                                subCategoryChildTierOne?.name
+                                                              )}
+                                                              /${generateSlug(
+                                                                subCategoryChildTierTwo?.name
+                                                              )}/${generateSlug(
+                                                                subCategoryChildTierThree?.name
+                                                              )}`}
+                                                            >
+                                                              {subCategoryChildTierThree
+                                                                ?.children
+                                                                ?.length >
+                                                                0 && (
+                                                                <div>
+                                                                  {subCategoryChildTierThree?.children?.map(
+                                                                    (
+                                                                      subCategoryChildTierFour: Subcategory,
+                                                                      subCategoryChildTierFourIndex: number
+                                                                    ) => (
+                                                                      <NavLinkDropDownItem
+                                                                        key={
+                                                                          subCategoryChildTierFourIndex
+                                                                        }
+                                                                        label={
+                                                                          subCategoryChildTierFour?.name
+                                                                        }
+                                                                        href={`/products/${generateSlug(
+                                                                          category?.name
+                                                                        )}/${generateSlug(
+                                                                          subCategory?.name
+                                                                        )}/${generateSlug(
+                                                                          subCategoryChildTierOne?.name
+                                                                        )}/${generateSlug(
+                                                                          subCategoryChildTierTwo?.name
+                                                                        )}/${generateSlug(
+                                                                          subCategoryChildTierThree?.name
+                                                                        )}/${generateSlug(
+                                                                          subCategoryChildTierFour?.name
+                                                                        )}`}
+                                                                      ></NavLinkDropDownItem>
+                                                                    )
+                                                                  )}
+                                                                </div>
+                                                              )}
+                                                            </NavLinkDropDownItem>
+                                                          )
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                  </NavLinkDropDownItem>
+                                                )
+                                              )}
+                                            </div>
+                                          )}
+                                        </NavLinkDropDownItem>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </NavLinkDropDownItem>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </NavLinkDropDownItem>
+                  </div>
+                </li>
+              )
+            )}
           </ul>
         </div>
         <div className="flex items-center gap-1">
@@ -383,7 +506,15 @@ const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
   const { profile, showBalance } = state.profile;
   const { isLoggedIn, authData } = state.authentication;
-  return { isLoggedIn, authData, loading, profile, showBalance };
+  const { productCategories } = state.settings;
+  return {
+    isLoggedIn,
+    authData,
+    loading,
+    profile,
+    showBalance,
+    productCategories,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

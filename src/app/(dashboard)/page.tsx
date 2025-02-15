@@ -50,109 +50,47 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import TablePaginationComponent from "@/components/ui/pagination";
 import { ModalID } from "@/domain/components";
+import SingleProduct from "@/components/products/product";
+import SingleProductSkeleton from "@/components/shared/shimmers/singleProduct";
+import { ProductsFilters } from "@/domain/dto/input";
+import { Product } from "@/domain/product";
+import { Currency, ProductCategory } from "@/domain/dto/output";
+import ProductCategories from "@/components/products/categories";
 
 type HomePageProps = {
   isLoggedIn: boolean;
   setActiveModal: (modalId: ModalID) => void;
+  getProducts: (payload?: ProductsFilters) => void;
+  getProductCategories: () => void;
+  products: Array<Product>;
+  productCategories: Array<ProductCategory>;
+  productsRequestProcessing: boolean;
+  getCurrencies: () => void;
+  currencies: Array<Currency>;
 };
 
-const HomePage: FC<HomePageProps> = ({ isLoggedIn, setActiveModal }) => {
+const HomePage: FC<HomePageProps> = ({
+  isLoggedIn,
+  setActiveModal,
+  productCategories,
+  products,
+  productsRequestProcessing,
+  getProducts,
+  getProductCategories,
+  getCurrencies,
+  currencies,
+}) => {
   const { theme = "light" } = useTheme();
-  const [themeMode, setThemeMode] = useState("light");
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
-  const slides = [
-    "/assets/img_banner1.png",
-    "/assets/img_banner1.png",
-    "/assets/img_banner1.png",
-    "/assets/img_banner1.png",
-  ];
+  const [filters, setFilters] = useState<ProductsFilters>({
+    page: 1,
+    limit: 10,
+  });
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
-
-  useEffect(() => {
-    setThemeMode(theme);
-  }, [theme]);
-
-  const baseStyle = `
-    h-[210px] sm:h-[220px] md:h-[232px] lg:h-[246px] xl:h-[254px] 2xl:h-[268px] rounded-[20px] overflow-hidden
-  `;
-
-  const shimmerStyle = `
-    shimmer animate shimmer-slow bg-gray-200 animate-shimmer-slow
-  `;
-
-  const categories = [
-    {
-      name: "Kids",
-      icon: Users,
-    },
-    {
-      name: "Concerts",
-      icon: Music,
-    },
-    {
-      name: "Gyms",
-      icon: Dumbbell,
-    },
-    {
-      name: "Go karting",
-      icon: Car,
-    },
-    {
-      name: "Quad biking",
-      icon: Bike,
-    },
-    // {
-    //   name: "Swimming",
-    //   icon: Swimming
-    // },
-    {
-      name: "Stand Ups",
-      icon: Mic,
-    },
-    {
-      name: "Car shows",
-      icon: Car,
-    },
-    {
-      name: "Paintballing",
-      icon: Target,
-    },
-    {
-      name: "Sports",
-      icon: Trophy,
-    },
-    {
-      name: "Arts",
-      icon: Palette,
-    },
-    {
-      name: "Food",
-      icon: Utensils,
-    },
-    {
-      name: "Adventure",
-      icon: Mountain,
-    },
-    {
-      name: "Culture",
-      icon: Landmark,
-    },
-  ];
+    getProductCategories();
+    getProducts();
+    getCurrencies();
+  }, []);
 
   return (
     <div className="flex flex-col h-fit bg-gray-100">
@@ -243,37 +181,7 @@ const HomePage: FC<HomePageProps> = ({ isLoggedIn, setActiveModal }) => {
       </div>
 
       {/* Activity Categories */}
-      <div className="py-3 lg:py-6 md:py-6 xl:py-6 bg-white px-2 md:px-3 lg:px-4 ">
-        <div
-          className="flex items-center gap-8  py-4
-          px-4 sm:px-7"
-        >
-          <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
-            <ChevronLeft className="w-10 h-10 text-black" />
-          </button>
-
-          <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
-            {categories.map((category, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0"
-              >
-                <div className="w-6 h-6 lg:w-12 md:w-12 xl:w-12 lg:h-12 md:h-12 xl:h-12 rounded-ful flex items-center justify-center">
-                  {React.createElement(category.icon, {
-                    size: 24,
-                    className: "text-gray-600",
-                  })}
-                </div>
-                <span className="text-sm text-center">{category.name}</span>
-              </div>
-            ))}
-          </div>
-
-          <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
-            <ChevronRight className="w-10 h-10 text-black" />
-          </button>
-        </div>
-      </div>
+      <ProductCategories categories={productCategories} />
 
       {/* Popular Now Section */}
       <div className="py-2 lg:py-8 md:py-8 xl:py-8 px-2 md:px-3 lg:px-4 bg-white">
@@ -282,47 +190,37 @@ const HomePage: FC<HomePageProps> = ({ isLoggedIn, setActiveModal }) => {
           px-4 sm:px-7"
         >
           <h2 className="text-xl font-semibold">Popular now</h2>
-          <Link href="/popular" className="text-mainColor">
+          <Link href="/products" className="text-mainColor">
             See all
           </Link>
         </div>
 
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-4
-          px-4 sm:px-7"
-        >
-          {Array(10)
-            .fill(null)
-            .map((_, index) => (
-              <div
+        {productsRequestProcessing ? (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0
+            px-4 md:px-7"
+          >
+            {Array(10)
+              .fill(null)
+              .map((_, index) => (
+                <SingleProductSkeleton key={index} />
+              ))}
+          </div>
+        ) : (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0
+            px-4 md:px-7"
+          >
+            {products.map((product: Product, index: number) => (
+              <SingleProduct
                 key={index}
-                className="relative group rounded-lg overflow-hidden"
-              >
-                <Image
-                  src={"/assets/quad.png"}
-                  alt={"Event"}
-                  width={300}
-                  height={200}
-                  className="w-full h-[200px] object-cover shadow-md rounded-sm"
-                />
-                <div className="absolute top-3 right-3">
-                  <button className="p-2 rounded-full bg-white/80">
-                    <Heart className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold mb-2">{"Quad Biking"}</h3>
-                  <div className="flex items-center gap-2 text-sm text-textColor">
-                    <CalendarDays className="w-4 h-4" />
-                    <span>Every day from 8:00 AM to 10:00 PM</span>
-                  </div>
-                  <button className="w-full mt-4 py-2 px-4 bg-mainColor text-white rounded-full">
-                    Book this Activity
-                  </button>
-                </div>
-              </div>
+                product={product}
+                currencies={currencies}
+                categories={productCategories}
+              />
             ))}
-        </div>
+          </div>
+        )}
       </div>
       <div className="py-8 px-2 md:px-3 lg:px-4 bg-white text-center">
         <div className=" px-4 sm:px-7">
@@ -340,13 +238,26 @@ const HomePage: FC<HomePageProps> = ({ isLoggedIn, setActiveModal }) => {
 };
 
 const mapStateToProps = (state: RootState) => {
+  const productsRequestProcessing = state.loading.models.products;
   const { isLoggedIn } = state.authentication;
-  return { isLoggedIn };
+  const { products } = state.products;
+  const { productCategories, currencies } = state.settings;
+  return {
+    isLoggedIn,
+    products,
+    productCategories,
+    productsRequestProcessing,
+    currencies,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
+  getProducts: (payload?: ProductsFilters) =>
+    dispatch.products.getProducts(payload),
+  getProductCategories: () => dispatch.settings.getProductCategories(),
+  getCurrencies: () => dispatch.settings.getCurrencies(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

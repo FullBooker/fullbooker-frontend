@@ -5,6 +5,7 @@ import { components } from "./components";
 import { profile } from "./profile";
 import { vendor } from "./vendor";
 import { settings } from './settings';
+import { products } from './products';
 
 export interface RootModel extends Models<RootModel> {
   alert: typeof alert;
@@ -13,6 +14,7 @@ export interface RootModel extends Models<RootModel> {
   profile: typeof profile;
   vendor: typeof vendor;
   settings: typeof settings;
+  products: typeof products;
 }
 
 export const models: RootModel = {
@@ -21,5 +23,6 @@ export const models: RootModel = {
   components,
   profile,
   vendor,
-  settings
+  settings,
+  products,
 };
