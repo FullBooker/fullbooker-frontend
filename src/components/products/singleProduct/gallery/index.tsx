@@ -57,6 +57,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
                 width={isMobile ? 150 : 300}
                 height={isMobile ? 150 : 300}
                 className="w-full h-[150px] md:h-[300px] object-cover rounded-lg"
+                unoptimized={true}
               />
             ))}
         </div>

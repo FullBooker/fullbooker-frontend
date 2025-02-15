@@ -108,6 +108,7 @@ const HostDetails: FC<HostDetailsProps> = ({
                 width={300}
                 height={300}
                 className="w-full h-[300px] object-cover rounded-lg"
+                unoptimized={true}
               />
             </div>
           </div>
