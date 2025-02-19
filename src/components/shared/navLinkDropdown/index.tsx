@@ -6,31 +6,31 @@ type NavLinkDropDownProps = {
   label: string;
   href: string;
   children?: any;
+  level?: string;
 };
 
 const NavLinkDropDown: FC<NavLinkDropDownProps> = ({
   label,
   href,
   children,
+  level,
 }) => {
-  const cleanHref = href
-  .replace(/\s*\/\s*/g, "/")
-  .trim();
+  const cleanHref = href.replace(/\s*\/\s*/g, "/").trim();
   const encodedHref = encodeURI(cleanHref);
   const [open, setOpen] = useState(false);
 
   return (
     <Link
-      className={`relative group`}
+      className={`relative group hover:text-white`}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       href={encodedHref}
     >
       <button
-        className={`px-4 py-2 text-sm font-medium text-black bg-white hover:bg-primary hover:text-white flex items-center justify-between w-48 transition-opacity duration-300 hover:opacity-4`}
+        className={`px-4 py-2 text-sm font-medium text-black bg-white hover:bg-primary hover:text-white flex items-center justify-between transition-opacity duration-300 hover:opacity-4 w-full`}
         onClick={() => setOpen(!open)}
       >
-        {label}
+        <span className="text-black me-2 hover:text-white">{label}</span>
         {children && <ChevronDown />}
       </button>
       {open && children && (

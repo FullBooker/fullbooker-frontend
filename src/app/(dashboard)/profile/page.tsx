@@ -49,10 +49,10 @@ const ProfilePage: FC<ProfilePageProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col gap-12 h-fit sm:pt-6">
+    <div className="flex flex-col gap-12 h-fit py-6 md:py-10 px-4 md:px- max-w-7xl mx-auto">
       {/* BG Profile */}
       <div className="w-full flex flex-col">
-        <div className="flex flex-col justify-center sm:justify-end w-full h-[120px] xs:h-[150px] sm:h-[210px] md:h-[250px] lg:h-[270px] bg-[url('/assets/img_bg_profile.png')] rounded-[15px] md:rounded-[20px] bg-cover bg-center">
+        <div className="flex flex-col justify-center">
           <div className="hidden sm:flex ms-6 sm:-mb-[58px] sm:ms-6 md:-mb-16 md:ms-12 lg:-mb-24 lg:ms-16 items-center sm:items-end gap-4 md:gap-6 lg:gap-8">
             <Image
               src={`/assets/default-profile-picture-placeholder.jpg`}

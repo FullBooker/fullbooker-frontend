@@ -26,7 +26,7 @@ const ProductReviews: FC<ProductReviewsProps> = ({
   return (
     <div>
       {productsRequestProcessing ? (
-        <div className="mt-6 border-b border-gray-400 py-10 animate-pulse">
+        <div className="mt-5 border-b border-gray-400 py-10 animate-pulse">
            <div className="h-4 w-24 bg-gray-300 rounded mb-3"></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 space-y-4">
             {[1, 2].map((_, index) => (

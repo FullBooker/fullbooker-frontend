@@ -2,6 +2,7 @@ import axios from "axios";
 import { authHeader } from "./auth.header";
 import { store } from "../store";
 import { ModalID } from "@/domain/components";
+import { TechnicalError } from "./errors";
 
 //Create axios instance
 const axiosClient = axios.create({
@@ -19,6 +20,8 @@ axiosClient.interceptors.response.use(
       store.dispatch.authentication.setSessionHasExpired(true);
       store.dispatch.components.setActiveModal(ModalID.sessionExpired);
       return;
+    } else if (error.response.status === 500) {
+      return Promise.reject(new TechnicalError(error.response?.data));
     } else {
       return Promise.reject({
         status: error.response?.status,

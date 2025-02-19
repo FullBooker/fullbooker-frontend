@@ -25,6 +25,7 @@ import {
   EyeOff,
   EyeIcon,
   GiftIcon,
+  UserCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Profile from "./profile/Profile";
@@ -39,7 +40,14 @@ import { connect } from "react-redux";
 import { AuthData, ProductCategory, Subcategory } from "@/domain/dto/output";
 import { FC } from "react";
 import ButtonAuth from "../auth/ButtonAuth";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  CircularProgress,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import {
   addCommaSeparators,
   generateSlug,
@@ -53,7 +61,8 @@ import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
-import NavLinkDropDownItem from "../shared/naveLinkDropdown";
+import NavLinkDropDownItem from "../shared/navLinkDropdown";
+import Button from "../shared/button";
 
 type NavbarProps = {
   openNav: boolean;
@@ -119,367 +128,380 @@ const Navbar: FC<NavbarProps> = ({
   }, [authToken]);
 
   return (
-    <div
-      className={`sticky top-0 z-40 bg-background ${
-        openNav && isMobile && themeMode === "dark"
-          ? "bg-black opacity-30 z-40"
-          : openNav && isMobile && themeMode === "light"
-          ? "blur-sm bg-white opacity-30 z-40"
-          : "bg-background"
-      } px-2 md:px-3 lg:px-4`}
-    >
-      <div
-        className={`flex gap-1 sm:gap-2 justify-between items-center py-4
-          px-4 sm:px-7
-        }`}
-      >
-        <div className="flex justify-between">
-          <div
-            className={`flex flex-col xl:hidden px-[10px] py-[12px] md:px-3 md:py-[14px] sm:me-3 justify-center items-center ${
-              themeMode === "light"
-                ? "border-[1px] border-strokeColor2"
-                : "border border-inputBorderColor"
-            } rounded-full flex-shrink-0 cursor-pointer me-3`}
-            onClick={onOpenSideNav}
-          >
-            <div className="rotate-90 -mb-1">
-              <Tally3 className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
-            </div>
+    <Box sx={{ flexGrow: 1, backgroundColor: "#FFF", marginBottom: 2, }}>
+      <AppBar position="fixed" sx={{ backgroundColor: "#FFF", boxShadow: "none", zIndex: 10 }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+          className="flex justify-between items-center py-2
+          px-4 sm:px-7"
+        >
+          <div className="flex justify-between items-center">
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ color: "#000" }}
+            >
+              <div
+                className={`flex flex-col xl:hidden justify-center items-center rounded-full flex-shrink-0 cursor-pointer`}
+                onClick={onOpenSideNav}
+              >
+                <div className="rotate-90">
+                  <Tally3 className="w-[30px] h-[30px]" />
+                </div>
+              </div>
+            </IconButton>
+            <Link href="/" className="">
+              <div className="sm:flex xs:flex lg:hidden md:hidden xl:hidden ">
+                <Image
+                  src="/assets/logo.svg"
+                  alt="Fullbooker Logo"
+                  width={110}
+                  height={45}
+                />
+              </div>
+              <div className="hidden xl:flex md:flex lg:flex">
+                <Image
+                  src="/assets/logo.svg"
+                  alt="Fullbooker Logo"
+                  width={190}
+                  height={35}
+                />
+              </div>
+            </Link>
           </div>
-          <Link href="/" className="">
-            <div className="sm:flex xs:flex lg:hidden md:hidden xl:hidden ">
-              <Image
-                src="/assets/logo.svg"
-                alt="Fullbooker Logo"
-                width={120}
-                height={34}
-              />
-            </div>
-            <div className="hidden xl:flex md:flex lg:flex">
-              <Image
-                src="/assets/logo.svg"
-                alt="Fullbooker Logo"
-                width={238}
-                height={39.29}
-              />
-            </div>
-          </Link>
-        </div>
-        <div className="hidden items-center lg:flex">
-          <ul className="flex justify-between">
-            {productCategories?.map(
-              (category: ProductCategory, index: number) => (
-                <li key={index}>
-                  <Link
-                    href="/main-menu/promotions"
-                    // className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] gap-2 rounded-sm font-medium transition-opacity duration-300 hover:opacity-4 text-black"
-                  ></Link>
-                  <div className="relative inline-block text-left">
-                    <NavLinkDropDownItem
-                      label={category?.name}
-                      href={`/products/${generateSlug(category?.name)}`}
-                    >
-                      {category?.subcategories?.length > 0 && (
-                        <div>
-                          {category?.subcategories?.map(
-                            (
-                              subCategory: Subcategory,
-                              subCategoryIndex: number
-                            ) => (
-                              <NavLinkDropDownItem
-                                key={subCategoryIndex}
-                                label={subCategory?.name}
-                                href={`/products/${generateSlug(
-                                  category?.name
-                                )}/${generateSlug(subCategory?.name)}`}
-                              >
-                                {subCategory?.children?.length > 0 && (
-                                  <div>
-                                    {subCategory?.children?.map(
-                                      (
-                                        subCategoryChildTierOne: Subcategory,
-                                        subCategoryChildTierOneIndex: number
-                                      ) => (
-                                        <NavLinkDropDownItem
-                                          key={subCategoryChildTierOneIndex}
-                                          label={subCategoryChildTierOne?.name}
-                                          href={`/products/${generateSlug(
-                                            category?.name
-                                          )}/${generateSlug(
-                                            subCategory?.name
-                                          )}/${generateSlug(
-                                            subCategoryChildTierOne?.name
-                                          )}`}
-                                        >
-                                          {subCategoryChildTierOne?.children
-                                            ?.length > 0 && (
-                                            <div>
-                                              {subCategoryChildTierOne?.children?.map(
-                                                (
-                                                  subCategoryChildTierTwo: Subcategory,
-                                                  subCategoryChildTierTwoIndex: number
-                                                ) => (
-                                                  <NavLinkDropDownItem
-                                                    key={
-                                                      subCategoryChildTierTwoIndex
-                                                    }
-                                                    label={
-                                                      subCategoryChildTierTwo?.name
-                                                    }
-                                                    href={`/products/${generateSlug(
-                                                      category?.name
-                                                    )}/${generateSlug(
-                                                      subCategory?.name
-                                                    )}/${generateSlug(
-                                                      subCategoryChildTierOne?.name
-                                                    )}
+          <div className="hidden items-center lg:flex">
+            <ul className="flex justify-between">
+              {productCategories?.map(
+                (category: ProductCategory, index: number) => (
+                  <li key={index}>
+                    <div className="relative inline-block text-left">
+                      <NavLinkDropDownItem
+                        label={category?.name}
+                        href={`/products/${generateSlug(category?.name)}`}
+                        level="category"
+                      >
+                        {category?.subcategories?.length > 0 && (
+                          <div>
+                            {category?.subcategories?.map(
+                              (
+                                subCategory: Subcategory,
+                                subCategoryIndex: number
+                              ) => (
+                                <NavLinkDropDownItem
+                                  key={subCategoryIndex}
+                                  label={subCategory?.name}
+                                  href={`/products/${generateSlug(
+                                    category?.name
+                                  )}/${generateSlug(subCategory?.name)}`}
+                                >
+                                  {subCategory?.children?.length > 0 && (
+                                    <div>
+                                      {subCategory?.children?.map(
+                                        (
+                                          subCategoryChildTierOne: Subcategory,
+                                          subCategoryChildTierOneIndex: number
+                                        ) => (
+                                          <NavLinkDropDownItem
+                                            key={subCategoryChildTierOneIndex}
+                                            label={
+                                              subCategoryChildTierOne?.name
+                                            }
+                                            href={`/products/${generateSlug(
+                                              category?.name
+                                            )}/${generateSlug(
+                                              subCategory?.name
+                                            )}/${generateSlug(
+                                              subCategoryChildTierOne?.name
+                                            )}`}
+                                          >
+                                            {subCategoryChildTierOne?.children
+                                              ?.length > 0 && (
+                                              <div>
+                                                {subCategoryChildTierOne?.children?.map(
+                                                  (
+                                                    subCategoryChildTierTwo: Subcategory,
+                                                    subCategoryChildTierTwoIndex: number
+                                                  ) => (
+                                                    <NavLinkDropDownItem
+                                                      key={
+                                                        subCategoryChildTierTwoIndex
+                                                      }
+                                                      label={
+                                                        subCategoryChildTierTwo?.name
+                                                      }
+                                                      href={`/products/${generateSlug(
+                                                        category?.name
+                                                      )}/${generateSlug(
+                                                        subCategory?.name
+                                                      )}/${generateSlug(
+                                                        subCategoryChildTierOne?.name
+                                                      )}
                                                     /${generateSlug(
                                                       subCategoryChildTierTwo?.name
                                                     )}`}
-                                                  >
-                                                    {subCategoryChildTierTwo
-                                                      ?.children?.length >
-                                                      0 && (
-                                                      <div>
-                                                        {subCategoryChildTierTwo?.children?.map(
-                                                          (
-                                                            subCategoryChildTierThree: Subcategory,
-                                                            subCategoryChildTierThreeIndex: number
-                                                          ) => (
-                                                            <NavLinkDropDownItem
-                                                              key={
-                                                                subCategoryChildTierThreeIndex
-                                                              }
-                                                              label={
-                                                                subCategoryChildTierThree?.name
-                                                              }
-                                                              href={`/products/${generateSlug(
-                                                                category?.name
-                                                              )}/${generateSlug(
-                                                                subCategory?.name
-                                                              )}/${generateSlug(
-                                                                subCategoryChildTierOne?.name
-                                                              )}
+                                                    >
+                                                      {subCategoryChildTierTwo
+                                                        ?.children?.length >
+                                                        0 && (
+                                                        <div>
+                                                          {subCategoryChildTierTwo?.children?.map(
+                                                            (
+                                                              subCategoryChildTierThree: Subcategory,
+                                                              subCategoryChildTierThreeIndex: number
+                                                            ) => (
+                                                              <NavLinkDropDownItem
+                                                                key={
+                                                                  subCategoryChildTierThreeIndex
+                                                                }
+                                                                label={
+                                                                  subCategoryChildTierThree?.name
+                                                                }
+                                                                href={`/products/${generateSlug(
+                                                                  category?.name
+                                                                )}/${generateSlug(
+                                                                  subCategory?.name
+                                                                )}/${generateSlug(
+                                                                  subCategoryChildTierOne?.name
+                                                                )}
                                                               /${generateSlug(
                                                                 subCategoryChildTierTwo?.name
                                                               )}/${generateSlug(
-                                                                subCategoryChildTierThree?.name
-                                                              )}`}
-                                                            >
-                                                              {subCategoryChildTierThree
-                                                                ?.children
-                                                                ?.length >
-                                                                0 && (
-                                                                <div>
-                                                                  {subCategoryChildTierThree?.children?.map(
-                                                                    (
-                                                                      subCategoryChildTierFour: Subcategory,
-                                                                      subCategoryChildTierFourIndex: number
-                                                                    ) => (
-                                                                      <NavLinkDropDownItem
-                                                                        key={
-                                                                          subCategoryChildTierFourIndex
-                                                                        }
-                                                                        label={
-                                                                          subCategoryChildTierFour?.name
-                                                                        }
-                                                                        href={`/products/${generateSlug(
-                                                                          category?.name
-                                                                        )}/${generateSlug(
-                                                                          subCategory?.name
-                                                                        )}/${generateSlug(
-                                                                          subCategoryChildTierOne?.name
-                                                                        )}/${generateSlug(
-                                                                          subCategoryChildTierTwo?.name
-                                                                        )}/${generateSlug(
-                                                                          subCategoryChildTierThree?.name
-                                                                        )}/${generateSlug(
-                                                                          subCategoryChildTierFour?.name
-                                                                        )}`}
-                                                                      ></NavLinkDropDownItem>
-                                                                    )
-                                                                  )}
-                                                                </div>
-                                                              )}
-                                                            </NavLinkDropDownItem>
-                                                          )
-                                                        )}
-                                                      </div>
-                                                    )}
-                                                  </NavLinkDropDownItem>
-                                                )
-                                              )}
-                                            </div>
-                                          )}
-                                        </NavLinkDropDownItem>
-                                      )
-                                    )}
-                                  </div>
-                                )}
-                              </NavLinkDropDownItem>
-                            )
-                          )}
-                        </div>
-                      )}
-                    </NavLinkDropDownItem>
-                  </div>
-                </li>
-              )
-            )}
-          </ul>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1">
-            <div className="flex md:flex gap-2">
-              <button
-                onClick={() => {
-                  if (authToken) {
-                    switchToHost({
-                      user: authData?.user?.id,
-                    } as SwitchToHostPayload);
-                  } else {
-                    const newSearchParams = new URLSearchParams(
-                      searchParams.toString()
-                    );
-                    newSearchParams.set("user_flow", "vendor");
-                    router.push(`${pathname}?${newSearchParams.toString()}`);
-                    setActiveModal(ModalID.login);
-                  }
-                }}
-                className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-secondary font-medium"
-              >
-                {loading ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : authToken ? (
-                  "Switch to hosting"
-                ) : (
-                  "Become a Host"
-                )}
-              </button>
-              {!authToken && (
-                <button
-                  onClick={() => setActiveModal(ModalID.login)}
-                  className="flex md:flex items-center text-xs md:text-sm lg:text-sm h-fit px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-[10px] rounded-lg bg-primary text-black font-medium me-3"
-                >
-                  Sign In
-                </button>
-              )}
-            </div>
-            {/* Profile & Dropdown */}
-            {authToken && (
-              <Profile
-                button={
-                  <div className="flex gap-1 lg:gap-3 justify-center content-center items-center cursor-pointer me-1 sm:me-1 xl:me-2 ml-2">
-                    <div className="w-[37px] h-[37px] sm:w-10 sm:h-10 md:w-11 md:h-11 xl:w-11 xl:h-11 lg:w-10 lg:h-10 ">
-                      <CustomAvatar
-                        name={getInitials(
-                          `${authData?.user?.first_name} ${authData?.user?.last_name}`
-                        )}
-                      />
-                    </div>
-                  </div>
-                }
-                openState={openProfile}
-                setOpenState={setOpenProfile}
-                classNames={
-                  "py-2 top-[44px] -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[180px] lg:top-[54px] lg:-left-[180px] xl:top-[56px] xl:-left-[180px] w-max"
-                }
-              >
-                <div
-                  className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
-                    themeMode === "light"
-                      ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
-                      : "border-[1px] border-inputBorderColor"
-                  }`}
-                >
-                  <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center">
-                    {authToken && (
-                      <>
-                        <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
-                          {authData?.user?.phone_number && (
-                            <span className="text-[13px] sm:text-base lg:text-lg">
-                              {`${hideMiddleCharacters(
-                                authData?.user?.phone_number
-                              )}`}
-                            </span>
-                          )}
-                          <span
-                            className={`text-[11px] sm:text-sm ${
-                              themeMode === "light"
-                                ? "text-textColor2"
-                                : "text-textColor"
-                            }`}
-                          >
-                            {authData?.user?.first_name
-                              ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
-                              : ""}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                    <div className="w-full flex flex-col gap-2 sm:gap-3">
-                      <ProfileItem
-                        theme={themeMode}
-                        icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5" />}
-                        text="View My Profile"
-                        href={
-                          authToken
-                            ? "/profile"
-                            : `/login?redirect=${pathname?.slice(1)}`
-                        }
-                        onItemClick={handleCloseLink}
-                      />
-                    </div>
-                    <div className="-mt-1 -mb-1 h-[1.5px] w-full bg-gray-200 dark:bg-white/20 " />
-                    <div className="flex flex-col gap-3 w-full hover:opacity-40">
-                      {authToken ? (
-                        <button
-                          className={`w-full flex items-center justify-between gap-2 py-[10px] px-[8px] sm:py-[14px] sm:px-[12px] rounded-[10px] sm:rounded-[15px] ${
-                            themeMode === "light"
-                              ? ""
-                              : "border-[1.5px] border-inputBorderColor"
-                          } bg-gradient-to-br from-[#121211] to-[#21211F] hover:bg-gradient-to-bl`}
-                          onClick={() => sigOut()}
-                        >
-                          <span className="text-whiteColor text-[10px] sm:text-xs font-medium">
-                            {loading ? (
-                              <CircularProgress size={18} color="inherit" />
-                            ) : (
-                              "Logout"
+                                                                  subCategoryChildTierThree?.name
+                                                                )}`}
+                                                              >
+                                                                {subCategoryChildTierThree
+                                                                  ?.children
+                                                                  ?.length >
+                                                                  0 && (
+                                                                  <div>
+                                                                    {subCategoryChildTierThree?.children?.map(
+                                                                      (
+                                                                        subCategoryChildTierFour: Subcategory,
+                                                                        subCategoryChildTierFourIndex: number
+                                                                      ) => (
+                                                                        <NavLinkDropDownItem
+                                                                          key={
+                                                                            subCategoryChildTierFourIndex
+                                                                          }
+                                                                          label={
+                                                                            subCategoryChildTierFour?.name
+                                                                          }
+                                                                          href={`/products/${generateSlug(
+                                                                            category?.name
+                                                                          )}/${generateSlug(
+                                                                            subCategory?.name
+                                                                          )}/${generateSlug(
+                                                                            subCategoryChildTierOne?.name
+                                                                          )}/${generateSlug(
+                                                                            subCategoryChildTierTwo?.name
+                                                                          )}/${generateSlug(
+                                                                            subCategoryChildTierThree?.name
+                                                                          )}/${generateSlug(
+                                                                            subCategoryChildTierFour?.name
+                                                                          )}`}
+                                                                        ></NavLinkDropDownItem>
+                                                                      )
+                                                                    )}
+                                                                  </div>
+                                                                )}
+                                                              </NavLinkDropDownItem>
+                                                            )
+                                                          )}
+                                                        </div>
+                                                      )}
+                                                    </NavLinkDropDownItem>
+                                                  )
+                                                )}
+                                              </div>
+                                            )}
+                                          </NavLinkDropDownItem>
+                                        )
+                                      )}
+                                    </div>
+                                  )}
+                                </NavLinkDropDownItem>
+                              )
                             )}
-                          </span>
-                          <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-whiteColor" />
-                        </button>
-                      ) : (
+                          </div>
+                        )}
+                      </NavLinkDropDownItem>
+                    </div>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
+              <div className="flex md:flex gap-2">
+                <Button
+                  bg="bg-secondary"
+                  padding={`${
+                    authToken
+                      ? "py-2 px-4 md:py-2 md:px-4"
+                      : "py-2 px-3 md:py-2 md:px-4"
+                  }`}
+                  borderRadius="rounded-2xl"
+                  text="text-xs md:text-sm text-black"
+                  onClick={() => {
+                    if (authToken) {
+                      switchToHost({
+                        user: authData?.user?.id,
+                      } as SwitchToHostPayload);
+                    } else {
+                      const newSearchParams = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      newSearchParams.set("user_flow", "vendor");
+                      router.push(`${pathname}?${newSearchParams.toString()}`);
+                      setActiveModal(ModalID.login);
+                    }
+                  }}
+                >
+                  {loading ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : authToken ? (
+                    "Switch to hosting"
+                  ) : (
+                    "Become a Host"
+                  )}
+                </Button>
+                {!authToken && (
+                  <Button
+                    bg="bg-primary"
+                    padding="py-2 px-3 md:py-2 md:px-4"
+                    borderRadius="rounded-2xl"
+                    text="text-xs md:text-sm text-black"
+                    onClick={() => setActiveModal(ModalID.login)}
+                  >
+                    {loading ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+                )}
+              </div>
+              {/* Profile & Dropdown */}
+              {authToken && (
+                <Profile
+                  button={
+                    <div className="flex justify-center content-center items-center cursor-pointer ml-2">
+                      <Image
+                        src="/assets/default-profile-picture-placeholder.jpg"
+                        alt={"Host Profile Image"}
+                        width={isMobile ? 35 : 35}
+                        height={isMobile ? 35 : 35}
+                        className="rounded-lg"
+                      />
+                    </div>
+                  }
+                  openState={openProfile}
+                  setOpenState={setOpenProfile}
+                  classNames={
+                    "py-2 top-[44px] -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[180px] lg:top-[54px] lg:-left-[180px] xl:top-[56px] xl:-left-[180px] w-max"
+                  }
+                >
+                  <div
+                    className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
+                      themeMode === "light"
+                        ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
+                        : "border-[1px] border-inputBorderColor"
+                    }`}
+                  >
+                    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center">
+                      {authToken && (
                         <>
-                          <ButtonAuth
-                            type="submit"
-                            onClick={() =>
-                              router.push(
-                                `/login?redirect=${pathname?.slice(1)}`
-                              )
-                            }
-                          >
-                            Login
-                          </ButtonAuth>
-                          <ButtonAuth
-                            type="submit"
-                            onClick={() =>
-                              router.push(
-                                `/register?redirect=${pathname?.slice(1)}`
-                              )
-                            }
-                          >
-                            Sign Up
-                          </ButtonAuth>
+                          <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
+                            {authData?.user?.phone_number && (
+                              <span className="text-[13px] sm:text-base lg:text-lg text-black">
+                                {`${hideMiddleCharacters(
+                                  authData?.user?.phone_number
+                                )}`}
+                              </span>
+                            )}
+                            <span
+                              className={`text-[11px] sm:text-sm ${
+                                themeMode === "light"
+                                  ? "text-black"
+                                  : "text-white"
+                              }`}
+                            >
+                              {authData?.user?.first_name
+                                ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+                                : ""}
+                            </span>
+                          </div>
                         </>
                       )}
+                      <div className="w-full flex flex-col gap-2 sm:gap-3">
+                        <ProfileItem
+                          theme={themeMode}
+                          icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                          text="View My Profile"
+                          href={
+                            authToken
+                              ? "/profile"
+                              : `/login?redirect=${pathname?.slice(1)}`
+                          }
+                          onItemClick={handleCloseLink}
+                        />
+                      </div>
+                      <div className="-mt-1 -mb-1 h-[1.5px] w-full bg-gray-200 dark:bg-white/20 " />
+                      <div className="flex flex-col gap-3 w-full hover:opacity-40">
+                        {authToken ? (
+                          <button
+                            className={`w-full flex items-center justify-between gap-2 py-[10px] px-[8px] sm:py-[14px] sm:px-[12px] rounded-[10px] sm:rounded-[15px] ${
+                              themeMode === "light"
+                                ? ""
+                                : "border-[1.5px] border-inputBorderColor"
+                            } bg-gradient-to-br from-[#121211] to-[#21211F] hover:bg-gradient-to-bl`}
+                            onClick={() => sigOut()}
+                          >
+                            <span className="text-white text-[10px] sm:text-xs font-medium">
+                              {loading ? (
+                                <CircularProgress size={18} color="inherit" />
+                              ) : (
+                                "Logout"
+                              )}
+                            </span>
+                            <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-whiteColor" />
+                          </button>
+                        ) : (
+                          <>
+                            <ButtonAuth
+                              type="submit"
+                              onClick={() =>
+                                router.push(
+                                  `/login?redirect=${pathname?.slice(1)}`
+                                )
+                              }
+                            >
+                              Login
+                            </ButtonAuth>
+                            <ButtonAuth
+                              type="submit"
+                              onClick={() =>
+                                router.push(
+                                  `/register?redirect=${pathname?.slice(1)}`
+                                )
+                              }
+                            >
+                              Sign Up
+                            </ButtonAuth>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Profile>
-            )}
-            {/* <div
+                </Profile>
+              )}
+              {/* <div
             className={`flex items-center px-[10px] py-[10px] md:px-3 md:py-3 ${
               themeMode === "light"
                 ? "border-[1px] border-strokeColor2"
@@ -495,10 +517,11 @@ const Navbar: FC<NavbarProps> = ({
               <SunMedium className="w-4 h-4 sm:w-5 sm:h-5 xl:w-5 xl:h-5" />
             )}
           </div> */}
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

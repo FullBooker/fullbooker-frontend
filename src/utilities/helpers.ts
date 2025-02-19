@@ -66,3 +66,21 @@ export const extractCoordinates = (coordinateString: string) => {
 export const generateSlug = (name: string): string => {
   return name?.trim().replace(/\s+/g, "-").toLowerCase();
 };
+
+/**
+ *
+ * @param {*} data
+ * @returns
+ */
+export const encodeBase64 = (data: any) => {
+  return Buffer.from(data).toString("base64");
+};
+
+/**
+ *
+ * @param {*} data
+ * @returns
+ */
+export const decodeBase64 = (data: any) => {
+  return Buffer.from(data, "base64").toString("ascii");
+};

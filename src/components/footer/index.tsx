@@ -6,8 +6,8 @@ import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className=" bottom-0 w-full bg-white flex justify-center">
-      <div className="max-w-[1200px] px-8 py-12">
+    <footer className="bottom-0 w-full bg-white flex justify-center">
+      <div className="max-w-[1200px] px-5 py-12 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description Column */}
           <div className="col-span-1">
@@ -45,7 +45,7 @@ const Footer = () => {
           {/* Product Column */}
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 Features
               </Link>
@@ -67,7 +67,7 @@ const Footer = () => {
           {/* Company Column */}
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 About
               </Link>
@@ -89,7 +89,7 @@ const Footer = () => {
           {/* Support Column */}
           <div>
             <h3 className="font-semibold mb-4">Support</h3>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 Getting started
               </Link>
@@ -110,18 +110,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t">
+        <div className="mt-12 pt-3 md:pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-black">
+            <p className="text-xs md:tex-sm text-black">
               Copyright © {new Date().getFullYear()} Fullbooker
             </p>
-            <div className="flex gap-3">
-              <p className="text-sm text-black">All Rights Reserved |</p>
-              <Link href="#" className="text-sm text-blue-500 hover:text-mainColor underline">
+            <div className="flex gap-1 ga-3">
+              <p className="text-xs md:tex-sm text-black">All Rights Reserved |</p>
+              <Link href="#" className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent">
                 Terms and Conditions
               </Link>
-              <p className="text-sm text-black">|</p>
-              <Link href="#" className="text-sm text-blue-500 hover:text-mainColor underline">
+              <p className="text-xs md:tex-sm text-black">|</p>
+              <Link href="#" className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent">
                 Privacy Policy
               </Link>
             </div>

@@ -30,6 +30,7 @@ import {
 import { Facebook } from "lucide-react";
 import { Chrome } from "lucide-react";
 import { ModalID } from "@/domain/components";
+import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 
 type RegisterModalContentProps = {
   loading: boolean;
@@ -133,7 +134,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, message]);
 
-  console.log(errors);
+  const { login: register } = useGoogleLogin();
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -207,9 +208,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 error={errors.email?.message}
                 id="email"
                 name="email"
-                icon={
-                  <Mail className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<Mail className="w-4 h-4 text-white fill-gray-500" />}
               />
             )}
           />
@@ -245,9 +244,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 id="password"
                 name="password"
                 is_password={true}
-                icon={
-                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<KeyRound className="w-4 h-4 text-white fill-gray-500" />}
               />
             )}
           />
@@ -265,9 +262,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                 id="confirm_password"
                 name="confirm_password"
                 is_password={true}
-                icon={
-                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<KeyRound className="w-4 h-4 text-white fill-gray-500" />}
               />
             )}
           />
@@ -294,10 +289,10 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
             </div>
           </div>
 
-        
           <button
             type="button"
             className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
+            onClick={() => register()}
           >
             <Image
               src="/assets/google-icon.png"
@@ -305,7 +300,11 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
               width={20}
               height={20}
             />
-            Sign in with Google
+            {loading ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              "Sign in with Google"
+            )}
           </button>
 
           <button

@@ -20,6 +20,7 @@ import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVe
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
+import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -27,6 +28,7 @@ type DashboardLayoutProps = {
   message: String;
   type: NotificationType;
   sessionHasExpired: boolean;
+  isLoggedIn: boolean;
 };
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({
@@ -35,6 +37,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   message,
   type,
   sessionHasExpired,
+  isLoggedIn,
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -64,10 +67,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     setTimeout(() => {
       handleResize();
     }, 500);
-    window.addEventListener("resize", handleResize); // Listen for window resize events
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize); // Clean up the event listener
+      window.removeEventListener("resize", handleResize);
     };
   }, [router, data, children]);
 
@@ -138,6 +141,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     }
   }, [message, type]);
 
+  useGoogleOneTap();
+
   return (
     <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
       {/* Sidebar */}
@@ -163,11 +168,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
         }`}
       >
         <main
-          className={`h-fit mx-auto w-full overflow-x-hidden ${
-            data
-              ? "mt-7"
-              : router === "/" || router.startsWith("/promotions/detail/")
-          } content-container`}
+          className={`h-fit mx-auto w-full overflow-x-hidden mt-12 content-container`}
         >
           {/* Navbar */}
           {!data && !isPlayingGameOnMobile ? (
@@ -259,9 +260,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const { message, type } = state.alert;
-  const { sessionHasExpired } = state.authentication;
+  const { sessionHasExpired, isLoggedIn } = state.authentication;
   const { modalId } = state.components;
-  return { modalId, message, type, sessionHasExpired };
+  return { modalId, message, type, sessionHasExpired, isLoggedIn };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({});

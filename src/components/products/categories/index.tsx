@@ -19,6 +19,8 @@ import {
   Music,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { generateSlug } from "@/utilities";
 
 type ProductCategoriesProps = {
   categories: Array<ProductCategory>;
@@ -81,7 +83,9 @@ const ProductCategories: FC<ProductCategoriesProps> = ({ categories }) => {
   ];
   const router = useRouter();
 
-  const extractSubcategories = (categories: Array<ProductCategory>): Array<Subcategory> => {
+  const extractSubcategories = (
+    categories: Array<ProductCategory>
+  ): Array<Subcategory> => {
     let subcategories: any[] = [];
 
     const collectSubcategories = (subcats: Array<Subcategory>) => {
@@ -115,16 +119,10 @@ const ProductCategories: FC<ProductCategoriesProps> = ({ categories }) => {
         <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
           {extractSubcategories(categories)?.map(
             (subCategory: Subcategory, index: number) => (
-              <div
+              <Link
                 key={index}
                 className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0 cursor-pointer"
-                onClick={() =>
-                  router.push(
-                    `/products/${
-                      subCategory?.category?.toLocaleLowerCase
-                    }/${subCategory?.name.toLowerCase()}`
-                  )
-                }
+                href={`/products/${generateSlug(subCategory?.name)}`}
               >
                 <div className="w-6 h-6 lg:w-12 md:w-12 xl:w-12 lg:h-12 md:h-12 xl:h-12 rounded-ful flex items-center justify-center">
                   {React.createElement(
@@ -136,7 +134,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({ categories }) => {
                   )}
                 </div>
                 <span className="text-sm text-center">{subCategory.name}</span>
-              </div>
+              </Link>
             )
           )}
         </div>
