@@ -134,7 +134,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, message]);
 
-  const { login: register } = useGoogleLogin();
+  // const { login: register } = useGoogleLogin();
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -292,7 +292,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
           <button
             type="button"
             className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-            onClick={() => register()}
+            // onClick={() => register()}
           >
             <Image
               src="/assets/google-icon.png"

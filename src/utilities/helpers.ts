@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export const buildQueryString = (params: any) => {
   const query = Object.entries(params)
     .map(([key, value]) => {
@@ -83,4 +85,8 @@ export const encodeBase64 = (data: any) => {
  */
 export const decodeBase64 = (data: any) => {
   return Buffer.from(data, "base64").toString("ascii");
+};
+
+export const generateUUID = () => {
+  return uuidv4();
 };
