@@ -320,7 +320,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
               />
 
               {/* Map Section */}
-              <div className="mt-6 border-t border-b border-gray-400 py-8 h-[200px] md:h-[550px]" ref={mapRef}>
+              <div className="mt-6 border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]" ref={mapRef}>
                 {product?.locations?.length > 0 && (
                   <ProductLocation
                     coordinates={product?.locations[0]?.coordinates}

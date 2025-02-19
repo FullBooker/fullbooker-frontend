@@ -20,7 +20,7 @@ import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
 import { NotificationType } from "@/domain/notification";
-import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
+// import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 
 type LoginModalContentProps = {
   loading: boolean;
@@ -78,7 +78,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
     const { phone_number, password } = data;
     signIn({ phone_number, password } as UserCredentials);
   };
-  const { login } = useGoogleLogin();
+  // const { login } = useGoogleLogin();
 
   useEffect(() => {
     return () => {
@@ -185,7 +185,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           <button
             type="button"
             className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-            onClick={() => login()}
+            // onClick={() => login()}
           >
             <Image
               src="/assets/google-icon.png"

@@ -20,7 +20,8 @@ import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVe
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
-import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
+// import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
+
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -141,7 +142,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     }
   }, [message, type]);
 
-  useGoogleOneTap();
+  // useGoogleOneTap();
 
   return (
     <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">

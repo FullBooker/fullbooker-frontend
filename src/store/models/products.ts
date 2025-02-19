@@ -2,12 +2,13 @@ import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import { ProductsFilters } from "@/domain/dto/input";
 import { buildQueryString, getRequest } from "@/utilities";
-import { Product, ProductMedia } from "@/domain/product";
+import { CartItem, Product, ProductMedia } from "@/domain/product";
 
 type ProductsState = {
   products: Array<Product>;
   product: Product | null;
   productMedia: Array<ProductMedia>;
+  cart: Array<CartItem>;
 };
 
 export const products = createModel<RootModel>()({
@@ -15,6 +16,7 @@ export const products = createModel<RootModel>()({
     products: [],
     product: null,
     productMedia: [],
+    cart: [],
   } as ProductsState,
   reducers: {
     setProductDetails(state: ProductsState, product: Product) {
@@ -33,6 +35,36 @@ export const products = createModel<RootModel>()({
       return {
         ...state,
         productMedia,
+      };
+    },
+    addToCart(state: ProductsState, item: CartItem) {
+      const existingItem = state.cart.find(
+        (cartItem: CartItem) => cartItem.id === item.id
+      );
+      if (existingItem) {
+        return {
+          ...state,
+          cart: state.cart.map((cartItem) =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+              : cartItem
+          ),
+        };
+      }
+      return {
+        ...state,
+        cart: [...state.cart, item],
+      };
+    },
+    removeFromCart(state: ProductsState, id: string) {
+      const updatedCart = state.cart.filter((item: CartItem) => item.id !== id);
+      return {
+        ...state,
+        cart: updatedCart,
+        cartTotal: updatedCart.reduce(
+          (sum, cartItem) => sum + cartItem.total * cartItem.quantity,
+          0
+        ), 
       };
     },
   },

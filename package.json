@@ -57,6 +57,7 @@
     "rsuite": "^5.70.3",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.0.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

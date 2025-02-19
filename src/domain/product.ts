@@ -52,3 +52,15 @@ export interface ProductMedia {
   file: string;
   uploaded_at: string;
 }
+
+export interface CartItem  {
+  id: string;
+  name: string;
+  id_number: string;
+  phone_number: string;
+  email: string;
+  quantity: number;
+  discount?: number;
+  total: number;
+  type: string;
+};
