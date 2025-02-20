@@ -53,7 +53,7 @@ const Sidebar = ({
               <div data-hide-on-theme="light">
                 <Image
                   src="/assets/logo_dark.png"
-                  alt="MowinBet Logo"
+                  alt="Fullbooker Logo"
                   width={238}
                   height={39.29}
                   className="w-[190px] h-[55px]"

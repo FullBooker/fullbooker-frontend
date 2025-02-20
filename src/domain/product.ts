@@ -1,15 +1,15 @@
 import { MediaType, PricingType } from "./constants";
 
-export interface ProductPricing  {
+export interface ProductPricing {
   id: string;
   created_at: string;
-  updated_at: string; 
+  updated_at: string;
   active: boolean;
   host: string;
   name: string | null;
   product: string;
   currency: string;
-  cost: string; 
+  cost: string;
   type: PricingType | string;
   ticket_tier: string | null;
   maximum_number_of_tickets: number;
@@ -22,7 +22,7 @@ interface ProductLocation {
   created_at: string;
   updated_at: string;
   host: string;
-  product: string; 
+  product: string;
 }
 
 export interface Product {
@@ -38,7 +38,7 @@ export interface Product {
   subcategory: string;
   availability: string | null;
   pricing: Array<ProductPricing>;
-  image: ProductMedia
+  image: ProductMedia;
   locations: Array<ProductLocation>;
 }
 
@@ -48,12 +48,12 @@ export interface ProductMedia {
   updated_at: string;
   active: boolean;
   host: string;
-  media_type: MediaType
+  media_type: MediaType;
   file: string;
   uploaded_at: string;
 }
 
-export interface CartItem  {
+export interface CartItem {
   id: string;
   name: string;
   id_number: string;
@@ -63,4 +63,29 @@ export interface CartItem  {
   discount?: number;
   total: number;
   type: string;
+  date: string;
+  pricing_type: string;
+  product_thumbnail: string;
+  product_id: string;
+}
+
+export interface CartSummary {
+  product_id: string;
+  product_title: string;
+  product_thumbnail: string;
+  product_base_price: string;
+  product_location: string;
+  base_currency: string;
+  total_price: number;
+  total_items: number;
+}
+
+export type TicketPricingCategory = {
+  key: string;
+  title: string;
+};
+
+export type SessionPricingCategory = {
+  key: string;
+  title: string;
 };

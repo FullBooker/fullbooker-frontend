@@ -171,7 +171,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 
   return (
     <div className="flex flex-col h-fit bg-gray-100 max-w-7xl mx-auto px-4 md:px-7">
-      <div className="p-4">
+      <div className="py-4 md:py-8">
         {productsRequestProcessing ? (
           <div className="flex justify-between mb-2 animate-pulse">
             <div>

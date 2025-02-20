@@ -36,7 +36,7 @@ const FormInputAuth: React.FC<FormInputAuthProps> = ({
   };
 
   return (
-    <div className="flex flex-col space-y-1  font-thin text-sm">
+    <div className="flex flex-col space-y-1 font-thin text-sm">
       <label htmlFor={id} className="text-xs lg:text-sm xl:text-base">
         {children}
       </label>
