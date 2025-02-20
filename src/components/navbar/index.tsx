@@ -71,7 +71,10 @@ type NavbarProps = {
   sigOut: () => void;
   isLoggedIn: boolean;
   authData: AuthData;
-  loading: boolean;
+  emailPassowrdLoginRequestProcessing: boolean;
+  googleLoginRequestProcessing: boolean;
+  switchToHostRequestProcessing: boolean;
+  signOutRequestProcessing: boolean;
   getUserProfile: () => void;
   profile: UserProfile;
   showBalance: boolean;
@@ -79,6 +82,7 @@ type NavbarProps = {
   setActiveModal: (modalId: ModalID) => void;
   switchToHost: (payload: SwitchToHostPayload) => void;
   productCategories: Array<ProductCategory>;
+  modalId: ModalID;
 };
 
 const Navbar: FC<NavbarProps> = ({
@@ -88,7 +92,6 @@ const Navbar: FC<NavbarProps> = ({
   isLoggedIn,
   sigOut,
   authData,
-  loading,
   profile,
   getUserProfile,
   showBalance,
@@ -96,6 +99,11 @@ const Navbar: FC<NavbarProps> = ({
   setActiveModal,
   switchToHost,
   productCategories,
+  emailPassowrdLoginRequestProcessing,
+  googleLoginRequestProcessing,
+  switchToHostRequestProcessing,
+  signOutRequestProcessing,
+  modalId
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -128,8 +136,11 @@ const Navbar: FC<NavbarProps> = ({
   }, [authToken]);
 
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: "#FFF", marginBottom: 2, }}>
-      <AppBar position="fixed" sx={{ backgroundColor: "#FFF", boxShadow: "none", zIndex: 10 }}>
+    <Box sx={{ flexGrow: 1, backgroundColor: "#FFF", marginBottom: 2 }}>
+      <AppBar
+        position="fixed"
+        sx={{ backgroundColor: "#FFF", boxShadow: "none", zIndex: 10 }}
+      >
         <Toolbar
           sx={{
             display: "flex",
@@ -363,7 +374,7 @@ const Navbar: FC<NavbarProps> = ({
                     }
                   }}
                 >
-                  {loading ? (
+                  {switchToHostRequestProcessing ? (
                     <CircularProgress size={18} color="inherit" />
                   ) : authToken ? (
                     "Switch to hosting"
@@ -379,7 +390,9 @@ const Navbar: FC<NavbarProps> = ({
                     text="text-xs md:text-sm text-black"
                     onClick={() => setActiveModal(ModalID.login)}
                   >
-                    {loading ? (
+                    {(googleLoginRequestProcessing ||
+                      emailPassowrdLoginRequestProcessing) &&
+                    modalId === ModalID.none ? (
                       <CircularProgress size={18} color="inherit" />
                     ) : (
                       "Sign In"
@@ -442,7 +455,9 @@ const Navbar: FC<NavbarProps> = ({
                       <div className="w-full flex flex-col gap-2 sm:gap-3">
                         <ProfileItem
                           theme={themeMode}
-                          icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                          icon={
+                            <UserRound className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+                          }
                           text="View My Profile"
                           href={
                             authToken
@@ -464,7 +479,7 @@ const Navbar: FC<NavbarProps> = ({
                             onClick={() => sigOut()}
                           >
                             <span className="text-white text-[10px] sm:text-xs font-medium">
-                              {loading ? (
+                              {signOutRequestProcessing ? (
                                 <CircularProgress size={18} color="inherit" />
                               ) : (
                                 "Logout"
@@ -526,17 +541,28 @@ const Navbar: FC<NavbarProps> = ({
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.authentication;
+  const googleLoginRequestProcessing =
+    state.loading.effects.authentication.googleSocialSignin;
+  const emailPassowrdLoginRequestProcessing =
+    state.loading.effects.authentication.signIn;
+  const switchToHostRequestProcessing =
+    state.loading.effects.authentication.switchToHost;
+  const signOutRequestProcessing = state.loading.effects.authentication.signOut;
   const { profile, showBalance } = state.profile;
   const { isLoggedIn, authData } = state.authentication;
   const { productCategories } = state.settings;
+  const { modalId } = state.components;
   return {
     isLoggedIn,
     authData,
-    loading,
     profile,
     showBalance,
     productCategories,
+    googleLoginRequestProcessing,
+    switchToHostRequestProcessing,
+    emailPassowrdLoginRequestProcessing,
+    signOutRequestProcessing,
+    modalId,
   };
 };
 

@@ -101,10 +101,16 @@ export const products = createModel<RootModel>()({
         } as CartSummary,
       };
     },
-    setProductDetailsToCart(state: ProductsState, cartSummary: CartSummary) {
+    clearCartAndCartSummary(state: ProductsState) {
       return {
         ...state,
         cart: [],
+        cartSummary: null,
+      };
+    },
+    setProductDetailsToCart(state: ProductsState, cartSummary: CartSummary) {
+      return {
+        ...state,
         cartSummary,
       };
     },

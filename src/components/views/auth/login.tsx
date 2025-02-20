@@ -23,7 +23,7 @@ import { NotificationType } from "@/domain/notification";
 // import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 
 type LoginModalContentProps = {
-  loading: boolean;
+  emailPassowrdLoginRequestProcessing: boolean;
   isLoggedIn: boolean;
   signIn: (payload: UserCredentials) => void;
   message: string;
@@ -31,6 +31,7 @@ type LoginModalContentProps = {
   getUserProfile: () => void;
   setActiveModal: (modalId: ModalID) => void;
   type: NotificationType;
+  googleLoginRequestProcessing: boolean;
 };
 
 const defaultValues = {
@@ -52,7 +53,7 @@ export const schema = yup.object().shape({
 });
 
 const LoginModalContent: FC<LoginModalContentProps> = ({
-  loading,
+  emailPassowrdLoginRequestProcessing,
   isLoggedIn,
   signIn,
   message,
@@ -60,6 +61,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   getUserProfile,
   setActiveModal,
   type,
+  googleLoginRequestProcessing
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -165,7 +167,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
               type="submit"
               className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
             >
-              {loading ? (
+              {emailPassowrdLoginRequestProcessing ? (
                 <CircularProgress size={18} color="inherit" />
               ) : (
                 "Sign In"
@@ -193,7 +195,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
               width={20}
               height={20}
             />
-            {loading ? (
+            {googleLoginRequestProcessing ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
               "Sign in with Google"
@@ -231,10 +233,12 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.authentication;
+  const googleLoginRequestProcessing =
+  state.loading.effects.authentication.googleSocialSignin;
+  const emailPassowrdLoginRequestProcessing = state.loading.effects.authentication.signIn;
   const { isLoggedIn, authData } = state.authentication;
   const { message, type } = state.alert;
-  return { loading, isLoggedIn, message, authData, type };
+  return { emailPassowrdLoginRequestProcessing, isLoggedIn, message, authData, type, googleLoginRequestProcessing };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

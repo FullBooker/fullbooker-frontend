@@ -28,6 +28,7 @@ type CheckoutPageProps = {
   getCurrencies: () => void;
   setActiveModal: (modalId: ModalID) => void;
   authData: AuthData;
+  clearCartAndCartSummary: () => void;
 };
 
 const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
@@ -38,6 +39,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
   getCurrencies,
   setActiveModal,
   authData,
+  clearCartAndCartSummary,
 }) => {
   const isMobile = useIsMobile();
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -54,6 +56,8 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
         )?.code as string
       );
     }
+
+    clearCartAndCartSummary();
   }, []);
 
   return (
@@ -68,7 +72,9 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
       <div className="overflow-x-auto whitespace-nowrap">
         <div className="flex items-center justify-center bg-gray-100 min-w-[800px] md:min-w-[1200px]">
           <div className="flex w-[1200px] h-[250px] md:h-[400px] borderrounded-md shadow-lg">
-          <p className="[writing-mode:sideways-lr] text-center text-white bg-primary py-4">FULLBOOKER</p>
+            <p className="[writing-mode:sideways-lr] text-center text-white bg-primary py-4">
+              FULLBOOKER
+            </p>
 
             {/* Left Section */}
             <div className="w-[full] md:w-1/3 bg-white border-r-8 border-dashed p-4 flex flex-col justify-between px-4">
@@ -135,7 +141,9 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             </p> */}
             </div>
 
-            <p className="[writing-mode:vertical-rl] text-center text-white bg-primary py-4">REGULAR</p>
+            <p className="[writing-mode:vertical-rl] text-center text-white bg-primary py-4">
+              REGULAR
+            </p>
           </div>
         </div>
       </div>
@@ -174,6 +182,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   getCurrencies: () => dispatch.settings.getCurrencies(),
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
+  clearCartAndCartSummary: () => dispatch.products.clearCartAndCartSummary(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckoutPage);

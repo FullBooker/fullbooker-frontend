@@ -33,7 +33,8 @@ import { ModalID } from "@/domain/components";
 import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 
 type RegisterModalContentProps = {
-  loading: boolean;
+  googleRegisterRequestProcessing: boolean;
+  emailPassowrdRegisterRequestProcessing: boolean;
   registerUser: (payload: NewUserPayload) => void;
   type: NotificationType;
   message: string;
@@ -77,7 +78,8 @@ const schema = yup.object().shape({
 });
 
 const RegisterModalContent: FC<RegisterModalContentProps> = ({
-  loading,
+  googleRegisterRequestProcessing,
+  emailPassowrdRegisterRequestProcessing,
   registerUser,
   type,
   message,
@@ -272,7 +274,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
               type="submit"
               className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
             >
-              {loading ? (
+              {emailPassowrdRegisterRequestProcessing ? (
                 <CircularProgress size={18} color="inherit" />
               ) : (
                 "Create an Account"
@@ -300,7 +302,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
               width={20}
               height={20}
             />
-            {loading ? (
+            {googleRegisterRequestProcessing ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
               "Sign in with Google"
@@ -336,9 +338,11 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.authentication;
+  const googleRegisterRequestProcessing =
+  state.loading.effects.authentication.googleSocialSignin;
+  const emailPassowrdRegisterRequestProcessing = state.loading.effects.authentication.signIn;
   const { message, type } = state.alert;
-  return { loading, message, type };
+  return { googleRegisterRequestProcessing, emailPassowrdRegisterRequestProcessing, message, type };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

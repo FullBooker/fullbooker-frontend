@@ -223,6 +223,13 @@ const HomePage: FC<HomePageProps> = ({
             ))}
           </div>
         )}
+        {!productsRequestProcessing && products?.length === 0 && (
+          <div className="flex justify-center py-8">
+            <p className="text-red-500">
+              Oops! There are no products at the moment
+            </p>
+          </div>
+        )}
       </div>
       <div className="py-8 px-2 md:px-3 lg:px-4 bg-white text-center">
         <div className=" px-4 sm:px-7">
