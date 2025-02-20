@@ -20,6 +20,7 @@ import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVe
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
+import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index"
 // import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
 
 
@@ -253,6 +254,13 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<SessionExpiredModal />}
+        />
+      )}
+       {modalId === ModalID.successfullPayment && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<PaymentSuccessfullModal />}
         />
       )}
     </div>

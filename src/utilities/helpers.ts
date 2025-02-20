@@ -14,13 +14,13 @@ export const buildQueryString = (params: any) => {
 };
 
 export const hideMiddleCharacters = (number: string, numCharsToHide = 4) => {
-  const numString = number.toString();
-  const prefixLength = Math.ceil(numString.length / 2) - numCharsToHide / 2;
-  const suffixLength = Math.floor(numString.length / 2) + numCharsToHide / 2;
+  const numString = number?.toString();
+  const prefixLength = Math.ceil(numString?.length / 2) - numCharsToHide / 2;
+  const suffixLength = Math.floor(numString?.length / 2) + numCharsToHide / 2;
 
-  return `${numString.slice(0, prefixLength)}${"*".repeat(
+  return `${numString?.slice(0, prefixLength)}${"*".repeat(
     numCharsToHide
-  )}${numString.slice(suffixLength)}`;
+  )}${numString?.slice(suffixLength)}`;
 };
 
 export const convertToHumanReadableTime = (isoTimestamp: any) => {

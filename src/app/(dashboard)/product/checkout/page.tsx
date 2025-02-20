@@ -1,60 +1,52 @@
 "use client";
 
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
-import { ModalID } from "@/domain/components";
-import { ProductsFilters } from "@/domain/dto/input";
-import { Product, ProductMedia } from "@/domain/product";
-import { Currency, ProductCategory, Subcategory } from "@/domain/dto/output";
+import { CartItem, CartSummary } from "@/domain/product";
+import { Currency } from "@/domain/dto/output";
 import DashBoardLayout from "../../layout";
 import Button from "@/components/shared/button";
+import useIsMobile from "@/lib/hooks/useIsMobile";
+import { addCommaSeparators } from "@/utilities";
+import LocationIdentifier from "@/components/shared/locationidentifier";
+import { ModalID } from "@/domain/components";
 
 type CheckoutPageProps = {
-  productMedia: Array<ProductMedia>;
-  product: Product;
-  getProductById: (productId: string) => void;
-  productCategories: Array<ProductCategory>;
   productsRequestProcessing: boolean;
-  getCurrencies: () => void;
-  getProductCategories: () => void;
+  cart: Array<CartItem>;
   currencies: Array<Currency>;
-  params: {
-    slug: string;
-  };
+  cartSummary: CartSummary;
+  getCurrencies: () => void;
+  setActiveModal: (modalId: ModalID) => void;
 };
 
 const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
-  productCategories,
-  product,
   productsRequestProcessing,
-  getProductById,
-  getProductCategories,
-  getCurrencies,
+  cart,
+  cartSummary,
   currencies,
-  params,
-  productMedia,
+  getCurrencies,
+  setActiveModal,
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const isMobile = useIsMobile();
 
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [baseCurrency, setBaseCurrency] = useState("");
+
+  useEffect(() => {
+    getCurrencies();
+
+    if (currencies?.length > 0) {
+      setBaseCurrency(
+        currencies?.find(
+          (currency: Currency) => currency?.id === cartSummary?.base_currency
+        )?.code as string
+      );
+    }
+  }, []);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto py-6 md:py-10 px-4 md:px-7">
@@ -63,43 +55,58 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
         <h2 className="text-xl font-semibold text-center mb-4 border-b border-gray-300 pb-2 md:pb-4">
           Order Summary
         </h2>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left font-medium pb-2">Name</th>
-              <th className="text-left font-medium pb-2">Unit Price</th>
-              <th className="text-left font-medium pb-2">QTY</th>
-              <th className="text-left font-medium pb-2">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b pb-4 mb-4">
-              <td className="py-3 flex items-center gap-2">
-                <Image
-                  src={`/assets/quad.png`}
-                  alt={"Product Image"}
-                  width={isMobile ? 35 : 35}
-                  height={isMobile ? 35 : 35}
-                  className="rounded"
-                />
-                <div>
-                  <h3 className="font-medium">Quad Biking</h3>
-                  <p className="text-gray-500 text-sm">Lukenya, Mahckos</p>
-                </div>
-              </td>
-              <td className="py-3 text-green-600 font-medium">KES 3,690.00</td>
-              <td className="py-3">1</td>
-              <td className="py-3 text-green-600 font-medium">KES 3,690.00</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="overflow-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left font-medium pb-2">Name</th>
+                <th className="text-left font-medium pb-2">Unit Price</th>
+                <th className="text-left font-medium pb-2">QTY</th>
+                <th className="text-left font-medium pb-2">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b pb-4 mb-4">
+                <td className="py-3 flex items-center gap-2">
+                  <Image
+                    src={cartSummary?.product_thumbnail}
+                    alt={`${cartSummary?.product_title} Image`}
+                    width={isMobile ? 45 : 45}
+                    height={isMobile ? 45 : 50}
+                    className="rounded h-[50px] md:h-[45px]"
+                  />
+                  <div>
+                    <h3 className="font-medium">
+                      {cartSummary?.product_title}
+                    </h3>
+                    <p className="text-gray-500 text-sm w-44">
+                      <LocationIdentifier
+                        coordinates={cartSummary?.product_location}
+                      />
+                    </p>
+                  </div>
+                </td>
+                <td className="py-3 text-green-600 font-medium">
+                  {baseCurrency}{" "}
+                  {addCommaSeparators(
+                    parseInt(cartSummary?.product_base_price)
+                  )}
+                </td>
+                <td className="py-3">{cartSummary?.total_items}</td>
+                <td className="py-3 text-green-600 font-medium">
+                  {baseCurrency} {addCommaSeparators(cartSummary?.total_price)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         {/* Discount Code */}
         <div className="flex items-center py-6 mb-4 w-full border-b border-t">
           <div className="w-full me-2">
             <input
               type="text"
-              placeholder="Gift or discount code"
+              placeholder="Gift or discount code (Optional)"
               className="flex-1 p-2 outline-none border border-gray-300 rounded w-full"
             />
           </div>
@@ -118,17 +125,17 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
         <div className="text-s">
           <div className="flex justify-between w-full">
             <span>Subtotal</span>
-            <span>KES 3,150.00</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Tax (16%)</span>
-            <span>KES 540.00</span>
+            <span>
+              {baseCurrency} {addCommaSeparators(cartSummary?.total_price)}
+            </span>
           </div>
         </div>
 
         <div className="border-t mt-4 pt-4 flex justify-between text-lg font-semibold">
           <span>Total</span>
-          <span className="text-green-600">KES 3,690</span>
+          <span className="text-green-600">
+            {baseCurrency} {addCommaSeparators(cartSummary?.total_price)}
+          </span>
         </div>
       </div>
 
@@ -209,8 +216,9 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
           borderRadius="rounded-lg"
           text="w-full font-medium text-white"
           bg="bg-success"
+          onClick={() => setActiveModal(ModalID.successfullPayment)}
         >
-          Pay KES 3,690.00
+          Pay {baseCurrency} {addCommaSeparators(cartSummary?.total_price)}
         </Button>
 
         <p className="text-xs text-gray-500 mt-4 text-center">
@@ -225,23 +233,21 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
 CheckoutPage.layout = DashBoardLayout;
 
 const mapStateToProps = (state: RootState) => {
-  const productsRequestProcessing = state.loading.models.products;
-  const { product, productMedia } = state.products;
-  const { productCategories, currencies } = state.settings;
+  const loading = state.loading.models.products;
+  const { cart, cartSummary } = state.products;
+  const { currencies } = state.settings;
   return {
-    productMedia,
-    product,
-    productCategories,
-    productsRequestProcessing,
+    loading,
+    cart,
     currencies,
+    cartSummary,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
-  getProductById: (productId: ModalID) =>
-    dispatch.products.getProductById(productId),
-  getProductCategories: () => dispatch.settings.getProductCategories(),
   getCurrencies: () => dispatch.settings.getCurrencies(),
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckoutPage);

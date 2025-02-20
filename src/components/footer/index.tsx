@@ -44,7 +44,7 @@ const Footer = () => {
 
           {/* Product Column */}
           <div>
-            <h3 className="font-semibold mb-4">Product</h3>
+            <h3 className="font-semibold mb-3 md:mb-4">Product</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 Features
@@ -66,7 +66,7 @@ const Footer = () => {
 
           {/* Company Column */}
           <div>
-            <h3 className="font-semibold mb-4">Company</h3>
+            <h3 className="font-semibold mb-3 md:mb-4">Company</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 About
@@ -88,7 +88,7 @@ const Footer = () => {
 
           {/* Support Column */}
           <div>
-            <h3 className="font-semibold mb-4">Support</h3>
+            <h3 className="font-semibold mb-3 md:mb-4">Support</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
                 Getting started
@@ -111,11 +111,11 @@ const Footer = () => {
 
         {/* Bottom Section */}
         <div className="mt-12 pt-3 md:pt-8 border-t">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
             <p className="text-xs md:tex-sm text-black">
               Copyright © {new Date().getFullYear()} Fullbooker
             </p>
-            <div className="flex gap-1 ga-3">
+            <div className="flex gap-1 md:gap-3">
               <p className="text-xs md:tex-sm text-black">All Rights Reserved |</p>
               <Link href="#" className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent">
                 Terms and Conditions

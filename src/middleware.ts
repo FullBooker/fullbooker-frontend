@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const basicAuth = req.headers.get("authorization");
-  const bypassDomain = "beta.mowinbet.com";
+  const bypassDomain = "dev.fullbooker.co.ke";
   const requestHost = req.headers.get("host");
 
   // if (requestHost && requestHost.includes(bypassDomain)) {

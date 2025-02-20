@@ -1,37 +1,42 @@
 import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/shared/button";
-import {
-  Box,
-  Card,
-  CardContent,
-  CircularProgress,
-  Typography,
-} from "@mui/material";
 import { Calendar } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-import { CartItem, Product } from "@/domain/product";
 import {
-  ChevronDown,
+  CartItem,
+  CartSummary,
+  Product,
+  ProductPricing,
+  SessionPricingCategory,
+  TicketPricingCategory,
+} from "@/domain/product";
+import {
+  CalendarClock,
   ChevronDownCircle,
-  KeyRound,
   Mail,
   Phone,
+  Ticket,
   User,
   UserCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-
 import * as yup from "yup";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, ErrorOption } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInputAuth from "@/components/auth/FormInputAuth";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
-import { generateUUID } from "@/utilities";
+import { addCommaSeparators, generateUUID } from "@/utilities";
+import { Currency } from "@/domain/dto/output";
+import useIsMobile from "@/lib/hooks/useIsMobile";
+import {
+  TICKET_PRICING_CATEGORIES,
+  SESSION_PRICING_CATEGORIES,
+} from "@/constants";
+import Link from "next/link";
 
 type TicketDetailsProps = {
   productsRequestProcessing: boolean;
@@ -39,23 +44,42 @@ type TicketDetailsProps = {
   addToCart: (item: CartItem) => void;
   cart: Array<CartItem>;
   removeFromCart: (id: string) => void;
+  currencies: Array<Currency>;
+  cartSummary: CartSummary;
+  clearCart: () => void;
+  setFailureAlert: (message: string) => void;
+  setProductDetailsToCart: (payload: CartSummary) => void;
 };
 
+enum TicketType {
+  singleTicket = "SINGLE_TICKET",
+  bulkTickets = "BULK_TICKETS",
+}
+
 const defaultValues = {
+  ticket_type: TicketType.singleTicket,
   name: "",
   id_number: "",
   phone_number: "",
   email: "",
+  date: "",
+  quantity: 0,
+  pricing: "",
 };
 
 export interface FormData {
+  ticket_type?: string;
   name: string;
   id_number: string;
   phone_number: string;
   email: string;
+  date: string;
+  quantity?: number;
+  pricing: string;
 }
 
 export const schema = yup.object().shape({
+  ticket_type: yup.string(),
   name: yup.string().required("Name is required"),
   id_number: yup.string().required("ID Number is required"),
   email: yup
@@ -63,6 +87,12 @@ export const schema = yup.object().shape({
     .required("Email is required")
     .email("Provide a valid email address"),
   phone_number: yup.string().required("Phone number is required"),
+  date: yup.string().required("Date is required"),
+  quantity: yup
+    .number()
+    .min(1, "Quantity must be at least 1")
+    .required("Quantity is required"),
+  pricing: yup.string().required("Pricing is required"),
 });
 
 const TicketDetails: FC<TicketDetailsProps> = ({
@@ -71,14 +101,25 @@ const TicketDetails: FC<TicketDetailsProps> = ({
   addToCart,
   cart,
   removeFromCart,
+  currencies,
+  cartSummary,
+  clearCart,
+  setFailureAlert,
+  setProductDetailsToCart,
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [selectedDate, setSelectedDate] = useState<any>();
+  const [selectedPricing, setSelectedPricing] = useState<ProductPricing | null>(
+    null
+  );
 
   const {
     control,
     setError,
     handleSubmit,
+    watch,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues,
@@ -87,33 +128,81 @@ const TicketDetails: FC<TicketDetailsProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    const { phone_number, email, id_number, name } = data;
+    const {
+      phone_number,
+      email,
+      id_number,
+      name,
+      quantity,
+      pricing,
+      ticket_type,
+    } = data;
+    const ticketQuantity = quantity ?? 0;
+    const maxTickets = selectedPricing?.maximum_number_of_tickets ?? 0;
+    if (ticket_type === TicketType.singleTicket && cart?.length === 3) {
+      setFailureAlert(
+        "For single ticket booking you can book a maximum of 3 tickets"
+      );
+      return;
+    }
+    if (ticket_type === TicketType.bulkTickets) {
+      if (ticketQuantity > maxTickets) {
+        setFailureAlert(
+          `For this event you can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`
+        );
+        return;
+      }
+
+      if (
+        cartSummary?.total_items === maxTickets ||
+        cartSummary?.total_items > maxTickets ||
+        cartSummary?.total_items + ticketQuantity > maxTickets
+      ) {
+        setFailureAlert(
+          `For this event you can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`
+        );
+        return;
+      }
+    }
+
+    const cost = product?.pricing?.find(
+      (pType: ProductPricing) => pType?.id === pricing
+    )?.cost;
     addToCart({
       id: generateUUID(),
       phone_number: phone_number,
       email: email,
       id_number: id_number,
-      quantity: 1,
+      quantity: quantity || 1,
       name: name,
-      total: parseInt(product?.pricing[0].cost),
+      total: parseInt(cost as string) * (quantity as number),
+      product_id: product?.id,
+      product_thumbnail: product?.image?.file,
+      pricing_type: pricing,
     } as CartItem);
   };
 
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
+    const ticketType = getValues("ticket_type");
+    if (ticketType === TicketType.singleTicket) {
+      setValue("quantity", 1);
+      setValue("date", "");
+    } else {
+      setValue("quantity", 0);
+      setValue("date", "");
+    }
+  }, [watch("ticket_type")]);
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+  useEffect(() => {
+    setProductDetailsToCart({
+      ...cartSummary,
+      product_id: product?.id,
+      product_title: product?.name,
+      product_thumbnail: product?.image?.file,
+      product_location: product?.locations[0]?.coordinates,
+    } as CartSummary);
   }, []);
 
-  console.log("ERROR: ", errors);
   return (
     <div>
       {productsRequestProcessing ? (
@@ -175,6 +264,54 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                   className=""
                 >
                   <div className="space-y-4 bg-white shadow-lg py-6 px-3">
+                    <div>
+                      <Controller
+                        name="pricing"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <select
+                            className="w-full border-none outline-none font-thin text-sm rounded-sm bg-gray-100 shadow-md text-gray-500 px-2 py-2 "
+                            value={value}
+                            onChange={(e) => {
+                              const pricing = product?.pricing?.find(
+                                (p: ProductPricing) => p.id === e.target.value
+                              ) as ProductPricing;
+                              setSelectedPricing(pricing);
+                              setProductDetailsToCart({
+                                ...cartSummary,
+                                base_currency: pricing?.currency,
+                                product_base_price: pricing?.cost,
+                              } as CartSummary);
+                              onChange(e);
+                            }}
+                          >
+                            <option value="">Select Pricing Type</option>
+                            {product?.pricing?.map(
+                              (pricing: ProductPricing, idx: number) => (
+                                <option key={idx} value={pricing.id}>
+                                  {pricing?.type === "ticket"
+                                    ? TICKET_PRICING_CATEGORIES.find(
+                                        (tCat: TicketPricingCategory) =>
+                                          tCat.key === pricing?.ticket_tier
+                                      )?.title
+                                    : SESSION_PRICING_CATEGORIES.find(
+                                        (spCat: SessionPricingCategory) =>
+                                          spCat.key === pricing?.type
+                                      )?.title}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        )}
+                      />
+                      {errors?.pricing && (
+                        <p className="text-red-500 text-sm font-thin mt-2">
+                          {errors?.pricing?.message}
+                        </p>
+                      )}
+                    </div>
+
                     <Controller
                       name="name"
                       control={control}
@@ -232,7 +369,6 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                         />
                       )}
                     />
-
                     <Controller
                       name="email"
                       control={control}
@@ -252,6 +388,64 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                         />
                       )}
                     />
+                    {/* Date Selection Mobile */}
+                    {isMobile && (
+                      <Controller
+                        name="date"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <FormInputAuth
+                            id="date"
+                            name="date"
+                            type="date"
+                            placeholder="Date"
+                            onChange={onChange}
+                            value={value}
+                            icon={
+                              <CalendarClock className="w-4 h-4 text-white fill-gray-500" />
+                            }
+                            error={errors?.date?.message}
+                          />
+                        )}
+                      />
+                    )}
+                    {watch("ticket_type") === TicketType.bulkTickets && (
+                      <Controller
+                        name="quantity"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <FormInputAuth
+                            id="quantity"
+                            name="quantity"
+                            type="number"
+                            placeholder="Number of tickets"
+                            onChange={(e) => {
+                              if (
+                                selectedPricing &&
+                                parseInt(e.target.value) >
+                                  selectedPricing?.maximum_number_of_tickets
+                              ) {
+                                setError("quantity", {
+                                  message: `You can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`,
+                                } as ErrorOption);
+                              } else {
+                                setError("quantity", {
+                                  message: "",
+                                } as ErrorOption);
+                              }
+                              onChange(e);
+                            }}
+                            value={value?.toString()}
+                            icon={
+                              <Ticket className="w-4 h-4 text-white fill-gray-500" />
+                            }
+                            error={errors?.quantity?.message}
+                          />
+                        )}
+                      />
+                    )}
                   </div>
                   <div className="text-center mt-4">
                     <Button
@@ -267,87 +461,134 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                 </form>
               </div>
               <div className="mt-4 border border-primary py-4 px-3">
-                <p className="text-center mb-3">Tikets Summary</p>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="font-medium border text-center py-3">
-                        Name
-                      </th>
-                      <th className="font-medium  border">ID/Passport</th>
-                      <th className="text-center font-medium  border py-3">
-                        Phone No
-                      </th>
-                      <th className="text-center font-medium  border py-3">
-                        Email
-                      </th>
-                      <th className="text-center font-medium  border py-3">
-                        QTY
-                      </th>
-                      <th className="text-center font-medium  border py-3">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {cart?.map((item: CartItem, index: number) => (
-                      <tr key={index} className="border-b pb-4 mb-4">
-                        <td className="py-3 text-sm border text-center">
-                          {item?.name}
-                        </td>
-                        <td className="py-3 text-sm border text-center">
-                          {item?.id_number}
-                        </td>
-                        <td className="py-3 text-sm border text-center">
-                          {" "}
-                          {item?.phone_number}
-                        </td>
-                        <td className="py-3 text-sm border text-center">
-                          {item?.email}
-                        </td>
-                        <td className="py-3 text-sm border text-center">
-                          {item?.quantity}
-                        </td>
-                        <td className="py-3 text-center">
-                          <Button
-                            bg="bg-primary"
-                            text="text-sm"
-                            padding="px-2"
-                            onClick={() => removeFromCart(item?.id)}
-                          >
-                            Delete
-                          </Button>
-                        </td>
+                <p className="text-center mb-3">Tickets Summary</p>
+                <div className="overflow-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="font-medium border text-center py-3 px-3">
+                          Name
+                        </th>
+                        <th className="font-medium border text-center py-3 px-3">
+                          ID/Passport
+                        </th>
+                        <th className="text-center font-medium  border py-3 px-3">
+                          Phone No
+                        </th>
+                        <th className="text-center font-medium  border py-3 px-3">
+                          Email
+                        </th>
+                        <th className="text-center font-medium  border py-3 px-3">
+                          QTY
+                        </th>
+                        <th className="text-center font-medium  border py-3 px-3">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {cart &&
+                        cart?.map((item: CartItem, index: number) => (
+                          <tr key={index} className="border-b pb-4 mb-4">
+                            <td className="py-3 px-3 text-sm border text-center">
+                              {item?.name}
+                            </td>
+                            <td className="py-3 px-3 text-sm border text-center">
+                              {item?.id_number}
+                            </td>
+                            <td className="py-3 px-3 text-sm border text-center">
+                              {" "}
+                              {item?.phone_number}
+                            </td>
+                            <td className="py-3 px-3 text-sm border text-center">
+                              {item?.email}
+                            </td>
+                            <td className="py-3 px-3 text-sm border text-center">
+                              {item?.quantity}
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <Button
+                                bg="bg-primary"
+                                text="text-sm"
+                                padding="px-3"
+                                onClick={() => removeFromCart(item?.id)}
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {cart?.length === 0 && (
+                    <div className="px-2 py-6 text-center">
+                      <p className="text-sm w-full md:text-center">
+                        Tickets will appear here when added
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <div className="text-center mt-6 mb-3">
-                  <p className="text-center">More than 3 tickets?</p>
+                  <p className="text-center">
+                    {watch("ticket_type") === TicketType.bulkTickets
+                      ? "Less than 3 tickets?"
+                      : "More than 3 tickets?"}
+                  </p>
                   <Button
                     bg="bg-secondary"
                     borderRadius="rounded-lg"
-                    type="submit"
+                    type="button"
                     text="text-sm"
+                    onClick={async () => {
+                      if (cart?.length > 0) {
+                        clearCart();
+                      }
+                      const newTicketType =
+                        watch("ticket_type") === TicketType.bulkTickets
+                          ? TicketType.singleTicket
+                          : TicketType.bulkTickets;
+
+                      await setValue("ticket_type", newTicketType, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      });
+                    }}
                   >
-                    Bulk Booking
+                    {watch("ticket_type") === TicketType.bulkTickets
+                      ? "Single ticket booking"
+                      : "Bulk booking"}
                   </Button>
                 </div>
               </div>
             </div>
             <div className="w-full">
-              {/* Date Selection */}
-              <div className="mt-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Select Date</h3>
-                  <div>
-                    <ChevronDownCircle className="w-6 h-6 md:h-6 md:w-6" />
+              {/* Date Selection Desktop */}
+              {!isMobile && (
+                <div className="mt-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">Select Date</h3>
+                    <div>
+                      <ChevronDownCircle className="w-6 h-6 md:h-6 md:w-6" />
+                    </div>
+                  </div>
+
+                  <div className="w-full">
+                    <Calendar
+                      className="bg-white px-4 py-4 rounded-2xl shadow-lg !w-full !text-[10px] md:!text-[16px]"
+                      onChange={(date) => {
+                        setSelectedDate(date);
+                        setValue("date", date.toString());
+                      }}
+                    />
+                    {errors?.date && (
+                      <p className="text-red-500 font-light mt-2">
+                        {errors?.date?.message}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="w-full">
-                  <Calendar className="bg-white px-4 py-4 rounded-2xl shadow-lg w-full" />
-                </div>
-              </div>
+              )}
 
               {/* Pricing Summary */}
               <div className="mt-6 bg-white rounded-2xl shadow-lg space-y-4 px-4 md:px-8 py-4 pb-8">
@@ -364,7 +605,7 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                 <div data-hide-on-theme="light" className="flex justify-center">
                   <Image
                     src="/assets/logo_dark.png"
-                    alt="MowinBet Logo"
+                    alt="Fullbooker Logo"
                     width={238}
                     height={39.29}
                     className="w-[190px] h-[55px]"
@@ -373,41 +614,58 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                 <p className="flex justify-between">
                   Ticket price:
                   <span className="font-semibold">
-                    {product?.pricing[0]?.cost}
+                    {addCommaSeparators(parseInt(product?.pricing[0]?.cost)) ||
+                      0}
                   </span>
                 </p>
                 <p className="flex justify-between">
-                  Number of Tickets: <span className="font-semibold">
-                    {
-                      cart.reduce(
-                        (sum: number, cartItem: CartItem) =>
-                          sum + cartItem.quantity,
-                        0
-                      )
-                    }
+                  Number of Tickets:{" "}
+                  <span className="font-semibold">
+                    {cartSummary?.total_items || 0}
                   </span>
                 </p>
-                <p className="flex justify-between">
-                  TAX: <span className="font-semibold">0.00</span>
+                <p className="flex justify-between text-green-500 font-bold">
+                  Total:
+                  <span>
+                    <span className="me-1">
+                      {
+                        currencies?.find(
+                          (currency: Currency) =>
+                            currency.id === product?.pricing[0].currency
+                        )?.code
+                      }
+                    </span>
+                    <span>
+                      {addCommaSeparators(cartSummary?.total_price) || 0}
+                    </span>
+                  </span>
                 </p>
-                <p className="flex justify-between">
-                  Total:{" "}
-                  <span className="text-green-500 font-bold">{cart.reduce(
-                      (sum: number, cartItem: CartItem) =>
-                        sum + cartItem.total * cartItem.quantity,
-                      0
-                    )}</span>
-                </p>
-                <Link href={"/products/checkout"}>
+                {cart?.length == 0 ? (
                   <Button
                     extraClasses=""
                     margin="mt-4"
                     borderRadius="rounded-lg"
                     text="w-full font-medium"
+                    onClick={() =>
+                      setFailureAlert(
+                        "You need to add tickets inorder to proceed to checkout"
+                      )
+                    }
                   >
                     Proceed to checkout
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/product/checkout">
+                    <Button
+                      extraClasses=""
+                      margin="mt-4"
+                      borderRadius="rounded-lg"
+                      text="w-full font-medium"
+                    >
+                      Proceed to checkout
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -420,14 +678,28 @@ const TicketDetails: FC<TicketDetailsProps> = ({
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
   const { isLoggedIn, authData } = state.authentication;
-  const { cart } = state.products;
+  const { cart, cartSummary } = state.products;
   const { message, type } = state.alert;
-  return { loading, isLoggedIn, message, authData, type, cart };
+  const { currencies } = state.settings;
+  return {
+    loading,
+    isLoggedIn,
+    message,
+    authData,
+    type,
+    cart,
+    currencies,
+    cartSummary,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
   addToCart: (item: CartItem) => dispatch.products.addToCart(item),
   removeFromCart: (id: string) => dispatch.products.removeFromCart(id),
+  clearCart: () => dispatch.products.clearCart(),
+  setProductDetailsToCart: (payload: CartSummary) =>
+    dispatch.products.setProductDetailsToCart(payload),
+  setFailureAlert: (message: string) => dispatch.alert.setFailureAlert(message),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TicketDetails);

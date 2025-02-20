@@ -13,4 +13,5 @@ export enum ModalID {
   deleteProductConfirmation = "DELETE_PRODUCT_CONFIRMATION",
   pauseProductConfirmation = "PAUSE_PRODUCT_CONFIRMATION",
   activateProductConfirmation = "ACTIVATE_PRODUCT_CONFIRMATION",
+  successfullPayment = "SUCCESSFULL_PAYMENT"
 }
