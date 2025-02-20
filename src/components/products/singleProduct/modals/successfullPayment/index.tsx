@@ -13,10 +13,12 @@ import { generateUUID } from "@/utilities";
 
 type PaymentSuccessfullModalContentProps = {
   setActiveModal: (modalId: ModalID) => void;
+  clearCartAndCartSummary: () => void;
 };
 
 const PaymentSuccessfullModal: FC<PaymentSuccessfullModalContentProps> = ({
   setActiveModal,
+  clearCartAndCartSummary,
 }) => {
   const router = useRouter();
   return (
@@ -63,6 +65,7 @@ const mapStateToProps = (state: RootState) => {};
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
+  clearCartAndCartSummary: () => dispatch.products.clearCartAndCartSummary(),
 });
 
 export default connect(

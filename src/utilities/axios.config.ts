@@ -17,7 +17,6 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       store.dispatch.authentication.signOut({});
-      store.dispatch.authentication.setSessionHasExpired(true);
       store.dispatch.components.setActiveModal(ModalID.sessionExpired);
       return;
     } else if (error.response.status === 500) {

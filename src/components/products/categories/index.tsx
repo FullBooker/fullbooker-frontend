@@ -108,41 +108,51 @@ const ProductCategories: FC<ProductCategoriesProps> = ({ categories }) => {
 
   return (
     <div className="py-3 lg:py-6 md:py-6 xl:py-6 bg-white px-2 md:px-3 lg:px-4 ">
-      <div
-        className="flex items-center gap-8  py-4
-    px-4 sm:px-7"
-      >
-        <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
-          <ChevronLeft className="w-10 h-10 text-black" />
-        </button>
-
-        <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
-          {extractSubcategories(categories)?.map(
-            (subCategory: Subcategory, index: number) => (
-              <Link
-                key={index}
-                className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0 cursor-pointer"
-                href={`/products/${generateSlug(subCategory?.name)}`}
-              >
-                <div className="w-6 h-6 lg:w-12 md:w-12 xl:w-12 lg:h-12 md:h-12 xl:h-12 rounded-ful flex items-center justify-center">
-                  {React.createElement(
-                    icons[Math.floor(Math.random() * 13 + 1) - 1].icon,
-                    {
-                      size: 24,
-                      className: "text-gray-600",
-                    }
-                  )}
-                </div>
-                <span className="text-sm text-center">{subCategory.name}</span>
-              </Link>
-            )
-          )}
+      {categories?.length === 0 ? (
+        <div className="flex justify-center py-8">
+          <p className="text-red-500">
+            Oops! There are no product categories at the moment
+          </p>
         </div>
+      ) : (
+        <div
+          className="flex items-center gap-8  py-4
+    px-4 sm:px-7"
+        >
+          <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
+            <ChevronLeft className="w-10 h-10 text-black" />
+          </button>
 
-        <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
-          <ChevronRight className="w-10 h-10 text-black" />
-        </button>
-      </div>
+          <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
+            {extractSubcategories(categories)?.map(
+              (subCategory: Subcategory, index: number) => (
+                <Link
+                  key={index}
+                  className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0 cursor-pointer"
+                  href={`/products/${generateSlug(subCategory?.name)}`}
+                >
+                  <div className="w-6 h-6 lg:w-12 md:w-12 xl:w-12 lg:h-12 md:h-12 xl:h-12 rounded-ful flex items-center justify-center">
+                    {React.createElement(
+                      icons[Math.floor(Math.random() * 13 + 1) - 1].icon,
+                      {
+                        size: 24,
+                        className: "text-gray-600",
+                      }
+                    )}
+                  </div>
+                  <span className="text-sm text-center">
+                    {subCategory.name}
+                  </span>
+                </Link>
+              )
+            )}
+          </div>
+
+          <button className="rounded-full bg-white hover:bg-gray-200 flex-shrink-0 border border-gray-800">
+            <ChevronRight className="w-10 h-10 text-black" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

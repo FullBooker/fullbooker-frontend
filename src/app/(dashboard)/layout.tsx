@@ -249,7 +249,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<PasswordResetSuccessfullModal />}
         />
       )}
-      {modalId === ModalID.sessionExpired && sessionHasExpired && (
+      {modalId === ModalID.sessionExpired && (
         <UniversalModal
           theme={themeMode}
           open={true}
