@@ -8,6 +8,8 @@ import { ProductCategory } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { addCommaSeparators } from "@/utilities";
+import useIsMobile from "@/lib/hooks/useIsMobile";
+import Button from "@/components/shared/button";
 
 type VendorProductsListViewProps = {
   loading: boolean;
@@ -36,22 +38,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
     page: 1,
     limit: 10,
   });
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const isMobile = useIsMobile();
 
   const handleViewOrEditProduct = (product: any) => {
     setNewProductDetails(product);
@@ -83,14 +70,30 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
 
   return (
     <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
-      <h2 className="text-lg font-medium text-center mb-3">My Products</h2>
+      {isMobile ? (
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-medium">My Products</h2>
+          <Button
+            margin="m-0"
+            bg="bg-primary"
+            borderRadius="rounded-md"
+            text="text-black"
+            padding="py-1 px-3"
+            onClick={() => setProductPageViewType(ViewType.onboardingView)}
+          >
+            Add Product +
+          </Button>
+        </div>
+      ) : (
+        <h2 className="text-lg font-medium text-center mb-3">My Products</h2>
+      )}
       {loading ? (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-[200px] md:h-screen">
           <CircularProgress size={18} color="inherit" className="me-2" />
           <span>Fetching your products..</span>
         </div>
       ) : (
-        <div className="rounded-lg border px-1 py-2 md:px-6 md:py-6">
+        <div className="rounded-lg md:border px-1 py-2 md:px-6 md:py-6">
           {vendorProducts?.length === 0 ? (
             <div className="grid place-items-center text-center mt-4 mb-12 md:mt-8 md:mb-20 px-2 md:px-0">
               <div className="grid place-items-center text-center">
@@ -123,110 +126,115 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                     <h2 className="text-lg font-medium  w-full border-b">
                       {category?.name}
                     </h2>
-                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                      <thead className="border">
-                        <tr className="text-left border-b">
-                          <th className="p-3 pl-0 border font-medium">
-                            Tracking Number
-                          </th>
-                          <th className="p-3 pl-0 border text-center font-medium">
-                            Product Name
-                          </th>
-                          <th className="p-3 pl-0 border text-center font-medium">
-                            Price
-                          </th>
-                          <th className="p-3 pl-0 border text-center font-medium">
-                            Status
-                          </th>
-                          <th className="p-3 pl-0 border text-center font-medium">
-                            Next actions
-                          </th>
-                        </tr>
-                      </thead>
-                      {vendorProducts?.filter(
-                        (product: Product) => product.category === category?.id
-                      ).length > 0 ? (
-                        <tbody>
-                          {vendorProducts
-                            ?.filter(
-                              (product: Product) =>
-                                product.category === category?.id
-                            )
-                            .map((product: Product, idx: number) => (
-                              <tr key={idx} className="border-b">
-                                <td
-                                  className="p-3 pl-0 border-r font-thin cursor-pointer"
-                                  onClick={() =>
-                                    handleViewOrEditProduct(product)
-                                  }
-                                >
-                                  {product?.number}
-                                </td>
-                                <td
-                                  className="p-3 border-r text-center font-thin cursor-pointer"
-                                  onClick={() =>
-                                    handleViewOrEditProduct(product)
-                                  }
-                                >
-                                  {product?.name}
-                                </td>
-                                <td
-                                  className="p-3 text-blue-600 border-r text-center font-thin cursor-pointer"
-                                  onClick={() =>
-                                    handleViewOrEditProduct(product)
-                                  }
-                                >
-                                  {product?.pricing[0]?.cost &&
-                                    addCommaSeparators(
-                                      parseInt(product?.pricing[0]?.cost)
-                                    )}
-                                </td>
-                                <td
-                                  className={`p-3 font-semibold ${
-                                    product?.active
-                                      ? "text-green-600"
-                                      : "text-red-600"
-                                  } border-r text-center font-base cursor-pointer`}
-                                  onClick={() =>
-                                    handleViewOrEditProduct(product)
-                                  }
-                                >
-                                  {product?.active ? "Active" : "Inactive"}
-                                </td>
-                                <td className="p-3 text-center flex justify-center space-x-2">
-                                  <button
-                                    className="bg-orange-200 text-orange-700 px-4 py-0 rounded"
+                    <div className="overflow-auto whitespace-nowrap min-w-7">
+                      <table className="w-full border border-gray-200 rounded-lg ">
+                        <thead className="border">
+                          <tr className="text-left border-b">
+                            <th className="p-3 pl-2 border font-medium ">
+                              Tracking Number
+                            </th>
+                            <th className="p-3 pl-0 border text-center font-medium">
+                              Product Name
+                            </th>
+                            <th className="p-3 pl-0 border text-center font-medium">
+                              Price
+                            </th>
+                            <th className="p-3 pl-0 border text-center font-medium">
+                              Status
+                            </th>
+                            <th className="p-3 pl-0 border text-center font-medium">
+                              Next actions
+                            </th>
+                          </tr>
+                        </thead>
+                        {vendorProducts?.filter(
+                          (product: Product) =>
+                            product.category === category?.id
+                        ).length > 0 ? (
+                          <tbody>
+                            {vendorProducts
+                              ?.filter(
+                                (product: Product) =>
+                                  product.category === category?.id
+                              )
+                              .map((product: Product, idx: number) => (
+                                <tr key={idx} className="border-b">
+                                  <td
+                                    className="p-3 pl-2 border-r font-thin cursor-pointer"
                                     onClick={() =>
                                       handleViewOrEditProduct(product)
                                     }
                                   >
-                                    Edit
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      ) : (
-                        <tbody>
-                          <p className="font-base text-red-500 w-full py-3">
-                            Oops! You have no products available for this
-                            category!
-                          </p>
-                        </tbody>
-                      )}
-                    </table>
+                                    {product?.number}
+                                  </td>
+                                  <td
+                                    className="p-3 border-r text-center font-thin cursor-pointer"
+                                    onClick={() =>
+                                      handleViewOrEditProduct(product)
+                                    }
+                                  >
+                                    {product?.name}
+                                  </td>
+                                  <td
+                                    className="p-3 text-blue-600 border-r text-center font-thin cursor-pointer"
+                                    onClick={() =>
+                                      handleViewOrEditProduct(product)
+                                    }
+                                  >
+                                    {product?.pricing[0]?.cost &&
+                                      addCommaSeparators(
+                                        parseInt(product?.pricing[0]?.cost)
+                                      )}
+                                  </td>
+                                  <td
+                                    className={`p-3 font-semibold ${
+                                      product?.active
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                    } border-r text-center font-base cursor-pointer`}
+                                    onClick={() =>
+                                      handleViewOrEditProduct(product)
+                                    }
+                                  >
+                                    {product?.active ? "Active" : "Inactive"}
+                                  </td>
+                                  <td className="p-3 text-center flex justify-center space-x-2">
+                                    <button
+                                      className="bg-orange-200 text-orange-700 px-4 py-0 rounded"
+                                      onClick={() =>
+                                        handleViewOrEditProduct(product)
+                                      }
+                                    >
+                                      Edit
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        ) : (
+                          <tbody>
+                            <p className="font-base text-red-500 w-full py-3">
+                              Oops! You have no products available for this
+                              category!
+                            </p>
+                          </tbody>
+                        )}
+                      </table>
+                    </div>
                   </div>
                 ))}
-              <div className="flex justify-end">
-                <button
-                  className=" bg-primary px-6 py-2 rounded-lg mt-4 text-black"
-                  onClick={() =>
-                    setProductPageViewType(ViewType.onboardingView)
-                  }
-                >
-                  Add a new product
-                </button>
-              </div>
+              {!isMobile && (
+                <div className="flex justify-end">
+                  <button
+                    className=" bg-primary px-6 py-2 rounded-lg mt-4 text-black"
+                    onClick={() =>
+                      setProductPageViewType(ViewType.onboardingView)
+                    }
+                  >
+                    Add a new product
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

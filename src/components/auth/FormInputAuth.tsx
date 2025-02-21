@@ -58,8 +58,8 @@ const FormInputAuth: React.FC<FormInputAuthProps> = ({
             border: 'none',
             fontSize: '14px',
             paddingLeft: '34px',
-            paddingTop: '10px',
-            paddingBottom: '10px',
+            paddingTop: '14px',
+            paddingBottom: '14px',
             color: '#000'
           }}
         />

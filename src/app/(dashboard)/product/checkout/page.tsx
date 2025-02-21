@@ -74,6 +74,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                     width={isMobile ? 45 : 45}
                     height={isMobile ? 45 : 50}
                     className="rounded h-[50px] md:h-[45px]"
+                    unoptimized={true}
                   />
                   <div>
                     <h3 className="font-medium">

@@ -123,14 +123,15 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
             {authToken && (
               <Profile
                 button={
-                  <div className="items-center cursor-pointer ">
-                    <div className="">
-                      <CustomAvatar
-                        name={getInitials(
-                          `${authData?.user?.first_name} ${authData?.user?.last_name}`
-                        )}
-                      />
-                    </div>
+                  <div className="md:flex justify-center content-center items-center cursor-pointer ml-2">
+                    <Image
+                      src="/assets/default-profile-picture-placeholder.jpg"
+                      alt={"Host Profile Image"}
+                      width={isMobile ? 35 : 35}
+                      height={isMobile ? 35 : 35}
+                      className="rounded-lg"
+                      unoptimized={true}
+                    />
                   </div>
                 }
                 openState={openProfile}

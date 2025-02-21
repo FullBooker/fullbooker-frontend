@@ -4,13 +4,21 @@ import { useTheme } from "next-themes";
 import React from "react";
 import { SIDENAV_ITEMS } from "@/constants";
 import { SideNavItem } from "@/types";
-import { ChevronUp, LogOut, X } from "lucide-react";
+import { ChevronUp, Gamepad2, LogOut, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import LogoutButton from "./components/LogoutButton";
 import CircularProgress from "@mui/material/CircularProgress";
+import Drawer from "@mui/material/Drawer";
+import { connect } from "react-redux";
+import { RootState } from "@/store";
+import { ProductCategory } from "@/domain/dto/output";
+import { generateSlug } from "@/utilities/helpers";
+import ProductCetgoriesMenuItem from "./components/productCategoriesMenuItem";
+
+const drawerWidth = 280;
 
 const Sidebar = ({
   theme,
@@ -18,76 +26,160 @@ const Sidebar = ({
   onClose,
   isMobile,
   signOut,
+  signingOutRequestProcessing,
+  isLoggedIn,
+  getProductCategories,
+  productCategories,
+  productsCategoriesRequestProcessing,
 }: {
   theme: string | undefined;
   open: boolean;
   onClose: React.MouseEventHandler<HTMLSpanElement>;
   isMobile: boolean;
   signOut: () => void;
+  signingOutRequestProcessing: boolean;
+  isLoggedIn: boolean;
+  getProductCategories: () => void;
+  productCategories: Array<ProductCategory>;
+  productsCategoriesRequestProcessing: boolean;
 }) => {
+  useEffect(() => {
+    getProductCategories();
+  }, []);
   return (
-    <div
-      className={`w-65 xl:block duration-175 linear !z-50 absolute h-[100vh] overflow-auto bg-sidebarColor transition-all ${
-        theme === "light" ? "border-strokeColor2" : "bg-dark"
-      } lg:!z-50 xl:!z-50 2xl:!z-0 sidebar-container ${
-        open ? "translate-x-0" : "-translate-x-96"
-      } flex flex-col`}
+    <Drawer
+      variant={isMobile ? "temporary" : "permanent"}
+      open={open}
+      onClose={onClose}
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: "100%",
+          boxSizing: "border-box",
+          backgroundColor: "#FFF",
+        },
+      }}
+      anchor="left"
     >
-      <span
-        className="absolute top-4 right-4 block cursor-pointer xl:hidden"
-        onClick={onClose}
-      >
-        <X className="w-4 h-4" />
-      </span>
       <div className={`flex flex-col justify-between h-[100vh]`}>
-        <div className="flex-grow">
-          <div className={`mx-6 mb-5 ${isMobile ? "mt-12" : "mt-5"}`}>
-            <Link href="/">
-              <div data-hide-on-theme="dark">
-                <Image
-                  src="/assets/logo.svg"
-                  alt="Fullbooker Logo"
-                  width={238}
-                  height={39.29}
-                  className="w-[190px] h-[55px]"
-                />
-              </div>
+        <span
+          className="absolute top-4 right-4 block cursor-pointer xl:hidden"
+          onClick={onClose}
+        >
+          <X className="w-4 h-4" />
+        </span>
+        <div className={`flex flex-col justify-between h-[100vh]`}>
+          <div className="flex-grow">
+            <div className={`mx-6 ${isMobile ? "mt-2 mb-2 " : "mt-5 mb-5 "}`}>
+              <Link href="/">
+                <div data-hide-on-theme="dark">
+                  <Image
+                    src="/assets/logo.svg"
+                    alt="Fullbooker Logo"
+                    width={238}
+                    height={39.29}
+                    className="w-[190px] h-[55px]"
+                  />
+                </div>
 
-              <div data-hide-on-theme="light">
-                <Image
-                  src="/assets/logo_dark.png"
-                  alt="Fullbooker Logo"
-                  width={238}
-                  height={39.29}
-                  className="w-[190px] h-[55px]"
-                />
-              </div>
-            </Link>
-          </div>
+                <div data-hide-on-theme="light">
+                  <Image
+                    src="/assets/logo_dark.png"
+                    alt="Fullbooker Logo"
+                    width={238}
+                    height={39.29}
+                    className="w-[190px] h-[55px]"
+                  />
+                </div>
+              </Link>
+            </div>
 
-          <div className="flex flex-col space-y-5">
-            {SIDENAV_ITEMS.map((item, idx) => {
-              return <MenuItem key={idx} item={item} />;
-            })}
-          </div>
-          <div className="flex flex-row items-center py-2 px-6 w-full justify-between hover:opacity-40">
-            <button
-              className={`w-full flex items-center justify-start gap-2 py-[18px] rounded-[10px] sm:rounded-[15px hover:bg-gradient-to-bl`}
-              onClick={() => {
-                signOut();
-              }}
-            >
-              <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-black me-3" />
-              <span className="text-black font-medium">Logout</span>
-            </button>
+            <div className="flex flex-col space-y-5">
+              {SIDENAV_ITEMS.map((item, idx) => {
+                return <MenuItem key={idx} item={item} />;
+              })}
+              {productsCategoriesRequestProcessing ? (
+                <div className="flex items-center px-6">
+                  <CircularProgress
+                    size={18}
+                    color="inherit"
+                    className="me-2"
+                  />
+                  <span className="text-sm">Fetching your product categories..</span>
+                </div>
+              ) : (
+                <>
+                  {productCategories?.map((category, index) => (
+                    <ProductCetgoriesMenuItem
+                      key={index}
+                      label={category.name}
+                      href={`/products/${generateSlug(category.name)}`}
+                      icon={<Gamepad2 width={22} height={22} />}
+                      descendants={category.subcategories?.map(
+                        (subCategory) => ({
+                          name: subCategory.name,
+                          path: generateSlug(subCategory.name),
+                          children: subCategory.children?.map((child) => ({
+                            name: child.name,
+                            path: generateSlug(child.name),
+                            children: child.children?.map((grandChild) => ({
+                              name: grandChild.name,
+                              path: generateSlug(grandChild.name),
+                            })),
+                          })),
+                        })
+                      )}
+                    />
+                  ))}
+                </>
+              )}
+            </div>
+            {isLoggedIn && (
+              <div className="flex flex-col flex-grow items-center justify-end space-y-4 mb-4 mx-6 mt-6 relative bottom-0">
+                <button
+                  className={`w-full flex items-center justify-start gap-2 py-[18px] px-[15px] rounded-[10px] sm:rounded-[15px] bg-gray-950 hover:bg-gradient-to-bl`}
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-whiteColor" />
+                  <span className="text-whiteColor text-[14px] font-medium">
+                    {signingOutRequestProcessing ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      "Logout"
+                    )}
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </Drawer>
   );
 };
 
-export default Sidebar;
+const mapStateToProps = (state: RootState) => {
+  const signingOutRequestProcessing =
+    state.loading.effects.authentication.signOut;
+  const productsCategoriesRequestProcessing =
+    state.loading.effects.settings.getProductCategories;
+  const { isLoggedIn } = state.authentication;
+  const { productCategories } = state.settings;
+  return {
+    signingOutRequestProcessing,
+    productsCategoriesRequestProcessing,
+    isLoggedIn,
+    productCategories,
+  };
+};
+
+const mapDispatchToProps = (dispatch: any) => ({
+  signOut: () => dispatch.authentication.signOut(),
+  getProductCategories: () => dispatch.settings.getProductCategories(),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
 
 const MenuItem = ({ item }: { item: SideNavItem }) => {
   const { theme = "light" } = useTheme();
@@ -175,7 +267,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
               item.path === pathname
                 ? "border-b-[3px] border-b-mainColor pb-3 w-1/2"
                 : ""
-            } `}
+            }`}
           >
             {item.icon}
             <span className="font-light text-base flex">{item.title}</span>

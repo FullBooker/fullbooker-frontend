@@ -7,7 +7,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 const Footer = () => {
   return (
     <footer className="bottom-0 w-full bg-white flex justify-center">
-      <div className="max-w-[1200px] px-5 py-12 md:px-8">
+      <div className="max-w-[1200px] px-4 py-12 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description Column */}
           <div className="col-span-1">
