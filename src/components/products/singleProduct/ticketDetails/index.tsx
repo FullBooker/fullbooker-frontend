@@ -639,7 +639,7 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                       {
                         currencies?.find(
                           (currency: Currency) =>
-                            currency.id === product?.pricing[0].currency
+                            currency.id === product?.pricing[0]?.currency
                         )?.code
                       }
                     </span>
