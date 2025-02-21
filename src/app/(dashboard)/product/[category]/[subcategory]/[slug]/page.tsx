@@ -194,13 +194,21 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     currency: Currency;
     pricingOption: ProductPricing;
   } => {
-    const defaultPricingOption = pricingOptions[0];
-    return {
-      currency: currencies?.find(
-        (currency: Currency) => currency?.id === defaultPricingOption?.currency
-      ) as Currency,
-      pricingOption: defaultPricingOption,
-    };
+    if (pricingOptions?.length > 0) {
+      const defaultPricingOption = pricingOptions[0];
+      return {
+        currency: currencies?.find(
+          (currency: Currency) =>
+            currency?.id === defaultPricingOption?.currency
+        ) as Currency,
+        pricingOption: defaultPricingOption,
+      };
+    } else {
+      return {
+        currency: {} as Currency,
+        pricingOption: {} as ProductPricing,
+      };
+    }
   };
 
   const renderDefaultPricingOption = () => {
@@ -223,7 +231,13 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
               Math.round(parseFloat(defaultPricing?.pricingOption?.cost))
             )}
           </p>
-          <div className={`bg-primary rounded-xl px-2 flex justify-center ${product?.pricing?.length > 1 ? "w-[70%] md:w-[70%]" : "w-[40%] md:w-[50%] lg:w-[30%]"}`}>
+          <div
+            className={`bg-primary rounded-xl px-2 flex justify-center ${
+              product?.pricing?.length > 1
+                ? "w-[70%] md:w-[70%]"
+                : "w-[40%] md:w-[50%] lg:w-[30%]"
+            }`}
+          >
             <span className="text-white text-xs">
               {defaultPricing?.pricingOption?.type === "ticket"
                 ? TICKET_PRICING_CATEGORIES.find(
