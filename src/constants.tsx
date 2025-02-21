@@ -1,4 +1,4 @@
-import { Banknote, Gamepad2, Home, User, DollarSign } from "lucide-react";
+import { Banknote, Gamepad2, Home, User, DollarSign, UserCircle } from "lucide-react";
 import { SideNavItem } from "./types";
 import {
   SessionPricingCategory,
@@ -35,6 +35,12 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     icon: <User width={22} height={22} />,
     submenu: false,
   },
+  {
+    title: "Profile",
+    path: "/profile",
+    icon: <UserCircle width={22} height={22} />,
+    submenu: false,
+  }
 ];
 
 export const TICKET_PRICING_CATEGORIES: Array<TicketPricingCategory> = [

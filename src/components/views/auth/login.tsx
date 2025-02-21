@@ -20,7 +20,7 @@ import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
 import { NotificationType } from "@/domain/notification";
-// import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
+import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 
 type LoginModalContentProps = {
   emailPassowrdLoginRequestProcessing: boolean;
@@ -61,7 +61,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   getUserProfile,
   setActiveModal,
   type,
-  googleLoginRequestProcessing
+  googleLoginRequestProcessing,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -80,7 +80,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
     const { phone_number, password } = data;
     signIn({ phone_number, password } as UserCredentials);
   };
-  // const { login } = useGoogleLogin();
+  const { login } = useGoogleLogin();
 
   useEffect(() => {
     return () => {
@@ -187,18 +187,21 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           <button
             type="button"
             className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-            // onClick={() => login()}
+            onClick={() => login()}
           >
-            <Image
-              src="/assets/google-icon.png"
-              alt="Google"
-              width={20}
-              height={20}
-            />
             {googleLoginRequestProcessing ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
-              "Sign in with Google"
+              <div className="flex items-center">
+                <Image
+                  src="/assets/google-icon.png"
+                  alt="Google"
+                  width={20}
+                  height={20}
+                  className="me-1"
+                />
+                <span>Sign in with Google</span>
+              </div>
             )}
           </button>
 
@@ -234,11 +237,19 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const googleLoginRequestProcessing =
-  state.loading.effects.authentication.googleSocialSignin;
-  const emailPassowrdLoginRequestProcessing = state.loading.effects.authentication.signIn;
+    state.loading.effects.authentication.googleSocialSignin;
+  const emailPassowrdLoginRequestProcessing =
+    state.loading.effects.authentication.signIn;
   const { isLoggedIn, authData } = state.authentication;
   const { message, type } = state.alert;
-  return { emailPassowrdLoginRequestProcessing, isLoggedIn, message, authData, type, googleLoginRequestProcessing };
+  return {
+    emailPassowrdLoginRequestProcessing,
+    isLoggedIn,
+    message,
+    authData,
+    type,
+    googleLoginRequestProcessing,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

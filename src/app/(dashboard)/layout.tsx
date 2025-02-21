@@ -21,7 +21,7 @@ import PasswordResetSuccessfullModal from "@/components/views/auth/passwordReset
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
 import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index"
-// import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
+import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
 
 
 type DashboardLayoutProps = {
@@ -31,6 +31,7 @@ type DashboardLayoutProps = {
   type: NotificationType;
   sessionHasExpired: boolean;
   isLoggedIn: boolean;
+  signOut: () => void;
 };
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({
@@ -40,6 +41,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   type,
   sessionHasExpired,
   isLoggedIn,
+  signOut
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -143,7 +145,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     }
   }, [message, type]);
 
-  // useGoogleOneTap();
+  useGoogleOneTap();
 
   return (
     <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
@@ -157,6 +159,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           open={open}
           onClose={() => setOpen(false)}
           isMobile={isMobile}
+          signOut={signOut}
         />
       </div>
 
@@ -274,6 +277,8 @@ const mapStateToProps = (state: RootState) => {
   return { modalId, message, type, sessionHasExpired, isLoggedIn };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({});
+const mapDispatchToProps = (dispatch: any) => ({
+  signOut: () => dispatch.authentication.signOut(),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardLayout);

@@ -136,7 +136,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, message]);
 
-  // const { login: register } = useGoogleLogin();
+  const { login: register } = useGoogleLogin();
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -294,18 +294,21 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
           <button
             type="button"
             className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-            // onClick={() => register()}
+            onClick={() => register()}
           >
-            <Image
-              src="/assets/google-icon.png"
-              alt="Google"
-              width={20}
-              height={20}
-            />
             {googleRegisterRequestProcessing ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
-              "Sign in with Google"
+              <div className="flex items-center">
+                <Image
+                  src="/assets/google-icon.png"
+                  alt="Google"
+                  width={20}
+                  height={20}
+                  className="me-1"
+                />
+                <span>Sign in with Google</span>
+              </div>
             )}
           </button>
 
@@ -339,10 +342,16 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const googleRegisterRequestProcessing =
-  state.loading.effects.authentication.googleSocialSignin;
-  const emailPassowrdRegisterRequestProcessing = state.loading.effects.authentication.signIn;
+    state.loading.effects.authentication.googleSocialSignin;
+  const emailPassowrdRegisterRequestProcessing =
+    state.loading.effects.authentication.signIn;
   const { message, type } = state.alert;
-  return { googleRegisterRequestProcessing, emailPassowrdRegisterRequestProcessing, message, type };
+  return {
+    googleRegisterRequestProcessing,
+    emailPassowrdRegisterRequestProcessing,
+    message,
+    type,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({

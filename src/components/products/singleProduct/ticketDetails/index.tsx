@@ -274,15 +274,22 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                             className="w-full border-none outline-none font-thin text-sm rounded-sm bg-gray-100 shadow-md text-gray-500 px-2 py-2 "
                             value={value}
                             onChange={(e) => {
-                              const pricing = product?.pricing?.find(
-                                (p: ProductPricing) => p.id === e.target.value
-                              ) as ProductPricing;
-                              setSelectedPricing(pricing);
-                              setProductDetailsToCart({
-                                ...cartSummary,
-                                base_currency: pricing?.currency,
-                                product_base_price: pricing?.cost,
-                              } as CartSummary);
+                              if (e.target.value !== "") {
+                                const pricing = product?.pricing?.find(
+                                  (p: ProductPricing) => p.id === e.target.value
+                                ) as ProductPricing;
+                                setSelectedPricing(pricing);
+                                setProductDetailsToCart({
+                                  ...cartSummary,
+                                  base_currency: pricing?.currency,
+                                  product_base_price: pricing?.cost,
+                                } as CartSummary);
+                              } else {
+                                setProductDetailsToCart({
+                                  ...cartSummary,
+                                  product_base_price: "0",
+                                } as CartSummary);
+                              }
                               onChange(e);
                             }}
                           >
@@ -614,8 +621,9 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                 <p className="flex justify-between">
                   Ticket price:
                   <span className="font-semibold">
-                    {addCommaSeparators(parseInt(product?.pricing[0]?.cost)) ||
-                      0}
+                    {addCommaSeparators(
+                      parseInt(cartSummary?.product_base_price)
+                    ) || 0}
                   </span>
                 </p>
                 <p className="flex justify-between">

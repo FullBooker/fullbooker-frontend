@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Head from "next/head";
-// import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const poppins = Poppins({
   weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
@@ -33,7 +33,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const GOOGLE_CLIENT_ID =  "" ;
   
   return (
     <html lang="en">
@@ -67,9 +66,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}> */}
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
             {children}
-          {/* </GoogleOAuthProvider> */}
+          </GoogleOAuthProvider>
         </ThemeProvider>
       </body>
     </html>
