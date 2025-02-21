@@ -106,32 +106,38 @@ const Sidebar = ({
                     color="inherit"
                     className="me-2"
                   />
-                  <span className="text-sm">Fetching your product categories..</span>
+                  <span className="text-sm">
+                    Fetching your product categories..
+                  </span>
                 </div>
               ) : (
                 <>
-                  {productCategories?.map((category, index) => (
-                    <ProductCetgoriesMenuItem
-                      key={index}
-                      label={category.name}
-                      href={`/products/${generateSlug(category.name)}`}
-                      icon={<Gamepad2 width={22} height={22} />}
-                      descendants={category.subcategories?.map(
-                        (subCategory) => ({
-                          name: subCategory.name,
-                          path: generateSlug(subCategory.name),
-                          children: subCategory.children?.map((child) => ({
-                            name: child.name,
-                            path: generateSlug(child.name),
-                            children: child.children?.map((grandChild) => ({
-                              name: grandChild.name,
-                              path: generateSlug(grandChild.name),
-                            })),
-                          })),
-                        })
-                      )}
-                    />
-                  ))}
+                  {productCategories && productCategories?.length === 0 && (
+                    <>
+                      {productCategories?.map((category, index) => (
+                        <ProductCetgoriesMenuItem
+                          key={index}
+                          label={category?.name}
+                          href={`/products/${generateSlug(category.name)}`}
+                          icon={<Gamepad2 width={22} height={22} />}
+                          descendants={category?.subcategories?.map(
+                            (subCategory) => ({
+                              name: subCategory?.name,
+                              path: generateSlug(subCategory?.name),
+                              children: subCategory?.children?.map((child) => ({
+                                name: child?.name,
+                                path: generateSlug(child?.name),
+                                children: child.children?.map((grandChild) => ({
+                                  name: grandChild?.name,
+                                  path: generateSlug(grandChild?.name),
+                                })),
+                              })),
+                            })
+                          )}
+                        />
+                      ))}
+                    </>
+                  )}
                 </>
               )}
             </div>
