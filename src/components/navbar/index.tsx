@@ -187,7 +187,7 @@ const Navbar: FC<NavbarProps> = ({
           </div>
           <div className="hidden items-center lg:flex">
             <ul className="flex justify-between">
-              {productCategories?.map(
+              {productCategories && productCategories?.map(
                 (category: ProductCategory, index: number) => (
                   <li key={index}>
                     <div className="relative inline-block text-left">

@@ -123,7 +123,7 @@ export const products = createModel<RootModel>()({
         );
 
         if (response && response?.data) {
-          dispatch.products.setProducts(response?.data);
+          dispatch.products.setProducts(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -136,7 +136,7 @@ export const products = createModel<RootModel>()({
         );
 
         if (response && response?.data) {
-          dispatch.products.setProducts(response?.data);
+          dispatch.products.setProducts(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -160,7 +160,7 @@ export const products = createModel<RootModel>()({
           `/media/?product_id=${productId}`
         );
         if (response && response?.data) {
-          dispatch.products.setProductMedia(response?.data);
+          dispatch.products.setProductMedia(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

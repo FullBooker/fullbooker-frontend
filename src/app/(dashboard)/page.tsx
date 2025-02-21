@@ -214,7 +214,7 @@ const HomePage: FC<HomePageProps>  & { layout: any } = ({
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0
             px-4 md:px-7"
           >
-            {products.map((product: Product, index: number) => (
+            {products?.map((product: Product, index: number) => (
               <SingleProduct
                 key={index}
                 product={product}

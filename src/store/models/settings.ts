@@ -50,7 +50,7 @@ export const settings = createModel<RootModel>()({
         const response: any = await getRequest("/categories/");
 
         if (response && response?.data) {
-          dispatch.settings.setProductCategories(response?.data);
+          dispatch.settings.setProductCategories(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -61,7 +61,7 @@ export const settings = createModel<RootModel>()({
         const response: any = await getRequest("/days-of-week/");
 
         if (response && response?.data) {
-          dispatch.settings.setDaysOfWeek(response?.data);
+          dispatch.settings.setDaysOfWeek(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -72,7 +72,7 @@ export const settings = createModel<RootModel>()({
         const response: any = await getRequest("/currencies/");
 
         if (response && response?.data) {
-          dispatch.settings.setCurrencies(response?.data);
+          dispatch.settings.setCurrencies(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

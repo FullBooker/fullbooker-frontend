@@ -132,7 +132,7 @@ export const vendor = createModel<RootModel>()({
           if (response?.data?.length > 0) {
             dispatch.vendor.setProductPageViewType(ViewType.productsListView);
           }
-          dispatch.vendor.setVendorProducts(response?.data);
+          dispatch.vendor.setVendorProducts(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -173,7 +173,7 @@ export const vendor = createModel<RootModel>()({
           `/media/?product_id=${productId}`
         );
         if (response && response?.data) {
-          dispatch.vendor.setProductMedia(response?.data);
+          dispatch.vendor.setProductMedia(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
