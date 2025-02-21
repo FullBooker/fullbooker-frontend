@@ -271,7 +271,7 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => (
                           <select
-                            className="w-full border-none outline-none font-thin text-sm rounded-sm bg-gray-100 shadow-md text-gray-500 px-2 py-2 "
+                            className="w-full border-none outline-none font-thin text-sm rounded-sm bg-gray-100 shadow-md text-gray-500 px-2 py-3 "
                             value={value}
                             onChange={(e) => {
                               if (e.target.value !== "") {
@@ -569,7 +569,7 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                 </div>
               </div>
             </div>
-            <div className="w-full">
+            <div className="">
               {/* Date Selection Desktop */}
               {!isMobile && (
                 <div className="mt-4">
@@ -582,7 +582,7 @@ const TicketDetails: FC<TicketDetailsProps> = ({
 
                   <div className="w-full">
                     <Calendar
-                      className="bg-white px-4 py-4 rounded-2xl shadow-lg !w-full !text-[10px] md:!text-[16px]"
+                      className="bg-white px-4 py-4 rounded-2xl shadow-lg !w-full !text-[10px] md:!text-[12px] lg:!text-[16px]"
                       onChange={(date) => {
                         setSelectedDate(date);
                         setValue("date", date.toString());

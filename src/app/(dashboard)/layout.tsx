@@ -159,7 +159,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           open={open}
           onClose={() => setOpen(false)}
           isMobile={isMobile}
-          signOut={signOut}
         />
       </div>
 

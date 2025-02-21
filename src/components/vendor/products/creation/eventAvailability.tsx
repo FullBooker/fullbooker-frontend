@@ -16,6 +16,7 @@ import {
 } from "@/domain/dto/input";
 import LocationSearch from "./locationSearch";
 import ReverseGeocoding from "./locationPointer";
+import { extractCoordinates } from "@/utilities";
 
 type EventAvailabilityProps = {
   getDaysOfWeek: () => void;
@@ -78,16 +79,6 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
 
   const [selectedLocation, setSelectedLocation] =
     useState<google.maps.places.PlaceResult | null>(null);
-
-  function extractCoordinates(coordinateString: string) {
-    const parts = coordinateString?.split("POINT (");
-    if (parts.length < 2) return null;
-    const coordinates = parts[1].replace(")", "").trim().split(" ");
-    return {
-      latitude: parseFloat(coordinates[1]),
-      longitude: parseFloat(coordinates[0]),
-    };
-  }
 
   return (
     <div className="px-0 md:px-5">
@@ -206,22 +197,28 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
                 <span className="font-light">
                   {(selectedLocation &&
                     selectedLocation?.formatted_address) || (
-                    <ReverseGeocoding
-                      lat={
-                        extractCoordinates(
-                          newProduct?.locations[
-                            newProduct?.locations?.length - 1
-                          ]?.coordinates
-                        )?.latitude as number
-                      }
-                      lng={
-                        extractCoordinates(
-                          newProduct?.locations[
-                            newProduct?.locations?.length - 1
-                          ]?.coordinates
-                        )?.longitude as number
-                      }
-                    />
+                    <>
+                      {newProduct?.locations?.length > 0 ? (
+                        <ReverseGeocoding
+                          lat={
+                            extractCoordinates(
+                              newProduct?.locations[
+                                newProduct?.locations?.length - 1
+                              ]?.coordinates
+                            )?.latitude as number
+                          }
+                          lng={
+                            extractCoordinates(
+                              newProduct?.locations[
+                                newProduct?.locations?.length - 1
+                              ]?.coordinates
+                            )?.longitude as number
+                          }
+                        />
+                      ) : (
+                        "N/A"
+                      )}
+                    </>
                   )}
                 </span>
               </div>

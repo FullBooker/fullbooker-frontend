@@ -70,8 +70,8 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
         </p>
       </div>
       <div className="overflow-x-auto whitespace-nowrap">
-        <div className="flex items-center justify-center bg-gray-100 min-w-[800px] md:min-w-[1200px]">
-          <div className="flex w-[1200px] h-[250px] md:h-[400px] borderrounded-md shadow-lg">
+        <div className="flex items-center justify-center bg-gray-100 min-w-[800px] md:min-w-[600px]">
+          <div className="flex w-[1200px] h-[250px] md:h-[280px] borderrounded-md shadow-lg">
             <p className="[writing-mode:sideways-lr] text-center text-white bg-primary py-4">
               FULLBOOKER
             </p>
@@ -90,7 +90,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
               </div>
               <div className="flex w-full">
                 {/* QR Code Placeholder */}
-                <QRCode size={isMobile ? 100 : 250} value={generateUUID()} />
+                <QRCode size={isMobile ? 100 : 160} value={generateUUID()} />
               </div>
               {/* <p className="text-xs text-gray-600 text-center rotate-180 transform origin-left">
               Fullbooker
@@ -101,7 +101,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             <div className="w-full md:w-2/3 p-4 bg-white relative">
               <h2 className="text-2xl font-bold text-center">Rock Concert</h2>
 
-              <div className="mt-3 text-sm w-full">
+              <div className="mt-3 text-sm w-full md:mt-6">
                 <p>
                   <span className="font-semibold">Confirmation Number:</span>{" "}
                   FGEDE46374H2
@@ -115,7 +115,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                 </p>
               </div>
 
-              <p className="text-sm font-semibold mt-4">
+              <p className="relative bottom-0 text-sm font-semibold mt-4 md:mt-20">
                 Location:{" "}
                 <span className="font-normal">
                   Carnivore Grounds, Nairobi, Kenya

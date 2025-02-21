@@ -45,6 +45,7 @@ import {
   SESSION_PRICING_CATEGORIES,
   TICKET_PRICING_CATEGORIES,
 } from "@/constants";
+import useIsMobile from "@/lib/hooks/useIsMobile";
 
 type SingleProductPageProps = {
   productMedia: Array<ProductMedia>;
@@ -154,21 +155,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     );
   }
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const isMobile = useIsMobile()
 
   const mapRef = useRef<HTMLDivElement | null>(null);
 

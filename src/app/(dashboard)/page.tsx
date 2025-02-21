@@ -58,6 +58,7 @@ import { Currency, ProductCategory } from "@/domain/dto/output";
 import ProductCategories from "@/components/products/categories";
 import { getToken } from "@/utilities/auth.cookie";
 import Button from "@/components/shared/button";
+import DashBoardLayout from "./layout";
 
 type HomePageProps = {
   isLoggedIn: boolean;
@@ -71,7 +72,7 @@ type HomePageProps = {
   currencies: Array<Currency>;
 };
 
-const HomePage: FC<HomePageProps> = ({
+const HomePage: FC<HomePageProps>  & { layout: any } = ({
   isLoggedIn,
   setActiveModal,
   productCategories,
@@ -252,6 +253,8 @@ const HomePage: FC<HomePageProps> = ({
     </div>
   );
 };
+
+HomePage.layout = DashBoardLayout;
 
 const mapStateToProps = (state: RootState) => {
   const productsRequestProcessing = state.loading.models.products;
