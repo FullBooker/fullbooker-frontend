@@ -21,11 +21,9 @@ export const useGoogleOneTap = () => {
       }
     }, 500);
 
-    return () => clearInterval(interval);
-  }, [authToken]);
-
-  useEffect(() => {
     setIsLoggedIn(authToken ? true : false);
+
+    return () => clearInterval(interval);
   }, [authToken]);
 
   useGoogleOneTapLogin({

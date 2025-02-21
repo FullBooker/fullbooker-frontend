@@ -8,13 +8,27 @@ import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ModalID } from "@/domain/components";
 import { ProductsFilters } from "@/domain/dto/input";
-import { Product, ProductMedia } from "@/domain/product";
+import {
+  Product,
+  ProductMedia,
+  ProductPricing,
+  TicketPricingCategory,
+  SessionPricingCategory,
+} from "@/domain/product";
 import { Currency, ProductCategory, Subcategory } from "@/domain/dto/output";
 import DashBoardLayout from "../../../../layout";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import {
+  AccordionSummary,
+  Accordion,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  AccordionDetails,
+} from "@mui/material";
 import { MediaType } from "@/domain/constants";
 import Button from "@/components/shared/button";
-import { Heart } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Heart } from "lucide-react";
 import { Calendar } from "react-date-range";
 import ProductLocation from "@/components/products/singleProduct/productLocation";
 import Tabs from "@mui/material/Tabs";
@@ -27,6 +41,10 @@ import { addCommaSeparators, extractCoordinates } from "@/utilities";
 import LocationIdentifier from "@/components/shared/locationidentifier";
 import TicketDetails from "@/components/products/singleProduct/ticketDetails";
 import ProductsByVendor from "@/components/products/singleProduct/productsByVendor";
+import {
+  SESSION_PRICING_CATEGORIES,
+  TICKET_PRICING_CATEGORIES,
+} from "@/constants";
 
 type SingleProductPageProps = {
   productMedia: Array<ProductMedia>;
@@ -57,6 +75,9 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     page: 1,
     limit: 10,
   });
+  const [selectedDate, setSelectedDate] = useState<any>();
+  const [showOtherPricingOptions, setShowOtherPricingOptions] =
+    useState<boolean>(false);
 
   useEffect(() => {
     getProductCategories();
@@ -89,8 +110,6 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 
     return subcategories;
   };
-
-  const [selectedDate, setSelectedDate] = useState<any>();
 
   interface TabPanelProps {
     children?: React.ReactNode;
@@ -168,6 +187,76 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     product?.locations?.length > 0
       ? extractCoordinates(product?.locations[0]?.coordinates)
       : null;
+
+  const getDefaultPricingOption = (
+    pricingOptions: Array<ProductPricing>
+  ): {
+    currency: Currency;
+    pricingOption: ProductPricing;
+  } => {
+    const defaultPricingOption = pricingOptions[0];
+    return {
+      currency: currencies?.find(
+        (currency: Currency) => currency?.id === defaultPricingOption?.currency
+      ) as Currency,
+      pricingOption: defaultPricingOption,
+    };
+  };
+
+  const renderDefaultPricingOption = () => {
+    const defaultPricing: {
+      currency: Currency;
+      pricingOption: ProductPricing;
+    } = getDefaultPricingOption(product?.pricing);
+
+    return (
+      <div className="flex justify-between items-center w-full">
+        <div className="items-center w-full">
+          <p className="text-lg font-semibold text-black">
+            {currencies?.length > 0
+              ? currencies?.find(
+                  (currency: Currency) =>
+                    currency?.id === defaultPricing?.pricingOption?.currency
+                )?.code
+              : "KES"}{" "}
+            {addCommaSeparators(
+              Math.round(parseFloat(defaultPricing?.pricingOption?.cost))
+            )}
+          </p>
+          <div className={`bg-primary rounded-xl px-2 flex justify-center ${product?.pricing?.length > 1 ? "w-[70%] md:w-[70%]" : "w-[40%] md:w-[50%] lg:w-[30%]"}`}>
+            <span className="text-white text-xs">
+              {defaultPricing?.pricingOption?.type === "ticket"
+                ? TICKET_PRICING_CATEGORIES.find(
+                    (tCat: TicketPricingCategory) =>
+                      tCat.key === defaultPricing?.pricingOption?.ticket_tier
+                  )?.title
+                : SESSION_PRICING_CATEGORIES.find(
+                    (spCat: SessionPricingCategory) =>
+                      spCat.key === defaultPricing?.pricingOption?.type
+                  )?.title}
+            </span>
+          </div>
+        </div>
+        {product?.pricing?.length > 1 && (
+          <div
+            className="flex items-center cursor-pointer w-full"
+            onClick={() => setShowOtherPricingOptions(!showOtherPricingOptions)}
+          >
+            <p className="text-primary text-sm lg:text-base">
+              More pricing options
+            </p>
+            <span>
+              {showOtherPricingOptions ? (
+                <ChevronUp className="w-8 h-8 text-primary" />
+              ) : (
+                <ChevronDown className="w-8 h-8 text-primary" />
+              )}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col h-fit bg-gray-100 max-w-7xl mx-auto px-4 md:px-7">
@@ -259,17 +348,53 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                 )}
               </p>
               <p className="text-gray-500">Mon to Sat from 9AM to 4PM</p>
-              <p className="text-lg font-semibold">
-                {currencies?.length > 0
-                  ? currencies?.find(
-                      (currency: Currency) =>
-                        currency?.id === product?.pricing[0]?.currency
-                    )?.code
-                  : "KES"}{" "}
-                {addCommaSeparators(
-                  Math.round(parseFloat(product?.pricing[0]?.cost))
-                )}
-              </p>
+              {product?.pricing?.length > 1 ? (
+                <div className="flex justify-between mt-2 w-full">
+                  <div className="w-full">{renderDefaultPricingOption()}</div>
+                </div>
+              ) : (
+                <div>{renderDefaultPricingOption()}</div>
+              )}
+              {showOtherPricingOptions && (
+                <div className="bg-white shadow-lg px-3 py-1 mt-3 mb-2">
+                  {product?.pricing
+                    ?.filter(
+                      (p: ProductPricing) =>
+                        p?.id !==
+                        getDefaultPricingOption(product?.pricing)?.pricingOption
+                          ?.id
+                    )
+                    ?.map((pricing: ProductPricing, index: number) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center py-2"
+                      >
+                        <span className="text-base me-2 text-black">
+                          {pricing?.type === "ticket"
+                            ? TICKET_PRICING_CATEGORIES.find(
+                                (tCat: TicketPricingCategory) =>
+                                  tCat.key === pricing?.ticket_tier
+                              )?.title
+                            : SESSION_PRICING_CATEGORIES.find(
+                                (spCat: SessionPricingCategory) =>
+                                  spCat.key === pricing?.type
+                              )?.title}
+                        </span>
+                        <p className="font-semibold text-primary text-base">
+                          {currencies?.length > 0
+                            ? currencies?.find(
+                                (currency: Currency) =>
+                                  currency?.id === pricing?.currency
+                              )?.code
+                            : "KES"}{" "}
+                          {addCommaSeparators(
+                            Math.round(parseFloat(pricing?.cost))
+                          )}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
             <div className="text-right">
               <Button
@@ -282,7 +407,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                 View Map
               </Button>
             </div>
-            <div className="hidden md:flex justify-end items-start">
+            <div className="hidden lg:flex justify-end items-start">
               <div className="flex items-center">
                 <Image
                   src="/assets/default-profile-picture-placeholder.jpg"
@@ -313,14 +438,17 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
             </div>
           ) : (
             <div>
-               {/* Ticket Details */}
+              {/* Ticket Details */}
               <TicketDetails
                 product={product}
                 productsRequestProcessing={productsRequestProcessing}
               />
 
               {/* Map Section */}
-              <div className="mt-6 border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]" ref={mapRef}>
+              <div
+                className="mt-6 border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]"
+                ref={mapRef}
+              >
                 {product?.locations?.length > 0 && (
                   <ProductLocation
                     coordinates={product?.locations[0]?.coordinates}

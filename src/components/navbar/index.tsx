@@ -103,7 +103,7 @@ const Navbar: FC<NavbarProps> = ({
   googleLoginRequestProcessing,
   switchToHostRequestProcessing,
   signOutRequestProcessing,
-  modalId
+  modalId,
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -377,7 +377,7 @@ const Navbar: FC<NavbarProps> = ({
                   {switchToHostRequestProcessing ? (
                     <CircularProgress size={18} color="inherit" />
                   ) : authToken ? (
-                    "Switch to hosting"
+                    `${isMobile ? "Hosting" : "Switch to hosting"}`
                   ) : (
                     "Become a Host"
                   )}
@@ -389,6 +389,7 @@ const Navbar: FC<NavbarProps> = ({
                     borderRadius="rounded-2xl"
                     text="text-xs md:text-sm text-black"
                     onClick={() => setActiveModal(ModalID.login)}
+                    extraClasses="hidden md:flex"
                   >
                     {(googleLoginRequestProcessing ||
                       emailPassowrdLoginRequestProcessing) &&
@@ -404,7 +405,7 @@ const Navbar: FC<NavbarProps> = ({
               {authToken && (
                 <Profile
                   button={
-                    <div className="flex justify-center content-center items-center cursor-pointer ml-2">
+                    <div className="hidden md:flex justify-center content-center items-center cursor-pointer ml-2">
                       <Image
                         src="/assets/default-profile-picture-placeholder.jpg"
                         alt={"Host Profile Image"}

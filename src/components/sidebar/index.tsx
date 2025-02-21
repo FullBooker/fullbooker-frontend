@@ -4,23 +4,26 @@ import { useTheme } from "next-themes";
 import React from "react";
 import { SIDENAV_ITEMS } from "@/constants";
 import { SideNavItem } from "@/types";
-import { ChevronUp, X } from "lucide-react";
+import { ChevronUp, LogOut, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import LogoutButton from "./components/LogoutButton";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Sidebar = ({
   theme,
   open,
   onClose,
   isMobile,
+  signOut,
 }: {
   theme: string | undefined;
   open: boolean;
   onClose: React.MouseEventHandler<HTMLSpanElement>;
   isMobile: boolean;
+  signOut: () => void;
 }) => {
   return (
     <div
@@ -67,11 +70,19 @@ const Sidebar = ({
               return <MenuItem key={idx} item={item} />;
             })}
           </div>
+          <div className="flex flex-row items-center py-2 px-6 w-full justify-between hover:opacity-40">
+            <button
+              className={`w-full flex items-center justify-start gap-2 py-[18px] rounded-[10px] sm:rounded-[15px hover:bg-gradient-to-bl`}
+              onClick={() => {
+                signOut();
+              }}
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-black me-3" />
+              <span className="text-black font-medium">Logout</span>
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col items-center justify-end space-y-4 mb-4">
       </div>
-      </div>
-    
     </div>
   );
 };
