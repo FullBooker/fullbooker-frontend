@@ -90,7 +90,7 @@ export type UpdateProductPayload = {
 
 export type ProductsFilters = {
   page: number;
-  limit: number;
+  page_size: number;
 };
 
 

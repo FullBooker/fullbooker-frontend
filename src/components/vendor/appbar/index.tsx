@@ -17,7 +17,7 @@ import { UserProfile } from "@/domain/profile";
 import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import Profile from "@/components/vendor/profile/Profile";
-import CustomAvatar from "@/components/navbar/components/customAvatar";
+import CustomAvatar from "@/components/layout/navbar/components/customAvatar";
 import { getInitials, hideMiddleCharacters } from "@/utilities";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";

@@ -2,23 +2,33 @@ import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import { ProductsFilters } from "@/domain/dto/input";
 import { buildQueryString, getRequest } from "@/utilities";
-import { CartItem, CartSummary, Product, ProductMedia } from "@/domain/product";
+import { CartItem, CartSummary, ComprehensiveProductFilters, Product, ProductMedia } from "@/domain/product";
 
 type ProductsState = {
   products: Array<Product>;
   product: Product | null;
+  popularProducts: Array<Product>;
+  nearByProducts: Array<Product>;
+  recommendedProducts: Array<Product>;
+  upcomingProducts: Array<Product>;
   productMedia: Array<ProductMedia>;
   cart: Array<CartItem>;
   cartSummary: CartSummary | null;
+  productFilters: ComprehensiveProductFilters | null;
 };
 
 export const products = createModel<RootModel>()({
   state: {
     products: [],
     product: null,
+    popularProducts: [],
+    nearByProducts: [],
+    recommendedProducts: [],
+    upcomingProducts: [],
     productMedia: [],
     cart: [],
     cartSummary: null,
+    productFilters: null,
   } as ProductsState,
   reducers: {
     setProductDetails(state: ProductsState, product: Product) {
@@ -31,6 +41,36 @@ export const products = createModel<RootModel>()({
       return {
         ...state,
         products,
+      };
+    },
+    setPopularProducts(state: ProductsState, popularProducts: Array<Product>) {
+      return {
+        ...state,
+        popularProducts,
+      };
+    },
+    setRecommendedProducts(
+      state: ProductsState,
+      recommendedProducts: Array<Product>
+    ) {
+      return {
+        ...state,
+        recommendedProducts,
+      };
+    },
+    setNearByProducts(state: ProductsState, nearByProducts: Array<Product>) {
+      return {
+        ...state,
+        nearByProducts,
+      };
+    },
+    setUpcomingProducts(
+      state: ProductsState,
+      upcomingProducts: Array<Product>
+    ) {
+      return {
+        ...state,
+        upcomingProducts,
       };
     },
     setProductMedia(state: ProductsState, productMedia: Array<ProductMedia>) {
@@ -114,6 +154,18 @@ export const products = createModel<RootModel>()({
         cartSummary,
       };
     },
+    setProductFilters(state: ProductsState, filters: ComprehensiveProductFilters) {
+      return {
+        ...state,
+        productFilters: filters,
+      };
+    },
+    clearProductFilters(state: ProductsState) {
+      return {
+        ...state,
+        productFilters: null,
+      };
+    },
   },
   effects: (dispatch: any) => ({
     async getProducts(payload: ProductsFilters, rootState) {
@@ -124,6 +176,66 @@ export const products = createModel<RootModel>()({
 
         if (response && response?.data) {
           dispatch.products.setProducts(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getPopularProducts(payload: ProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload
+            ? `/products/popular?${buildQueryString(payload)}`
+            : "/products/popular"
+        );
+
+        if (response && response?.data) {
+          dispatch.products.setPopularProducts(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getRecommendedProducts(payload: ProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload
+            ? `/products/popular?${buildQueryString(payload)}`
+            : "/products/popular"
+        );
+
+        if (response && response?.data) {
+          dispatch.products.setRecommendedProducts(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getNearByProducts(payload: ProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload
+            ? `/products/nearby?${buildQueryString(payload)}&lat=1.2921&long=36.8219`
+            : "/products/nearby"
+        );
+
+        if (response && response?.data) {
+          dispatch.products.setNearByProducts(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getUpcomingProducts(payload: ProductsFilters, rootState) {
+      try {
+        const response: any = await getRequest(
+          payload
+            ? `/products/upcoming?${buildQueryString(payload)}`
+            : "/products/upcoming"
+        );
+
+        if (response && response?.data) {
+          dispatch.products.setUpcomingProducts(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

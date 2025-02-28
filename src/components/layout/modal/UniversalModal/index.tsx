@@ -23,6 +23,7 @@ import { X } from "lucide-react";
     open?: boolean;
     setActiveModal: (modalId: ModalID) => void;
     content: any;
+    fullScreen?: boolean;
   }
   
   const UniversalModal: FC<UniversalModalProps> = ({
@@ -31,11 +32,12 @@ import { X } from "lucide-react";
     description,
     open = true,
     content,
-    setActiveModal
+    setActiveModal,
+    fullScreen = false
   }) => {
     return (
       <Dialog open={open}>
-        <DialogContent className="w-[320px] xs:w-[450px] md:w-[530px] flex flex-col justify-center items-center pt-4 rounded-xl sm:rounded-2xl md:rounded-3xl">
+        <DialogContent className={`w-[320px] xs:w-[450px] md:w-[530px] flex flex-col justify-center items-center pt-4 sm:rounded-2xl md:rounded-3xl ${fullScreen ? 'w-full h-full' : 'rounded-xl'} max-h-[100vh] overflow-y-auto`}>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" onClick={() => setActiveModal(ModalID.none)}>
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>

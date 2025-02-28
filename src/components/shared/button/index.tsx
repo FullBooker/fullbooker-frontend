@@ -11,6 +11,7 @@ interface ButtonAuthProps {
   width?: string;
   height?: string;
   extraClasses?: string;
+  isSecondary?: boolean;
 }
 
 const Button: React.FC<ButtonAuthProps> = ({
@@ -25,7 +26,8 @@ const Button: React.FC<ButtonAuthProps> = ({
   text = "text-xs lg:text-sm xl:text-sm 2xl:text-base",
   width,
   height,
-  extraClasses
+  extraClasses,
+  isSecondary = false,
 }) => {
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     if (onClick) {
@@ -36,7 +38,9 @@ const Button: React.FC<ButtonAuthProps> = ({
   return (
     <button
       type={type}
-      className={`${padding} ${margin} ${borderRadius} ${bg} ${width} ${height} ${text} transition-opacity duration-200 hover:opacity-40 ${extraClasses}`}
+      className={`${padding} ${margin} ${borderRadius} ${bg} ${width} ${height} ${text} transition-opacity duration-200 hover:opacity-40 ${
+        isSecondary ? "bg-transparent border border-black text-black" : ""
+      } ${extraClasses}`}
       onClick={handleClick}
       disabled={disabled}
     >

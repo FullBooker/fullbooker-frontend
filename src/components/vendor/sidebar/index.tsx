@@ -28,13 +28,13 @@ import { connect } from "react-redux";
 import { RootState } from "@/store";
 import { AuthData } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
-import CustomAvatar from "@/components/navbar/components/customAvatar";
+import CustomAvatar from "@/components/layout/navbar/components/customAvatar";
 import { getInitials, hideMiddleCharacters } from "@/utilities";
-import Profile from "@/components/navbar/profile/Profile";
-import ProfileItem from "@/components/navbar/profile/ProfileItem";
+import Profile from "@/components/layout/navbar/profile/Profile";
+import ProfileItem from "@/components/layout/navbar/profile/ProfileItem";
 import Drawer from "@mui/material/Drawer";
 
-const drawerWidth = 280;
+const drawerWidth = 300;
 
 const SIDENAV_ITEMS: SideNavItem[] = [
   {
@@ -199,7 +199,7 @@ const Sidebar: FC<SidebarProps> = ({
                 </Profile>
               </div>
               <div className="me-12">
-                <div className="text-white cursor-pointer">
+                <div className="text-white cursor-pointer text-sm">
                   {`${authData?.user?.first_name} ${authData?.user?.last_name}`}
                 </div>
                 <div

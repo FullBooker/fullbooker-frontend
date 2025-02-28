@@ -5,7 +5,7 @@ import { ImageUp } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { FC, use, useEffect, useState } from "react";
-import DeactiveModalAccount from "@/components/modal/DeactiveModal";
+import DeactiveModalAccount from "@/components/layout/modal/DeactiveModal";
 
 import { RootState } from "@/store";
 
