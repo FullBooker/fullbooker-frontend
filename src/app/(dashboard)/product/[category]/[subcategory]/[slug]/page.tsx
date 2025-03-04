@@ -74,7 +74,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 }) => {
   const [filters, setFilters] = useState<ProductsFilters>({
     page: 1,
-    limit: 10,
+    page_size: 10,
   });
   const [selectedDate, setSelectedDate] = useState<any>();
   const [showOtherPricingOptions, setShowOtherPricingOptions] =

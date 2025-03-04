@@ -8,7 +8,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
-import LogoutButton from "@/components/sidebar/components/LogoutButton"
+import LogoutButton from "@/components/layout/sidebar/components/LogoutButton"
 
 const SidebarShort = ({
   theme,
