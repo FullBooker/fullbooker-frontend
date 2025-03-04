@@ -39,7 +39,7 @@ import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { AuthData, ProductCategory, Subcategory } from "@/domain/dto/output";
 import { FC } from "react";
-import ButtonAuth from "../auth/ButtonAuth";
+import ButtonAuth from "../../auth/ButtonAuth";
 import {
   AppBar,
   Box,
@@ -61,8 +61,8 @@ import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
-import NavLinkDropDownItem from "../shared/navLinkDropdown";
-import Button from "../shared/button";
+import NavLinkDropDownItem from "../../shared/navLinkDropdown";
+import Button from "../../shared/button";
 
 type NavbarProps = {
   openNav: boolean;
@@ -351,14 +351,14 @@ const Navbar: FC<NavbarProps> = ({
             <div className="flex items-center gap-1">
               <div className="flex md:flex gap-2">
                 <Button
-                  bg="bg-secondary"
                   padding={`${
                     authToken
                       ? "py-2 px-4 md:py-2 md:px-4"
                       : "py-2 px-3 md:py-2 md:px-4"
                   }`}
-                  borderRadius="rounded-2xl"
-                  text="text-xs md:text-sm text-black"
+                  borderRadius="rounded"
+                  text="text-sm"
+                  isSecondary={true}
                   onClick={() => {
                     if (authToken) {
                       switchToHost({
@@ -386,8 +386,8 @@ const Navbar: FC<NavbarProps> = ({
                   <Button
                     bg="bg-primary"
                     padding="py-2 px-3 md:py-2 md:px-4"
-                    borderRadius="rounded-2xl"
-                    text="text-xs md:text-sm text-black"
+                    borderRadius="rounded"
+                    text="text-xs md:text-sm text-white"
                     onClick={() => setActiveModal(ModalID.login)}
                     extraClasses="hidden md:flex"
                   >

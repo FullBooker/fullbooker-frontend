@@ -17,9 +17,9 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       store.dispatch.authentication.signOut({});
-      store.dispatch.alert.setFailureAlert(
-        "You session has expired! Sign in again"
-      );
+      // store.dispatch.alert.setFailureAlert(
+      //   "You session has expired! Sign in again"
+      // );
       return;
     } else if (error.response.status === 500) {
       return Promise.reject(new TechnicalError(error.response?.data));

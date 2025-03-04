@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button } from "../../ui/button"
+import { Button } from "../../../ui/button"
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../ui/dialog"
+} from "../../../ui/dialog"
 import { cn } from "@/lib/utils"
 import { InputOTP, InputOTPSlot } from "./input-otp"
 

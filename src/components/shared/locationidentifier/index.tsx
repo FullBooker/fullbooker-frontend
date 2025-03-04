@@ -1,7 +1,6 @@
 import { useState, useEffect, FC } from "react";
 import axios from "axios";
 import { extractCoordinates } from "@/utilities";
-import { isNullOrUndefined } from "node:util";
 
 type LocationIdentifierProps = {
   lat?: number;

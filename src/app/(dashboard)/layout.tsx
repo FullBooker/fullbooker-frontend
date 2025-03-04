@@ -1,8 +1,8 @@
 "use client";
 
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
-import Sidebar from "@/components/sidebar";
+import Footer from "@/components/layout/footer";
+import Navbar from "@/components/layout/navbar";
+import Sidebar from "@/components/layout/sidebar";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { useTheme } from "next-themes";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { ModalID } from "@/domain/components";
-import UniversalModal from "@/components/modal/UniversalModal";
+import UniversalModal from "@/components/layout/modal/UniversalModal";
 import LoginModalContent from "@/components/views/auth/login";
 import RegisterModalContent from "@/components/views/auth/register";
 import ForgotPasswordModalContent from "@/components/views/auth/forgotPassword";
@@ -21,7 +21,10 @@ import PasswordResetSuccessfullModal from "@/components/views/auth/passwordReset
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
 import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index"
-import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
+// import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
+import BottomNavBar from "@/components/layout/bottomNavbar";
+import useIsMobile from '@/lib/hooks/useIsMobile';
+import ComprehensiveProductFilters from "@/components/products/homePage/comprehensiveProductFilters";
 
 
 type DashboardLayoutProps = {
@@ -50,7 +53,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const { theme = "light" } = useTheme();
   const [data, setData] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState("light");
-  const [isMobile, setIsMobile] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isPlayingGameOnMobile, setIsPlayingGameOnMobile] =
     useState<boolean>(false);
@@ -83,25 +85,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
       window.innerWidth < 1280 ? setOpen(false) : setOpen(true)
     );
   }, []);
-
-  useEffect(() => {
-    const dataValue = searchParams.get("data");
-    setData(dataValue || null);
-
-    setOpen(window.innerWidth > 1280);
-    setIsMobile(window.innerWidth < 1280);
-
-    const handleResize = () => {
-      setOpen(window.innerWidth > 1280);
-      setIsMobile(window.innerWidth < 1280);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [searchParams]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -145,7 +128,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     }
   }, [message, type]);
 
-  useGoogleOneTap();
+  // useGoogleOneTap();
+
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
@@ -172,10 +157,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
         }`}
       >
         <main
-          className={`h-fit mx-auto w-full overflow-x-hidden mt-12 content-container`}
+          className={`h-fit mx-auto w-full overflow-x-hidden mt-0 md:mt-12 content-container`}
         >
           {/* Navbar */}
-          {!data && !isPlayingGameOnMobile ? (
+          {!data && !isPlayingGameOnMobile && !isMobile ? (
             <Navbar
               openNav={open}
               onOpenSideNav={() => setOpen(true)}
@@ -207,6 +192,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<LoginModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.register && (
@@ -214,6 +200,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<RegisterModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.forgotPassword && (
@@ -221,6 +208,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<ForgotPasswordModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.phoneOTPVerification && (
@@ -228,6 +216,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<PhoneOtpVerificationModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.emailOTPVerification && (
@@ -235,6 +224,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<EmailOtpVerificationModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.changePassword && (
@@ -242,6 +232,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<ChangePasswordModalContent />}
+          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.passwordResetSuccessfull && (
@@ -265,6 +256,15 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<PaymentSuccessfullModal />}
         />
       )}
+       {modalId === ModalID.productFilters && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<ComprehensiveProductFilters />}
+          fullScreen={isMobile ? true : false}
+        />
+      )}
+      <BottomNavBar />
     </div>
   );
 };

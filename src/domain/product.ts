@@ -89,3 +89,13 @@ export type SessionPricingCategory = {
   key: string;
   title: string;
 };
+
+export type ComprehensiveProductFilters = {
+  keyword: string;
+  location: string;
+  pricingRange: {
+    max: number;
+    min: number;
+  };
+  categories: Array<string>;
+};
