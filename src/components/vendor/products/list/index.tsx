@@ -36,7 +36,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
 }) => {
   const [filters, setFilters] = useState<VendorProductsFilters>({
     page: 1,
-    limit: 10,
+    page_size: 10,
   });
   const isMobile = useIsMobile();
 

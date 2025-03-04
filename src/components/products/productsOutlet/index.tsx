@@ -31,7 +31,7 @@ const ProductsOutlet: FC<ProductsOutletProps> = ({
 }) => {
   const [filters, setFilters] = useState<ProductsFilters>({
     page: 1,
-    limit: 10,
+    page_size: 10,
   });
 
   useEffect(() => {

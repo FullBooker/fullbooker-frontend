@@ -96,7 +96,7 @@ export type ProductsFilters = {
 
 export type VendorProductsFilters = {
   page: number;
-  limit: number;
+  page_size: number;
 };
 
 export type ProductMediaPayload = {

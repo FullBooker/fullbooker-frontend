@@ -24,7 +24,7 @@ import { Product } from "@/domain/product";
 import VendorProductsListView from "@/components/vendor/products/list";
 import { ProductType, ViewType } from "@/domain/constants";
 import { ModalID } from "@/domain/components";
-import UniversalModal from "@/components/modal/UniversalModal";
+import UniversalModal from "@/components/layout/modal/UniversalModal";
 import ContinueWithProductCreation from "@/components/vendor/products/shared/continue-with-creation";
 import ProductDeletionConfirmation from "@/components/vendor/products/shared/deleteProductConfirmation";
 import PauseProductConfirmation from "@/components/vendor/products/shared/pauseProductConfirmation";
@@ -73,7 +73,7 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
 }) => {
   const [filters, setFilters] = useState<VendorProductsFilters>({
     page: 1,
-    limit: 10,
+    page_size: 10,
   });
   const { theme = "light" } = useTheme();
   const [data, setData] = useState<string | null>(null);
