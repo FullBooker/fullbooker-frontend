@@ -48,14 +48,13 @@ const Sidebar = ({
   }, []);
   return (
     <Drawer
-      variant={isMobile ? "temporary" : "permanent"}
+      variant={"temporary"}
       open={open}
       onClose={onClose}
       sx={{
         width: drawerWidth,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: "100%",
           boxSizing: "border-box",
           backgroundColor: "#FFF",
         },

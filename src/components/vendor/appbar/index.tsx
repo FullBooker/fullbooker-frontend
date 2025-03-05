@@ -14,7 +14,7 @@ import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
 import { AuthData } from "@/domain/dto/output";
 import { UserProfile } from "@/domain/profile";
-import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
+import { getToken, AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import Profile from "@/components/vendor/profile/Profile";
 import CustomAvatar from "@/components/layout/navbar/components/customAvatar";
@@ -73,7 +73,7 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentToken = Cookies.get(TOKEN_KEY);
+      const currentToken = Cookies.get(AUTH_TOKEN_KEY);
       if (currentToken !== authToken) {
         setAuthToken(currentToken as string);
       }

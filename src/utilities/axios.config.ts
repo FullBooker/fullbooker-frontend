@@ -1,8 +1,23 @@
 import axios from "axios";
 import { authHeader } from "./auth.header";
 import { store } from "../store";
-import { ModalID } from "@/domain/components";
+
 import { TechnicalError } from "./errors";
+
+const publicApiEndpoints = [
+  "/accounts/otp/request",
+  "/accounts/otp/verify",
+  "/accounts/password/reset",
+  "/accounts/google/",
+  "/accounts/signup/",
+  "/accounts/signin/",
+  "/oauth2/token/",
+  "/accounts/password/reset",
+];
+
+const isPublic = (url: string) => {
+  return publicApiEndpoints.includes(url);
+};
 
 //Create axios instance
 const axiosClient = axios.create({
@@ -11,12 +26,11 @@ const axiosClient = axios.create({
   withCredentials: false,
 });
 
-//Intercept the request for error handling
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
-      store.dispatch.authentication.signOut({});
+      // store.dispatch.authentication.signOut({});
       // store.dispatch.alert.setFailureAlert(
       //   "You session has expired! Sign in again"
       // );
@@ -46,7 +60,9 @@ export async function getRequest(URL: string) {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: authHeader(),
+      ...(authHeader() && !isPublic(URL)
+        ? { Authorization: authHeader() }
+        : {}),
     },
   });
   return response;
@@ -55,13 +71,28 @@ export async function getRequest(URL: string) {
 export async function postRequest(
   URL: string,
   payload: any,
-  hasFile?: boolean
+  hasFile?: boolean,
+  isOauth2TokenRequest?: boolean
 ) {
-  const response = await axiosClient.post(URL, payload, {
+  const requestPayload = isOauth2TokenRequest
+    ? new URLSearchParams({
+        ...payload,
+        client_id: payload.client_id,
+        client_secret: payload.client_secret,
+      })
+    : payload;
+
+  const response = await axiosClient.post(URL, requestPayload, {
     headers: {
-      "Content-Type": hasFile ? "multipart/form-data" : "application/json",
+      "Content-Type": isOauth2TokenRequest
+        ? "application/x-www-form-urlencoded"
+        : hasFile
+        ? "multipart/form-data"
+        : "application/json",
       Accept: "application/json",
-      Authorization: authHeader(),
+      ...(authHeader() && !isPublic(URL)
+        ? { Authorization: authHeader() }
+        : {}),
     },
   });
   return response;
@@ -72,7 +103,9 @@ export async function patchRequest(URL: string, payload: any) {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: authHeader(),
+      ...(authHeader() && !isPublic(URL)
+        ? { Authorization: authHeader() }
+        : {}),
     },
   });
   return response;
@@ -83,7 +116,9 @@ export async function putRequest(URL: string, payload: any) {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: authHeader(),
+      ...(authHeader() && !isPublic(URL)
+        ? { Authorization: authHeader() }
+        : {}),
     },
   });
   return response;
@@ -94,7 +129,9 @@ export async function deleteRequest(URL: string) {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: authHeader(),
+      ...(authHeader() && !isPublic(URL)
+        ? { Authorization: authHeader() }
+        : {}),
     },
   });
   return response;

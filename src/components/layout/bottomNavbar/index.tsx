@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { Briefcase, Home, Ticket, UserRound } from "lucide-react";
 import Link from "next/link";
@@ -6,6 +6,10 @@ import { connect } from "react-redux";
 import { ModalID } from "@/domain/components";
 import { RootState } from "@/store";
 import useAuth from "@/lib/hooks/useAuth";
+import { AUTH_TOKEN_KEY, getToken } from "@/utilities";
+import Cookies from "js-cookie";
+import { SwitchToHostPayload } from "@/domain/dto/input";
+import { AuthData } from "@/domain/dto/output";
 
 type BottomNavTab = {
   title: string;
@@ -16,9 +20,15 @@ type BottomNavTab = {
 
 type BottomNavBarProps = {
   setActiveModal: (modalId: ModalID) => void;
+  switchToHost: (payload: SwitchToHostPayload) => void;
+  authData: AuthData;
 };
 
-const BottomNavBar: FC<BottomNavBarProps> = ({ setActiveModal }) => {
+const BottomNavBar: FC<BottomNavBarProps> = ({
+  setActiveModal,
+  switchToHost,
+  authData,
+}) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { authenticated } = useAuth();
@@ -49,6 +59,21 @@ const BottomNavBar: FC<BottomNavBarProps> = ({ setActiveModal }) => {
     },
   ];
 
+  const [authToken, setAuthToken] = useState<string | null>(getToken());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentToken = Cookies.get(AUTH_TOKEN_KEY);
+      if (currentToken !== authToken) {
+        setAuthToken(currentToken as string);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authToken]);
+  ``;
+
   return (
     <div className="lg:hidden md:hidden">
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 pt-2 ">
@@ -73,6 +98,28 @@ const BottomNavBar: FC<BottomNavBarProps> = ({ setActiveModal }) => {
                     newSearchParams.set("redirect", navTab.path);
                     router.push(`${pathname}?${newSearchParams.toString()}`);
                     setActiveModal(ModalID.login);
+                  }}
+                >
+                  <span>{navTab.icon}</span>
+                  <span className="text-xs">{navTab.title}</span>
+                </button>
+              ) : navTab.path === "/vendor" ? (
+                <button
+                  type="button"
+                  className="inline-flex flex-col items-center justify-center"
+                  onClick={() => {
+                    if (authToken) {
+                      switchToHost({
+                        user: authData?.user?.id,
+                      } as SwitchToHostPayload);
+                    } else {
+                      const newSearchParams = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      newSearchParams.set("user_flow", "vendor");
+                      router.push(`${pathname}?${newSearchParams.toString()}`);
+                      setActiveModal(ModalID.login);
+                    }
                   }}
                 >
                   <span>{navTab.icon}</span>
@@ -139,14 +186,18 @@ const BottomNavBar: FC<BottomNavBarProps> = ({ setActiveModal }) => {
 };
 
 const mapStateToProps = (state: RootState) => {
+  const { authData } = state.authentication;
   return {
     state,
+    authData,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
+  switchToHost: (payload: SwitchToHostPayload) =>
+    dispatch.authentication.switchToHost(payload),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BottomNavBar);

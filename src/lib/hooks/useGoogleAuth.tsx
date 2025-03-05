@@ -7,7 +7,7 @@ import {
 } from "@react-oauth/google";
 import { store } from "@/store";
 import { GoogleSocialSigninPayload } from "@/domain/dto/input";
-import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
+import { getToken } from "@/utilities/auth.cookie";
 
 export const useGoogleOneTap = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

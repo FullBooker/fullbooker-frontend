@@ -10,6 +10,7 @@ import { PersistGate } from "redux-persist/lib/integration/react";
 import { store } from "../../src/store";
 import { Provider } from "react-redux";
 import NotificationHandler from "../lib/useNotificationHandler";
+import AuthProvider from "@/providers/authProvider";
 
 const persistor = getPersistor();
 
@@ -17,8 +18,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <NextThemesProvider {...props}>{children}</NextThemesProvider>
-        <NotificationHandler />
+        <AuthProvider>
+          <NextThemesProvider {...props}>{children}</NextThemesProvider>
+          <NotificationHandler />
+        </AuthProvider>
       </PersistGate>
     </Provider>
   );

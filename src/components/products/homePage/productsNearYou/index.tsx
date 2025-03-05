@@ -33,21 +33,14 @@ const ProductsNearYouSection: FC<PopularProductsSectionProps> = ({
   }, []);
 
   return (
-    <div className="py-2 lg:py-8 md:py-8 xl:py-8 px-2 md:px-3 lg:px-4 bg-white">
-      <div
-        className="flex justify-between items-center mb-6 py-4
-          px-4 sm:px-7"
-      >
-        <h2 className="text-xl font-semibold">Near you</h2>
-      </div>
-
-      <CategoryProductsOutlet
-        products={nearByProducts}
-        currencies={currencies}
-        productCategories={productCategories}
-        isProcessingRequest={productsRequestProcessing}
-      />
-    </div>
+    <CategoryProductsOutlet
+      title="Near you"
+      path="/products/nearby"
+      products={nearByProducts}
+      currencies={currencies}
+      productCategories={productCategories}
+      isProcessingRequest={productsRequestProcessing}
+    />
   );
 };
 

@@ -1,28 +1,30 @@
 {
-    "serviceName": "fullbooker-dev-fe-sm",
-    "containers": {
-        "fullbooker-fe-sm": {
-            "image": "{{IMAGE}}",
-            "ports": {
-                "3000": "HTTP"
-            },
-            "environment": {
-                "NEXT_PUBLIC_API_BASE_URL": "{{NEXT_PUBLIC_API_BASE_URL}}",
-                "NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY": "{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}",
-                "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "{{NEXT_PUBLIC_GOOGLE_CLIENT_ID}}"
-            }
-        }
-    },
-    "publicEndpoint": {
-        "containerName": "fullbooker-fe-sm",
-        "containerPort": 3000,
-        "healthCheck": {
-            "healthyThreshold": 2,
-            "unhealthyThreshold": 2,
-            "timeoutSeconds": 2,
-            "intervalSeconds": 5,
-            "path": "/",
-            "successCodes": "200-499"
-        }
+  "serviceName": "fullbooker-dev-fe-sm",
+  "containers": {
+    "fullbooker-fe-sm": {
+      "image": "{{IMAGE}}",
+      "ports": {
+        "3000": "HTTP"
+      },
+      "environment": {
+        "NEXT_PUBLIC_API_BASE_URL": "{{NEXT_PUBLIC_API_BASE_URL}}",
+        "NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY": "{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}",
+        "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "{{NEXT_PUBLIC_GOOGLE_CLIENT_ID}}",
+        "NEXT_PUBLIC_OAUTH2_CLIENT_ID": "{{NEXT_PUBLIC_OAUTH2_CLIENT_ID}}",
+        "NEXT_PUBLIC_OAUTH2_CLIENT_SECRET": "{{NEXT_PUBLIC_OAUTH2_CLIENT_SECRET}}"
+      }
     }
+  },
+  "publicEndpoint": {
+    "containerName": "fullbooker-fe-sm",
+    "containerPort": 3000,
+    "healthCheck": {
+      "healthyThreshold": 2,
+      "unhealthyThreshold": 2,
+      "timeoutSeconds": 2,
+      "intervalSeconds": 5,
+      "path": "/",
+      "successCodes": "200-499"
+    }
+  }
 }
