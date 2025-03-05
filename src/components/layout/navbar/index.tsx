@@ -57,7 +57,7 @@ import {
 import { UserProfile } from "@/domain/profile";
 import CustomAvatar from "./components/customAvatar";
 import BottomNavBar from "../bottomNavbar";
-import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
+import { getToken,AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
@@ -125,7 +125,7 @@ const Navbar: FC<NavbarProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentToken = Cookies.get(TOKEN_KEY);
+      const currentToken = Cookies.get(AUTH_TOKEN_KEY);
       if (currentToken !== authToken) {
         setAuthToken(currentToken as string);
       }
@@ -159,7 +159,7 @@ const Navbar: FC<NavbarProps> = ({
             >
               <div
                 className={`flex flex-col xl:hidden justify-center items-center rounded-full flex-shrink-0 cursor-pointer`}
-                onClick={onOpenSideNav}
+                onClick={() => onOpenSideNav()}
               >
                 <div className="rotate-90">
                   <Tally3 className="w-[30px] h-[30px]" />

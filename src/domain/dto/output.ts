@@ -12,6 +12,10 @@ export interface User {
   wallet_balance: number;
   bonus_wallet_balance: number;
   last_logged_in: string;
+  city: string;
+  address: string;
+  national_id: string;
+  phone: string;
 }
 
 export interface VendorDetails {

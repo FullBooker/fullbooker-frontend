@@ -1,7 +1,7 @@
 "use client";
 
 import { RootState } from "@/store";
-import { getToken, TOKEN_KEY } from "@/utilities/auth.cookie";
+import { getToken, AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
 import { usePathname, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -18,7 +18,7 @@ export const withAuth = <P extends object>(
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const currentToken = Cookies.get(TOKEN_KEY);
+        const currentToken = Cookies.get(AUTH_TOKEN_KEY);
         if (currentToken !== authToken) {
           setAuthToken(currentToken as string);
         }

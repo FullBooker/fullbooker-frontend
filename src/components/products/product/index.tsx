@@ -100,7 +100,7 @@ const SingleProduct: FC<SingleProductProps> = ({
       )}/${getProductSubCategoryName(product?.subcategory)}/${product?.name
         ?.toLowerCase()
         .replace(/\s+/g, "-")}_${product?.id}`}
-      className="max-w-sm rounded-sm bg-white overflow-hidden cursor-pointer shadow-lg transition-transform transform hover:-translate-y-5 ease-out duration-500"
+      className="max-w-sm rounded-sm bg-white overflow-hidden cursor-pointer shadow-lg transition-transform transform md:hover:-translate-y-5 ease-out duration-500"
     >
       <div className="relative shadow-xl">
         <Image

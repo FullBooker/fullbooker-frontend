@@ -20,12 +20,11 @@ import EmailOtpVerificationModalContent from "@/components/views/auth/emailOTPVe
 import PasswordResetSuccessfullModal from "@/components/views/auth/passwordResetSuccessfull";
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
-import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index"
+import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index";
 // import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
 import BottomNavBar from "@/components/layout/bottomNavbar";
-import useIsMobile from '@/lib/hooks/useIsMobile';
+import useIsMobile from "@/lib/hooks/useIsMobile";
 import ComprehensiveProductFilters from "@/components/products/homePage/comprehensiveProductFilters";
-
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -44,7 +43,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   type,
   sessionHasExpired,
   isLoggedIn,
-  signOut
+  signOut,
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -56,6 +55,22 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isPlayingGameOnMobile, setIsPlayingGameOnMobile] =
     useState<boolean>(false);
+
+  const [isTablet, setIsTablet] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsTablet(width >= 768 && width <= 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -81,20 +96,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   }, [router, data, children]);
 
   useEffect(() => {
-    window.addEventListener("resize", () =>
-      window.innerWidth < 1280 ? setOpen(false) : setOpen(true)
-    );
-  }, []);
-
-  useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target as Node) &&
-        window.innerWidth < 1280 && // Check screen width is below "xl"
+        window.innerWidth < 1280 &&
         open
       ) {
-        setOpen(false); // Close the sidebar if click is outside of it
+        setOpen(false);
       }
     };
 
@@ -208,7 +217,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<ForgotPasswordModalContent />}
-          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.phoneOTPVerification && (
@@ -216,7 +224,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<PhoneOtpVerificationModalContent />}
-          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.emailOTPVerification && (
@@ -224,7 +231,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<EmailOtpVerificationModalContent />}
-          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.changePassword && (
@@ -232,7 +238,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<ChangePasswordModalContent />}
-          fullScreen={isMobile ? true : false}
         />
       )}
       {modalId === ModalID.passwordResetSuccessfull && (
@@ -249,14 +254,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<SessionExpiredModal />}
         />
       )}
-       {modalId === ModalID.successfullPayment && (
+      {modalId === ModalID.successfullPayment && (
         <UniversalModal
           theme={themeMode}
           open={true}
           content={<PaymentSuccessfullModal />}
         />
       )}
-       {modalId === ModalID.productFilters && (
+      {modalId === ModalID.productFilters && (
         <UniversalModal
           theme={themeMode}
           open={true}

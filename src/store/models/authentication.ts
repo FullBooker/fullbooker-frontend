@@ -1,35 +1,28 @@
 import { AuthData, User } from "@/domain/dto/output";
 import type { RootModel } from ".";
-import { getQueryParam, postRequest, putRequest } from "../../utilities";
 import {
-  ForgotPasswordPayload,
+  getQueryParam,
+  postRequest,
+  purgeAnonymousAuthToken,
+} from "../../utilities";
+import {
   GoogleSocialSigninPayload,
   RequestOTPPayload,
-  ResendPhoneOTPPayload,
-  ResetPasswordPayload,
   SwitchToHostPayload,
-  UpdatePasswordPayload,
   VerifyOTPPayload,
-  VerifyPhoneOTPPayload,
 } from "@/domain/dto/input";
 
-import { setCookie, parseCookies } from "nookies";
 import { createModel } from "@rematch/core";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { getToken, removeToken, saveToken } from "@/utilities/auth.cookie";
+import {
+  getAnonymousAuthToken,
+  getToken,
+  removeToken,
+  saveAnonymousAuthToken,
+  saveToken,
+} from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { ChangePasswordPayload } from "@/domain/auth";
-
-// Function to retrieve auth data from localStorage
-const getAuthDataFromLocalStorage = () => {
-  try {
-    const authData = localStorage.getItem("authData");
-    return authData ? JSON.parse(authData) : null;
-  } catch (error) {
-    console.error("Error while retrieving auth data from localStorage:", error);
-    return null;
-  }
-};
 
 type Authentication = {
   isLoggedIn: boolean;
@@ -74,6 +67,32 @@ export const authentication = createModel<RootModel>()({
     },
   },
   effects: (dispatch: any) => ({
+    async initializeAnonymousAuthTokenProcurement() {
+      const authThoken = getToken();
+      const anonymousAuthThoken = getAnonymousAuthToken();
+      if (!authThoken && !anonymousAuthThoken) {
+        try {
+          const response: any = await postRequest(
+            "/oauth2/token/",
+            {
+              grant_type: "client_credentials",
+              client_id: process.env.NEXT_PUBLIC_OAUTH2_CLIENT_ID,
+              client_secret: process.env.NEXT_PUBLIC_OAUTH2_CLIENT_SECRET,
+            },
+            false,
+            true
+          );
+          if (response && response?.data) {
+            const token = response?.data?.access_token;
+            saveAnonymousAuthToken(token, response?.data?.expires_in);
+          }
+        } catch (error: any) {
+          dispatch.alert.setFailureAlert(
+            error?.message || "Failed to generate anonymous auth token."
+          );
+        }
+      }
+    },
     async register(payload, rootState) {
       try {
         const response: any = await postRequest("/accounts/signup/", payload);
@@ -95,6 +114,8 @@ export const authentication = createModel<RootModel>()({
             dispatch.authentication.setAuthStatusLoggedIn({
               user: data?.user,
             } as AuthData);
+
+            purgeAnonymousAuthToken();
           }
           dispatch.alert.setSuccessAlert(response?.data?.message);
           dispatch.components.setActiveModal(ModalID.none);
@@ -140,6 +161,7 @@ export const authentication = createModel<RootModel>()({
             dispatch.authentication.setAuthStatusLoggedIn({
               user: data?.user,
             } as AuthData);
+            purgeAnonymousAuthToken();
             dispatch.alert.setSuccessAlert(
               response?.data?.message || "Login successful!"
             );
@@ -164,6 +186,7 @@ export const authentication = createModel<RootModel>()({
       const autToken = getToken();
       try {
         dispatch.authentication.setAuthStatusLoggedOut();
+        dispatch.authentication.initializeAnonymousAuthTokenProcurement();
         // const response: any = await postRequest(
         //   "/api/v1/user/auth/logout",
         //   credentials
@@ -284,6 +307,7 @@ export const authentication = createModel<RootModel>()({
                 id: data?.user?.pk,
               } as User,
             } as AuthData);
+            purgeAnonymousAuthToken()
             dispatch.alert.setSuccessAlert(
               response?.data?.message || "Login successful!"
             );

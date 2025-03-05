@@ -33,20 +33,14 @@ const PopularProductsSection: FC<PopularProductsSectionProps> = ({
   }, []);
 
   return (
-    <div className="py-2 md:py-4 px-2 md:px-3 lg:px-4 bg-white">
-      <div
-        className="flex justify-between items-center mb-6 py-4
-          px-4 sm:px-7"
-      >
-        <h2 className="text-xl font-semibold">Popular</h2>
-      </div>
-      <CategoryProductsOutlet
-        products={popularProducts}
-        currencies={currencies}
-        productCategories={productCategories}
-        isProcessingRequest={productsRequestProcessing}
-      />
-    </div>
+    <CategoryProductsOutlet
+      title="Popular"
+      path="/products/popular"
+      products={popularProducts}
+      currencies={currencies}
+      productCategories={productCategories}
+      isProcessingRequest={productsRequestProcessing}
+    />
   );
 };
 

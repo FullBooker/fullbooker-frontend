@@ -1,4 +1,9 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import {
+  getAnonymousAuthToken,
+  getToken,
+  removeAnonymousAuthToken,
+} from "./auth.cookie";
 
 export const buildQueryString = (params: any) => {
   const query = Object.entries(params)
@@ -89,4 +94,11 @@ export const decodeBase64 = (data: any) => {
 
 export const generateUUID = () => {
   return uuidv4();
+};
+
+export const purgeAnonymousAuthToken = () => {
+  const anonymousToken = getAnonymousAuthToken();
+  if (anonymousToken) {
+    removeAnonymousAuthToken();
+  }
 };

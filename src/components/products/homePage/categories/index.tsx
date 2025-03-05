@@ -117,7 +117,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
   };
 
   return (
-    <div className="py-1 md:py-4 bg-white px-2 md:px-3 lg:px-4">
+    <div className="py-1 md:py-2 bg-white px-2 md:px-3 lg:px-4">
       {productCategories?.length === 0 ? (
         <div className="flex justify-center py-8">
           <p className="text-red-500">
