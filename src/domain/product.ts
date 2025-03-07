@@ -1,4 +1,5 @@
 import { MediaType, PricingType } from "./constants";
+import { User } from "./dto/output";
 
 export interface ProductPricing {
   id: string;
@@ -25,12 +26,20 @@ interface ProductLocation {
   product: string;
 }
 
+export interface ProductHost {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  active: boolean;
+  user: User
+}
+
 export interface Product {
   id: string;
   created_at: string;
   updated_at: string;
   active: boolean;
-  host: string;
+  host: ProductHost;
   name: string;
   description: string;
   number: string;

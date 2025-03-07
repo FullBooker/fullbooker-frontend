@@ -385,7 +385,7 @@ const Navbar: FC<NavbarProps> = ({
                 {!authToken && (
                   <Button
                     bg="bg-primary"
-                    padding="py-2 px-3 md:py-2 md:px-4"
+                    padding="py-2 px-3 md:py-2 md:px-10"
                     borderRadius="rounded"
                     text="text-xs md:text-sm text-white"
                     onClick={() => setActiveModal(ModalID.login)}

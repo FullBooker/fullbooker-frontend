@@ -63,6 +63,7 @@ const LocationSearch: FC<LocationSearchProps> = ({
         product: newProduct?.id,
         lat: selectedPlace?.geometry?.location?.lat(),
         long: selectedPlace?.geometry?.location?.lng(),
+        address: selectedPlace?.formatted_address,
       } as AddProductLocationPayload);
     }
   }, [selectedPlace]);
@@ -93,10 +94,14 @@ const LocationSearch: FC<LocationSearchProps> = ({
           defaultCenter={
             newProduct?.locations?.length > 0
               ? {
-                  lat: extractCoordinates(newProduct?.locations[newProduct?.locations?.length - 1]?.coordinates)
-                    ?.latitude as number,
-                  lng: extractCoordinates(newProduct?.locations[newProduct?.locations?.length - 1]?.coordinates)
-                    ?.longitude as number,
+                  lat: extractCoordinates(
+                    newProduct?.locations[newProduct?.locations?.length - 1]
+                      ?.coordinates
+                  )?.latitude as number,
+                  lng: extractCoordinates(
+                    newProduct?.locations[newProduct?.locations?.length - 1]
+                      ?.coordinates
+                  )?.longitude as number,
                 }
               : { lat: 1.286389, lng: 36.817223 }
           }

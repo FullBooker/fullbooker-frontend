@@ -38,7 +38,7 @@ const Button: React.FC<ButtonAuthProps> = ({
   return (
     <button
       type={type}
-      className={`${padding} ${margin} ${borderRadius} ${bg} ${width} ${height} ${text} transition-opacity duration-200 hover:opacity-40 ${
+      className={`${padding || ''} ${margin || ''} ${borderRadius || ''} ${bg || ''} ${width || ''} ${height || ''} ${text || ''} transition-opacity duration-200 hover:opacity-40 ${
         isSecondary ? "bg-transparent border border-black text-black" : ""
       } ${extraClasses}`}
       onClick={handleClick}
