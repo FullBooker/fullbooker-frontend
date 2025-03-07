@@ -126,14 +126,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
       type === NotificationType.success &&
       message === "Switched to hosting successfully!"
     ) {
-      navigation.push("/vendor");
+      navigation.push("/vendor/products");
     }
 
     if (
       type === NotificationType.success &&
       message === "Switched to hosting successfully!"
     ) {
-      navigation.push("/vendor");
+      navigation.push("/vendor/products");
     }
   }, [message, type]);
 
@@ -142,7 +142,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex h-fit w-full overflow-x-hidden bg-gray-100">
+    <div className="flex h-fit w-full overflow-x-hidden">
       {/* Sidebar */}
       <div
         className="h-fit lg:hidden xl:hidden md:flex xs:hidden"

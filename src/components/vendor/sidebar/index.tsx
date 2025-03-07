@@ -37,47 +37,47 @@ import Drawer from "@mui/material/Drawer";
 const drawerWidth = 300;
 
 const SIDENAV_ITEMS: SideNavItem[] = [
-  {
-    title: "Overview",
-    path: "/vendor",
-    icon: <LayoutGrid width={22} height={22} />,
-  },
+  // {
+  //   title: "Overview",
+  //   path: "/vendor",
+  //   icon: <LayoutGrid width={22} height={22} />,
+  // },
   {
     title: "Products",
     path: "/vendor/products",
     icon: <Wallet width={22} height={22} />,
     submenu: false,
   },
-  {
-    title: "Sales",
-    path: "/vendor/sales",
-    icon: <ArrowRightLeft width={22} height={22} />,
-    submenu: false,
-  },
-  {
-    title: "Bills",
-    path: "/vendor/bills",
-    icon: <Receipt width={22} height={22} />,
-    submenu: false,
-  },
-  {
-    title: "Expenses",
-    path: "/vendor/expenses",
-    icon: <BadgeDollarSign width={22} height={22} />,
-    submenu: false,
-  },
-  {
-    title: "Goals",
-    path: "/vendor/goals",
-    icon: <Crosshair width={22} height={22} />,
-    submenu: false,
-  },
-  {
-    title: "Settings",
-    path: "/vendor/settings",
-    icon: <Settings width={22} height={22} />,
-    submenu: false,
-  },
+  // {
+  //   title: "Sales",
+  //   path: "/vendor/sales",
+  //   icon: <ArrowRightLeft width={22} height={22} />,
+  //   submenu: false,
+  // },
+  // {
+  //   title: "Bills",
+  //   path: "/vendor/bills",
+  //   icon: <Receipt width={22} height={22} />,
+  //   submenu: false,
+  // },
+  // {
+  //   title: "Expenses",
+  //   path: "/vendor/expenses",
+  //   icon: <BadgeDollarSign width={22} height={22} />,
+  //   submenu: false,
+  // },
+  // {
+  //   title: "Goals",
+  //   path: "/vendor/goals",
+  //   icon: <Crosshair width={22} height={22} />,
+  //   submenu: false,
+  // },
+  // {
+  //   title: "Settings",
+  //   path: "/vendor/settings",
+  //   icon: <Settings width={22} height={22} />,
+  //   submenu: false,
+  // },
 ];
 
 type SidebarProps = {

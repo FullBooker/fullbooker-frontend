@@ -28,7 +28,16 @@ import {
 } from "@mui/material";
 import { MediaType } from "@/domain/constants";
 import Button from "@/components/shared/button";
-import { ChevronDown, ChevronRight, ChevronUp, Heart } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clock,
+  Heart,
+  Calendar as CalendarIcon,
+  MapPin,
+  Star,
+} from "lucide-react";
 import { Calendar } from "react-date-range";
 import ProductLocation from "@/components/products/singleProduct/productLocation";
 import Tabs from "@mui/material/Tabs";
@@ -46,6 +55,7 @@ import {
   TICKET_PRICING_CATEGORIES,
 } from "@/constants";
 import useIsMobile from "@/lib/hooks/useIsMobile";
+import TicketBooking from "@/components/products/singleProduct/ticketBooking";
 
 type SingleProductPageProps = {
   productMedia: Array<ProductMedia>;
@@ -155,13 +165,23 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     );
   }
 
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const buyTicketRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToMap = () => {
     if (mapRef.current) {
       mapRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const scrollToBuyTicket = () => {
+    if (buyTicketRef.current) {
+      buyTicketRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   };
 
@@ -259,8 +279,25 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     );
   };
 
+  const renderPricingRange = (pricing: Array<ProductPricing>): string => {
+    if (pricing?.length === 1) {
+      return addCommaSeparators(Math.round(parseFloat(pricing[0]?.cost)));
+    } else if (pricing?.length > 0) {
+      const prices = pricing.map((p: ProductPricing) =>
+        Math.round(parseFloat(p.cost))
+      );
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      return `${addCommaSeparators(minPrice)} - ${addCommaSeparators(
+        maxPrice
+      )}`;
+    } else {
+      return "N/A";
+    }
+  };
+
   return (
-    <div className="flex flex-col h-fit bg-gray-100 max-w-7xl mx-auto px-4 md:px-7">
+    <div className="flex flex-col h-fit max-w-7xl mx-auto px-4 md:px-7">
       <div className="py-4 md:py-8">
         {productsRequestProcessing ? (
           <div className="flex justify-between mb-2 animate-pulse">
@@ -277,27 +314,15 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
             </div>
           </div>
         ) : (
-          <div className="flex justify-between mb-2">
+          <div className="flex justify-center mb-2">
             <div>
-              <div className="-mb-1">
-                <p>
-                  {productCategories?.length > 0
-                    ? extractSubcategories(productCategories)?.find(
-                        (subcat: Subcategory) =>
-                          subcat?.id === product?.subcategory
-                      )?.name
-                    : "N/A"}
-                </p>
-              </div>
-              <div>
-                <p>{product?.name}</p>
-              </div>
+              <p className="text-base font-semibold">{product?.name}</p>
             </div>
-            <div>
+            {/* <div>
               <span>
                 <Heart className="w-6 h-6 text-black" />
               </span>
-            </div>
+            </div> */}
           </div>
         )}
 
@@ -335,77 +360,61 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-            <div>
-              <h2 className="text-xl font-semibold">{product?.name}</h2>
-              <p className="text-gray-500">
-                {processedCoordinates ? (
-                  <LocationIdentifier
-                    lat={processedCoordinates?.latitude}
-                    lng={processedCoordinates?.longitude}
-                  />
-                ) : (
-                  "N/A"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 border-b border-gray-400 pb-3 md:p-4">
+            <div className="space-y-2">
+              <p className="text-black text-base">
+                <strong>{product?.name}</strong>
+              </p>
+              <div className="flex items-center text-gray-400 space-x-2">
+                <MapPin className="h-5 w-5" />
+                <p className="text-sm">
+                  {processedCoordinates ? (
+                    <LocationIdentifier
+                      lat={processedCoordinates?.latitude}
+                      lng={processedCoordinates?.longitude}
+                    />
+                  ) : (
+                    "N/A"
+                  )}
+                </p>
+              </div>
+              <div
+                className={`${
+                  isMobile ? "flex justify-between items-center" : ""
+                } text-gray-400 space-y-1 md:space-y-2 text-sm font-light`}
+              >
+                <div className="flex items-center">
+                  <CalendarIcon className="h-5 w-5 me-2" />
+                  <p className="text-gray-400">Mon to Sat</p>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 me-2" />
+                  <p className="text-gray-400">9AM to 4PM</p>
+                </div>
+              </div>
+              <p>
+                {product?.pricing?.length > 0 && (
+                  <span className="font-semibold">
+                    {currencies?.length > 0
+                      ? currencies?.find(
+                          (currency: Currency) =>
+                            currency?.id === product?.pricing[0]?.currency
+                        )?.code
+                      : "KES"}{" "}
+                    {renderPricingRange(product?.pricing)}
+                  </span>
                 )}
               </p>
-              <p className="text-gray-500">Mon to Sat from 9AM to 4PM</p>
-              {product?.pricing?.length > 1 ? (
-                <div className="flex justify-between mt-2 w-full">
-                  <div className="w-full">{renderDefaultPricingOption()}</div>
-                </div>
-              ) : (
-                <div>{renderDefaultPricingOption()}</div>
-              )}
-              {showOtherPricingOptions && (
-                <div className="bg-white shadow-lg px-3 py-1 mt-3 mb-2">
-                  {product?.pricing
-                    ?.filter(
-                      (p: ProductPricing) =>
-                        p?.id !==
-                        getDefaultPricingOption(product?.pricing)?.pricingOption
-                          ?.id
-                    )
-                    ?.map((pricing: ProductPricing, index: number) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center py-2"
-                      >
-                        <span className="text-base me-2 text-black">
-                          {pricing?.type === "ticket"
-                            ? TICKET_PRICING_CATEGORIES.find(
-                                (tCat: TicketPricingCategory) =>
-                                  tCat.key === pricing?.ticket_tier
-                              )?.title
-                            : SESSION_PRICING_CATEGORIES.find(
-                                (spCat: SessionPricingCategory) =>
-                                  spCat.key === pricing?.type
-                              )?.title}
-                        </span>
-                        <p className="font-semibold text-primary text-base">
-                          {currencies?.length > 0
-                            ? currencies?.find(
-                                (currency: Currency) =>
-                                  currency?.id === pricing?.currency
-                              )?.code
-                            : "KES"}{" "}
-                          {addCommaSeparators(
-                            Math.round(parseFloat(pricing?.cost))
-                          )}
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              )}
             </div>
-            <div className="text-right">
+            <div className="hidden md:block text-center">
               <Button
                 extraClasses=""
                 margin="mt-2"
-                borderRadius="rounded-lg"
-                text="text-sm"
-                onClick={() => scrollToMap()}
+                borderRadius="rounded"
+                text="text-sm text-white"
+                onClick={() => scrollToBuyTicket()}
               >
-                View Map
+                Buy Tickets
               </Button>
             </div>
             <div className="hidden lg:flex justify-end items-start">
@@ -419,7 +428,11 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                 />
                 <div className="text-base">
                   <p className="-mb-2">Hosted by</p>
-                  <p>Kelvin Laichena</p>
+                  <p>
+                    {product?.host?.user?.first_name
+                      ? `${product?.host?.user?.first_name} ${product?.host?.user?.last_name}`
+                      : "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -427,9 +440,9 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
         )}
 
         {/* Booking Section */}
-        <div className="mt-6  w-full">
+        <div className="w-full">
           {productsRequestProcessing ? (
-            <div className="w-full flex justify-center animate-pulse">
+            <div className="w-full flex justify-center animate-pulse mt-4">
               <div className="flex space-x-4 w-full">
                 {/* Tab placeholders */}
                 <div className="h-10 w-1/3 bg-gray-300 rounded-md"></div>
@@ -439,15 +452,89 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
             </div>
           ) : (
             <div>
+              {/* Product Bio */}
+              <div className="space-y-2 pt-3 pb-3 md:pt-10 md:pb-10">
+                <p className="md:text-lg font-semibold md:text-center">
+                  ABOUT EVENT
+                </p>
+                <div className="md:hidden flex justify-between items-start">
+                  <div className="flex items-center">
+                    <Image
+                      src="/assets/default-profile-picture-placeholder.jpg"
+                      alt={"Host Profile Image"}
+                      width={35}
+                      height={35}
+                      className="rounded-lg me-2"
+                    />
+                    <div className="text-xs">
+                      <p className="me-2">Hosted by</p>
+                      <p>
+                        {product?.host?.user?.first_name
+                          ? `${product?.host?.user?.first_name} ${product?.host?.user?.last_name}`
+                          : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-1">
+                    <Star
+                      className="h-4 w-4"
+                      fill="#E4A70A"
+                      style={{
+                        color: "#E4A70A",
+                      }}
+                    />
+                    <Star
+                      className="h-4 w-4"
+                      fill="#E4A70A"
+                      style={{
+                        color: "#E4A70A",
+                      }}
+                    />
+                    <Star
+                      className="h-4 w-4"
+                      fill="#E4A70A"
+                      style={{
+                        color: "#E4A70A",
+                      }}
+                    />
+                    <Star
+                      className="h-4 w-4"
+                      fill="#E4A70A"
+                      style={{
+                        color: "#E4A70A",
+                      }}
+                    />
+                    <Star
+                      className="h-4 w-4"
+                      fill="#DDDDDD"
+                      style={{
+                        color: "#DDDDDD",
+                      }}
+                    />
+                  </div>
+                </div>
+                <p className="text-sm font-light">{product?.description}</p>
+              </div>
+
+              {/* Ticket Booking */}
+              <div ref={buyTicketRef}>
+                <TicketBooking
+                  product={product}
+                  productsRequestProcessing={productsRequestProcessing}
+                />
+              </div>
+
               {/* Ticket Details */}
-              <TicketDetails
-                product={product}
-                productsRequestProcessing={productsRequestProcessing}
-              />
+              {/* <div ref={buyTicketRef}>
+                <TicketDetails
+                  product={product}
+                  productsRequestProcessing={productsRequestProcessing}
+                />
+              </div> */}
 
               {/* Map Section */}
               <div
-                className="mt-6 border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]"
+                className="mt-0 md:mt-6 md:border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]"
                 ref={mapRef}
               >
                 {product?.locations?.length > 0 && (

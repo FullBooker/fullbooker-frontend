@@ -180,6 +180,7 @@ export const vendor = createModel<RootModel>()({
       }
     },
     async addProductLocation(payload: AddProductLocationPayload, rootState) {
+      console.log("PAYLOAD:", payload)
       try {
         const response: any = await postRequest("/location/", payload);
         if (response && response?.data) {

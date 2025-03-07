@@ -23,7 +23,7 @@ const SearchFilters: FC<SearchFiltersProps> = ({
   const isMobile = useIsMobile();
   return (
     <div className="flex justify-center max-w-7xl mx-auto w-full py-2 md:py-6 px-4 md:px-3">
-      <div className="relative w-full md:w-[60%] rounded-lg border border-inputBorderColor p-3 md:p-4 lg:p-5">
+      <div className="relative w-full md:w-[80%] rounded-lg border border-inputBorderColor p-3 md:p-4 lg:p-5">
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
           <Search
             width={isMobile ? 20 : 30}

@@ -158,7 +158,13 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                                   product.category === category?.id
                               )
                               .map((product: Product, idx: number) => (
-                                <tr key={idx} className="border-b">
+                                <tr
+                                  key={idx}
+                                  className="border-b cursor-pointer"
+                                  onClick={() =>
+                                    handleViewOrEditProduct(product)
+                                  }
+                                >
                                   <td
                                     className="p-3 pl-2 border-r font-thin cursor-pointer"
                                     onClick={() =>

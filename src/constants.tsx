@@ -46,11 +46,11 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 export const TICKET_PRICING_CATEGORIES: Array<TicketPricingCategory> = [
   {
     key: "early_bird",
-    title: "Early bird ticket",
+    title: "Early bird",
   },
   {
     key: "standard",
-    title: "Standard Ticket",
+    title: "Standard",
   },
   {
     key: "standard_at_the_gate",
@@ -58,15 +58,15 @@ export const TICKET_PRICING_CATEGORIES: Array<TicketPricingCategory> = [
   },
   {
     key: "last_minute",
-    title: "Last Minute Ticket",
+    title: "Last Minute",
   },
   {
     key: "vip",
-    title: "VIP ticket",
+    title: "VIP",
   },
   {
     key: "vvip",
-    title: "VVIP Ticket",
+    title: "VVIP",
   },
 ];
 

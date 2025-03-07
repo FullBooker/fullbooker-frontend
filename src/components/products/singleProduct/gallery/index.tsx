@@ -44,7 +44,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
             ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
           {productMedia
             ?.filter(
               (media: ProductMedia) => media.media_type === MediaType.image
@@ -56,7 +56,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
                 alt={"Event"}
                 width={isMobile ? 150 : 300}
                 height={isMobile ? 150 : 300}
-                className="w-full h-[150px] md:h-[300px] object-cover rounded-lg"
+                className="w-full h-[150px] md:h-[300px] object-cover"
                 unoptimized={true}
               />
             ))}

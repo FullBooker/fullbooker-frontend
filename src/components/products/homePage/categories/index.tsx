@@ -2,22 +2,9 @@
 
 import React, { FC } from "react";
 import { ProductCategory, Subcategory } from "@/domain/dto/output";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Trophy,
-  Utensils,
-  Landmark,
-  Mountain,
-  Palette,
-  Mic,
-  Car,
-  Target,
-  Bike,
-  Dumbbell,
-  Users,
-  Music,
-} from "lucide-react";
+import { Baby, Briefcase, Dumbbell, Music, PaintBucket, Car, Bike, Mountain, ChevronRight, } from "lucide-react";
+import { FaPersonBooth, FaRunning, FaSkiingNordic, FaMotorcycle, FaSwimmer } from "react-icons/fa";
+import { MdOutlineSportsMotorsports } from "react-icons/md";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { generateSlug } from "@/utilities";
@@ -34,58 +21,16 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
   productCategories,
 }) => {
   const icons = [
-    {
-      name: "Kids",
-      icon: Users,
-    },
-    {
-      name: "Concerts",
-      icon: Music,
-    },
-    {
-      name: "Gyms",
-      icon: Dumbbell,
-    },
-    {
-      name: "Go karting",
-      icon: Car,
-    },
-    {
-      name: "Quad biking",
-      icon: Bike,
-    },
-    {
-      name: "Stand Ups",
-      icon: Mic,
-    },
-    {
-      name: "Car shows",
-      icon: Car,
-    },
-    {
-      name: "Paintballing",
-      icon: Target,
-    },
-    {
-      name: "Sports",
-      icon: Trophy,
-    },
-    {
-      name: "Arts",
-      icon: Palette,
-    },
-    {
-      name: "Food",
-      icon: Utensils,
-    },
-    {
-      name: "Adventure",
-      icon: Mountain,
-    },
-    {
-      name: "Culture",
-      icon: Landmark,
-    },
+    { label: "Kids", icon: Baby},
+    { label: "Safari", icon: Briefcase},
+    { label: "Swimming", icon: FaSwimmer},
+    { label: "Gym", icon: Dumbbell },
+    { label: "Concert", icon: Music },
+    { label: "Paint Balling", icon: PaintBucket },
+    { label: "Quad Biking", icon: MdOutlineSportsMotorsports },
+    { label: "Ice Skating", icon: FaSkiingNordic },
+    { label: "Car Shows", icon: Car },
+    { label: "Cycling", icon: Bike },
   ];
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -137,7 +82,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
               (subCategory: Subcategory, index: number) => (
                 <span
                   key={index}
-                  className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0 cursor-pointer"
+                  className="flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer"
                   onClick={() => {
                     const newSearchParams = new URLSearchParams(
                       searchParams.toString()
@@ -151,9 +96,9 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
                 >
                   <div className="flex items-center justify-center">
                     {React.createElement(
-                      icons[Math.floor(Math.random() * 13 + 1) - 1].icon,
+                      icons[Math.floor(Math.random() * icons.length)]?.icon,
                       {
-                        size: isMobile ? 24 : 32,
+                        size: isMobile ? 24 : 30,
                         className: `${`${searchParams?.get("category") ===  generateSlug(subCategory?.name) ? 'text-primary' : 'text-gray-500' }`}`,
                       }
                     )}

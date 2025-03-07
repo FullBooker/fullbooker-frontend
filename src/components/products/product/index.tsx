@@ -100,7 +100,7 @@ const SingleProduct: FC<SingleProductProps> = ({
       )}/${getProductSubCategoryName(product?.subcategory)}/${product?.name
         ?.toLowerCase()
         .replace(/\s+/g, "-")}_${product?.id}`}
-      className="max-w-sm rounded-sm bg-white overflow-hidden cursor-pointer shadow-lg transition-transform transform md:hover:-translate-y-5 ease-out duration-500"
+      className="max-w-sm rounded bg-white overflow-hidden cursor-pointer shadow transition-transform transform md:hover:shadow-lg ease-out duration-500"
     >
       <div className="relative shadow-xl">
         <Image
@@ -119,7 +119,7 @@ const SingleProduct: FC<SingleProductProps> = ({
               )?.name
             : "N/A"}
         </div>
-        {/* Favorite Button */}
+        {/* Share Button */}
         <button className="absolute top-2 right-2 rounded-full p-1 shadow">
           <Share className="w-6 h-6 text-white" />
         </button>

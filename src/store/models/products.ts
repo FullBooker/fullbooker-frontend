@@ -171,7 +171,7 @@ export const products = createModel<RootModel>()({
     async getProducts(payload: ProductsFilters, rootState) {
       try {
         const response: any = await getRequest(
-          payload ? `/products/?${buildQueryString(payload)}` : "/products/"
+          payload ? `/accounts/products/?${buildQueryString(payload)}` : "/accounts/products/"
         );
 
         if (response && response?.data) {
@@ -185,8 +185,8 @@ export const products = createModel<RootModel>()({
       try {
         const response: any = await getRequest(
           payload
-            ? `/products/popular?${buildQueryString(payload)}`
-            : "/products/popular"
+            ? `/accounts/products/popular?${buildQueryString(payload)}`
+            : "/accounts/products/popular"
         );
 
         if (response && response?.data) {
@@ -200,8 +200,8 @@ export const products = createModel<RootModel>()({
       try {
         const response: any = await getRequest(
           payload
-            ? `/products/popular?${buildQueryString(payload)}`
-            : "/products/popular"
+            ? `/accounts/products/popular?${buildQueryString(payload)}`
+            : "/accounts/products/popular"
         );
 
         if (response && response?.data) {
@@ -215,8 +215,8 @@ export const products = createModel<RootModel>()({
       try {
         const response: any = await getRequest(
           payload
-            ? `/products/nearby?${buildQueryString(payload)}&lat=1.2921&long=36.8219`
-            : "/products/nearby"
+            ? `/accounts/products/nearby?${buildQueryString(payload)}&lat=1.2921&long=36.8219`
+            : "/accounts/products/nearby"
         );
 
         if (response && response?.data) {
@@ -230,8 +230,8 @@ export const products = createModel<RootModel>()({
       try {
         const response: any = await getRequest(
           payload
-            ? `/products/upcoming?${buildQueryString(payload)}`
-            : "/products/upcoming"
+            ? `/accounts/products/upcoming?${buildQueryString(payload)}`
+            : "/accounts/products/upcoming"
         );
 
         if (response && response?.data) {
@@ -256,7 +256,7 @@ export const products = createModel<RootModel>()({
     },
     async getProductById(id: string, rootState) {
       try {
-        const response: any = await getRequest(`/products/${id}/`);
+        const response: any = await getRequest(`/accounts/products/${id}/`);
 
         if (response && response?.data) {
           dispatch.products.setProductDetails(response?.data);
@@ -269,7 +269,7 @@ export const products = createModel<RootModel>()({
     async getProductMedia(productId: string, rootState) {
       try {
         const response: any = await getRequest(
-          `/media/?product_id=${productId}`
+          `/accounts/media/?product_id=${productId}`
         );
         if (response && response?.data) {
           dispatch.products.setProductMedia(response?.data?.results);

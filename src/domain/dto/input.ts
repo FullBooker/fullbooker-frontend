@@ -109,6 +109,7 @@ export type AddProductLocationPayload = {
   product: string;
   lat: number;
   long: number;
+  address: string;
 };
 
 export type UpdateProductLocationPayload = {
