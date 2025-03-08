@@ -5,7 +5,11 @@ import Image from "next/image";
 import { Calendar, Clock, Heart, MapPin, Share } from "lucide-react";
 import { Product, ProductPricing } from "@/domain/product";
 import LocationIdentifier from "@/components/shared/locationidentifier";
-import { addCommaSeparators, extractCoordinates } from "@/utilities";
+import {
+  addCommaSeparators,
+  extractCoordinates,
+  formatProductAvailability,
+} from "@/utilities";
 import { Currency, ProductCategory, Subcategory } from "@/domain/dto/output";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -100,7 +104,7 @@ const SingleProduct: FC<SingleProductProps> = ({
       )}/${getProductSubCategoryName(product?.subcategory)}/${product?.name
         ?.toLowerCase()
         .replace(/\s+/g, "-")}_${product?.id}`}
-      className="max-w-sm rounded bg-white overflow-hidden cursor-pointer shadow transition-transform transform md:hover:shadow-lg ease-out duration-500"
+      className="max-w-sm rounded bg-white overflow-hidden cursor-pointer shadow transition-transform transform md:hover:shadow-lg ease-out duration-500 flex flex-col h-full"
     >
       <div className="relative shadow-xl">
         <Image
@@ -108,7 +112,7 @@ const SingleProduct: FC<SingleProductProps> = ({
           alt={"Event"}
           width={250}
           height={250}
-          className="w-full h-[250px] object-cover rounded-tl-lg rounded-tr-lg"
+          className="w-full h-[250px] object-cover rounded-tl-sm rounded-tr-sm"
           unoptimized={true}
         />
         {/* Tag */}
@@ -120,19 +124,19 @@ const SingleProduct: FC<SingleProductProps> = ({
             : "N/A"}
         </div>
         {/* Share Button */}
-        <button className="absolute top-2 right-2 rounded-full p-1 shadow">
+        <button className="absolute top-2 right-2 rounded-full p-1 shadow cursor-pointer z-50">
           <Share className="w-6 h-6 text-white" />
         </button>
       </div>
 
       {/* Details Section */}
-      <div className="px-3 pt-3 pb-4 md:pb-0 space-y-2">
-        <p className="text-black text-base">
-          <strong>{product?.name}</strong>
-        </p>
-        <div className="flex items-center text-gray-400 space-x-2">
-          <MapPin className="h-5 w-5" />
-          <p className="text-sm">
+      <div className="px-3 pt-3 pb-4 md:pb-0 space-y-2 flex-grow">
+        <p className="text-black text-base font-medium">{product?.name}</p>
+
+        {/* Location */}
+        <div className="flex items-center text-[#808080] space-x-2">
+          <MapPin className="h-5 w-5 flex-shrink-0" />
+          <p className="text-sm truncate w-full">
             {processedCoordinates ? (
               <LocationIdentifier
                 lat={processedCoordinates?.latitude}
@@ -143,19 +147,30 @@ const SingleProduct: FC<SingleProductProps> = ({
             )}
           </p>
         </div>
-        <div className="flex justify-between items-center text-gray-400 space-x-2 text-sm">
-          <div className="flex items-center">
-            <Calendar className="h-5 w-5 me-2" />
-            <p className="text-gray-400">Mon to Sat</p>
+
+        {/* Availability */}
+        <div className="flex justify-between items-center text-[#808080] space-x-2 text-sm">
+          {/* Date */}
+          <div className="flex items-center min-w-0">
+            <Calendar className="h-5 w-5 flex-shrink-0 me-2" />
+            <p className="break-words whitespace-normal overflow-hidden">
+              {formatProductAvailability(product?.availability)?.date}
+            </p>
           </div>
-          <div className="flex items-center">
-            <Clock className="h-5 w-5 me-2" />
-            <p className="text-gray-400">9AM to 4PM</p>
+
+          {/* Time */}
+          <div className="flex items-center min-w-0">
+            <Clock className="h-5 w-5 flex-shrink-0 me-2" />
+            <p className="break-words whitespace-normal overflow-hidden">
+              {formatProductAvailability(product?.availability)?.time}
+            </p>
           </div>
         </div>
+
+        {/* Price */}
         <p>
           {product?.pricing?.length > 0 && (
-            <span className="font-semibold">
+            <span className="font-medium text-black">
               {currencies?.length > 0
                 ? currencies?.find(
                     (currency: Currency) =>
@@ -166,18 +181,20 @@ const SingleProduct: FC<SingleProductProps> = ({
             </span>
           )}
         </p>
-        <div className="mt-3">
-          <Button
-            width="w-full"
-            bg="bg-primary"
-            borderRadius="rounded"
-            text="text-white font-base"
-            padding="py-2"
-            margin="m-0"
-          >
-            Buy tickets
-          </Button>
-        </div>
+      </div>
+
+      {/* Button Section (Anchored at the bottom) */}
+      <div className="mt-auto p-3">
+        <Button
+          width="w-full"
+          bg="bg-primary"
+          borderRadius="rounded"
+          text="text-white font-base"
+          padding="py-2"
+          margin="m-0"
+        >
+          Buy tickets
+        </Button>
       </div>
     </Link>
   );

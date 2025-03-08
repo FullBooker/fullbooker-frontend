@@ -31,7 +31,32 @@ export interface ProductHost {
   created_at: string;
   updated_at: string;
   active: boolean;
-  user: User
+  user: User;
+}
+
+interface OpenDay {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  active: boolean;
+  host: string;
+  day: string;
+  day_name: string;
+  opening_at: string;
+  closing_at: string;
+}
+
+export interface Availability {
+  id: string;
+  product: string;
+  product_name: string;
+  start: string | null;
+  end: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  duration: number;
+  open_days: Array<OpenDay>;
+  closed_dates: Array<string>;
 }
 
 export interface Product {
@@ -45,7 +70,7 @@ export interface Product {
   number: string;
   category: string;
   subcategory: string;
-  availability: string | null;
+  availability: Availability;
   pricing: Array<ProductPricing>;
   image: ProductMedia;
   locations: Array<ProductLocation>;
@@ -68,23 +93,21 @@ export interface CartItem {
   id_number: string;
   phone_number: string;
   email: string;
-  quantity: number;
-  discount?: number;
-  total: number;
-  type: string;
-  date: string;
-  pricing_type: string;
-  product_thumbnail: string;
-  product_id: string;
 }
 
 export interface CartSummary {
   product_id: string;
   product_title: string;
   product_thumbnail: string;
+  product_base_currency: string;
+  product_base_pricing_id: string;
   product_base_price: string;
+  product_base_pricing_type: string;
   product_location: string;
   base_currency: string;
+  selected_date: Date | string;
+  time: string;
+  prefill_all_items_with_primary_user_details: boolean;
   total_price: number;
   total_items: number;
 }
@@ -97,14 +120,4 @@ export type TicketPricingCategory = {
 export type SessionPricingCategory = {
   key: string;
   title: string;
-};
-
-export type ComprehensiveProductFilters = {
-  keyword: string;
-  location: string;
-  pricingRange: {
-    max: number;
-    min: number;
-  };
-  categories: Array<string>;
 };

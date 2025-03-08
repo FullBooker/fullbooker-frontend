@@ -26,6 +26,7 @@ import {
   EyeIcon,
   GiftIcon,
   UserCircle,
+  Ticket,
 } from "lucide-react";
 import Image from "next/image";
 import Profile from "./profile/Profile";
@@ -57,7 +58,7 @@ import {
 import { UserProfile } from "@/domain/profile";
 import CustomAvatar from "./components/customAvatar";
 import BottomNavBar from "../bottomNavbar";
-import { getToken,AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
+import { getToken, AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
 import { SwitchToHostPayload } from "@/domain/dto/input";
@@ -187,164 +188,165 @@ const Navbar: FC<NavbarProps> = ({
           </div>
           <div className="hidden items-center lg:flex">
             <ul className="flex justify-between">
-              {productCategories && productCategories?.map(
-                (category: ProductCategory, index: number) => (
-                  <li key={index}>
-                    <div className="relative inline-block text-left">
-                      <NavLinkDropDownItem
-                        label={category?.name}
-                        href={`/products/${generateSlug(category?.name)}`}
-                        level="category"
-                      >
-                        {category?.subcategories?.length > 0 && (
-                          <div>
-                            {category?.subcategories?.map(
-                              (
-                                subCategory: Subcategory,
-                                subCategoryIndex: number
-                              ) => (
-                                <NavLinkDropDownItem
-                                  key={subCategoryIndex}
-                                  label={subCategory?.name}
-                                  href={`/products/${generateSlug(
-                                    category?.name
-                                  )}/${generateSlug(subCategory?.name)}`}
-                                >
-                                  {subCategory?.children?.length > 0 && (
-                                    <div>
-                                      {subCategory?.children?.map(
-                                        (
-                                          subCategoryChildTierOne: Subcategory,
-                                          subCategoryChildTierOneIndex: number
-                                        ) => (
-                                          <NavLinkDropDownItem
-                                            key={subCategoryChildTierOneIndex}
-                                            label={
-                                              subCategoryChildTierOne?.name
-                                            }
-                                            href={`/products/${generateSlug(
-                                              category?.name
-                                            )}/${generateSlug(
-                                              subCategory?.name
-                                            )}/${generateSlug(
-                                              subCategoryChildTierOne?.name
-                                            )}`}
-                                          >
-                                            {subCategoryChildTierOne?.children
-                                              ?.length > 0 && (
-                                              <div>
-                                                {subCategoryChildTierOne?.children?.map(
-                                                  (
-                                                    subCategoryChildTierTwo: Subcategory,
-                                                    subCategoryChildTierTwoIndex: number
-                                                  ) => (
-                                                    <NavLinkDropDownItem
-                                                      key={
-                                                        subCategoryChildTierTwoIndex
-                                                      }
-                                                      label={
-                                                        subCategoryChildTierTwo?.name
-                                                      }
-                                                      href={`/products/${generateSlug(
-                                                        category?.name
-                                                      )}/${generateSlug(
-                                                        subCategory?.name
-                                                      )}/${generateSlug(
-                                                        subCategoryChildTierOne?.name
-                                                      )}
+              {productCategories &&
+                productCategories?.map(
+                  (category: ProductCategory, index: number) => (
+                    <li key={index}>
+                      <div className="relative inline-block text-left">
+                        <NavLinkDropDownItem
+                          label={category?.name}
+                          href={`/products/${generateSlug(category?.name)}`}
+                          level="category"
+                        >
+                          {category?.subcategories?.length > 0 && (
+                            <div>
+                              {category?.subcategories?.map(
+                                (
+                                  subCategory: Subcategory,
+                                  subCategoryIndex: number
+                                ) => (
+                                  <NavLinkDropDownItem
+                                    key={subCategoryIndex}
+                                    label={subCategory?.name}
+                                    href={`/products/${generateSlug(
+                                      category?.name
+                                    )}/${generateSlug(subCategory?.name)}`}
+                                  >
+                                    {subCategory?.children?.length > 0 && (
+                                      <div>
+                                        {subCategory?.children?.map(
+                                          (
+                                            subCategoryChildTierOne: Subcategory,
+                                            subCategoryChildTierOneIndex: number
+                                          ) => (
+                                            <NavLinkDropDownItem
+                                              key={subCategoryChildTierOneIndex}
+                                              label={
+                                                subCategoryChildTierOne?.name
+                                              }
+                                              href={`/products/${generateSlug(
+                                                category?.name
+                                              )}/${generateSlug(
+                                                subCategory?.name
+                                              )}/${generateSlug(
+                                                subCategoryChildTierOne?.name
+                                              )}`}
+                                            >
+                                              {subCategoryChildTierOne?.children
+                                                ?.length > 0 && (
+                                                <div>
+                                                  {subCategoryChildTierOne?.children?.map(
+                                                    (
+                                                      subCategoryChildTierTwo: Subcategory,
+                                                      subCategoryChildTierTwoIndex: number
+                                                    ) => (
+                                                      <NavLinkDropDownItem
+                                                        key={
+                                                          subCategoryChildTierTwoIndex
+                                                        }
+                                                        label={
+                                                          subCategoryChildTierTwo?.name
+                                                        }
+                                                        href={`/products/${generateSlug(
+                                                          category?.name
+                                                        )}/${generateSlug(
+                                                          subCategory?.name
+                                                        )}/${generateSlug(
+                                                          subCategoryChildTierOne?.name
+                                                        )}
                                                     /${generateSlug(
                                                       subCategoryChildTierTwo?.name
                                                     )}`}
-                                                    >
-                                                      {subCategoryChildTierTwo
-                                                        ?.children?.length >
-                                                        0 && (
-                                                        <div>
-                                                          {subCategoryChildTierTwo?.children?.map(
-                                                            (
-                                                              subCategoryChildTierThree: Subcategory,
-                                                              subCategoryChildTierThreeIndex: number
-                                                            ) => (
-                                                              <NavLinkDropDownItem
-                                                                key={
-                                                                  subCategoryChildTierThreeIndex
-                                                                }
-                                                                label={
-                                                                  subCategoryChildTierThree?.name
-                                                                }
-                                                                href={`/products/${generateSlug(
-                                                                  category?.name
-                                                                )}/${generateSlug(
-                                                                  subCategory?.name
-                                                                )}/${generateSlug(
-                                                                  subCategoryChildTierOne?.name
-                                                                )}
+                                                      >
+                                                        {subCategoryChildTierTwo
+                                                          ?.children?.length >
+                                                          0 && (
+                                                          <div>
+                                                            {subCategoryChildTierTwo?.children?.map(
+                                                              (
+                                                                subCategoryChildTierThree: Subcategory,
+                                                                subCategoryChildTierThreeIndex: number
+                                                              ) => (
+                                                                <NavLinkDropDownItem
+                                                                  key={
+                                                                    subCategoryChildTierThreeIndex
+                                                                  }
+                                                                  label={
+                                                                    subCategoryChildTierThree?.name
+                                                                  }
+                                                                  href={`/products/${generateSlug(
+                                                                    category?.name
+                                                                  )}/${generateSlug(
+                                                                    subCategory?.name
+                                                                  )}/${generateSlug(
+                                                                    subCategoryChildTierOne?.name
+                                                                  )}
                                                               /${generateSlug(
                                                                 subCategoryChildTierTwo?.name
                                                               )}/${generateSlug(
-                                                                  subCategoryChildTierThree?.name
-                                                                )}`}
-                                                              >
-                                                                {subCategoryChildTierThree
-                                                                  ?.children
-                                                                  ?.length >
-                                                                  0 && (
-                                                                  <div>
-                                                                    {subCategoryChildTierThree?.children?.map(
-                                                                      (
-                                                                        subCategoryChildTierFour: Subcategory,
-                                                                        subCategoryChildTierFourIndex: number
-                                                                      ) => (
-                                                                        <NavLinkDropDownItem
-                                                                          key={
-                                                                            subCategoryChildTierFourIndex
-                                                                          }
-                                                                          label={
-                                                                            subCategoryChildTierFour?.name
-                                                                          }
-                                                                          href={`/products/${generateSlug(
-                                                                            category?.name
-                                                                          )}/${generateSlug(
-                                                                            subCategory?.name
-                                                                          )}/${generateSlug(
-                                                                            subCategoryChildTierOne?.name
-                                                                          )}/${generateSlug(
-                                                                            subCategoryChildTierTwo?.name
-                                                                          )}/${generateSlug(
-                                                                            subCategoryChildTierThree?.name
-                                                                          )}/${generateSlug(
-                                                                            subCategoryChildTierFour?.name
-                                                                          )}`}
-                                                                        ></NavLinkDropDownItem>
-                                                                      )
-                                                                    )}
-                                                                  </div>
-                                                                )}
-                                                              </NavLinkDropDownItem>
-                                                            )
-                                                          )}
-                                                        </div>
-                                                      )}
-                                                    </NavLinkDropDownItem>
-                                                  )
-                                                )}
-                                              </div>
-                                            )}
-                                          </NavLinkDropDownItem>
-                                        )
-                                      )}
-                                    </div>
-                                  )}
-                                </NavLinkDropDownItem>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </NavLinkDropDownItem>
-                    </div>
-                  </li>
-                )
-              )}
+                                                                    subCategoryChildTierThree?.name
+                                                                  )}`}
+                                                                >
+                                                                  {subCategoryChildTierThree
+                                                                    ?.children
+                                                                    ?.length >
+                                                                    0 && (
+                                                                    <div>
+                                                                      {subCategoryChildTierThree?.children?.map(
+                                                                        (
+                                                                          subCategoryChildTierFour: Subcategory,
+                                                                          subCategoryChildTierFourIndex: number
+                                                                        ) => (
+                                                                          <NavLinkDropDownItem
+                                                                            key={
+                                                                              subCategoryChildTierFourIndex
+                                                                            }
+                                                                            label={
+                                                                              subCategoryChildTierFour?.name
+                                                                            }
+                                                                            href={`/products/${generateSlug(
+                                                                              category?.name
+                                                                            )}/${generateSlug(
+                                                                              subCategory?.name
+                                                                            )}/${generateSlug(
+                                                                              subCategoryChildTierOne?.name
+                                                                            )}/${generateSlug(
+                                                                              subCategoryChildTierTwo?.name
+                                                                            )}/${generateSlug(
+                                                                              subCategoryChildTierThree?.name
+                                                                            )}/${generateSlug(
+                                                                              subCategoryChildTierFour?.name
+                                                                            )}`}
+                                                                          ></NavLinkDropDownItem>
+                                                                        )
+                                                                      )}
+                                                                    </div>
+                                                                  )}
+                                                                </NavLinkDropDownItem>
+                                                              )
+                                                            )}
+                                                          </div>
+                                                        )}
+                                                      </NavLinkDropDownItem>
+                                                    )
+                                                  )}
+                                                </div>
+                                              )}
+                                            </NavLinkDropDownItem>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                  </NavLinkDropDownItem>
+                                )
+                              )}
+                            </div>
+                          )}
+                        </NavLinkDropDownItem>
+                      </div>
+                    </li>
+                  )
+                )}
             </ul>
           </div>
           <div className="flex items-center gap-1">
@@ -463,6 +465,19 @@ const Navbar: FC<NavbarProps> = ({
                           href={
                             authToken
                               ? "/profile"
+                              : `/login?redirect=${pathname?.slice(1)}`
+                          }
+                          onItemClick={handleCloseLink}
+                        />
+                        <ProfileItem
+                          theme={themeMode}
+                          icon={
+                            <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+                          }
+                          text="My Tickets"
+                          href={
+                            authToken
+                              ? "/tickets"
                               : `/login?redirect=${pathname?.slice(1)}`
                           }
                           onItemClick={handleCloseLink}

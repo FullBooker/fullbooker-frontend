@@ -1,83 +1,122 @@
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-  } from "@/components/ui/dialog";
+import React, { FC } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import { ModalID } from "@/domain/components";
 import { RootState } from "@/store";
-  import React, { FC } from "react";
 import { connect } from "react-redux";
 import { X } from "lucide-react";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 
-  type UniversalModalProps = {
-    theme?: string | undefined;
-    title: string;
-    description: string;
-    type: "Deposit" | "Withdraw";
-    amount: string;
-    buttonTitle?: string;
-    open?: boolean;
-    setActiveModal: (modalId: ModalID) => void;
-    content: any;
-    fullScreen?: boolean;
-  }
-  
-  const UniversalModal: FC<UniversalModalProps> = ({
-    theme,
-    title,
-    description,
-    open = true,
-    content,
-    setActiveModal,
-    fullScreen = false
-  }) => {
-    return (
-      <Dialog open={open}>
-        <DialogContent className={`w-[320px] xs:w-[450px] md:w-[530px] flex flex-col justify-center items-center pt-4 sm:rounded-2xl md:rounded-3xl ${fullScreen ? 'w-full h-full' : 'rounded-xl'} max-h-[100vh] overflow-y-auto`}>
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" onClick={() => setActiveModal(ModalID.none)}>
+type UniversalModalProps = {
+  theme?: string | undefined;
+  title: string;
+  description: string;
+  type: "Deposit" | "Withdraw";
+  amount: string;
+  buttonTitle?: string;
+  open?: boolean;
+  setActiveModal: (modalId: ModalID) => void;
+  content: any;
+  fullScreen?: boolean;
+  showDividers?: boolean;
+  footer?: any;
+};
+
+const UniversalModal: FC<UniversalModalProps> = ({
+  theme,
+  title,
+  description,
+  open = true,
+  content,
+  setActiveModal,
+  fullScreen = false,
+  showDividers = false,
+  footer,
+}) => {
+  const handleclose = () => {
+    setActiveModal(ModalID.none);
+  };
+  const device = useDeviceType();
+  return (
+    <Dialog
+      open={open}
+      onClose={() => handleclose}
+      scroll={"paper"}
+      aria-labelledby="scroll-dialog-title"
+      aria-describedby="scroll-dialog-description"
+      maxWidth={false}
+      PaperProps={{
+        style: {
+          width:
+            device === DeviceType.mobile
+              ? "90vw"
+              : device === DeviceType.tablet
+              ? "60vw"
+              : "30vw",
+          maxWidth: "1200px",
+          minHeight: "40vh",
+          borderRadius: "10px",
+        },
+      }}
+      sx={{
+        "& .MuiPaper-root": {
+          maxWidth: "1200px",
+          width:
+            device === DeviceType.mobile
+              ? "90vw"
+              : device === DeviceType.tablet
+              ? "60vw"
+              : "30vw",
+          "@media (max-width: 600px)": {
+            width:
+              device === DeviceType.mobile
+                ? "90vw"
+                : device === DeviceType.tablet
+                ? "60vw"
+                : "30vw",
+            minHeight: "40vh",
+            maxWidth: "100%",
+            margin: 0,
+            borderRadius: 0,
+          },
+        },
+      }}
+    >
+      <DialogTitle id="scroll-dialog-title">
+        <div className="flex justify-between items-center">
+          <div
+            className="flex justify-start cursor-pointer"
+            onClick={() => handleclose()}
+          >
             <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-          <DialogHeader className="flex flex-col justify-center items-center gap-1 lg:gap-4">
-            <DialogTitle className="text-lg md:text-xl lg:text-2xl text-center">
-              {title}
-            </DialogTitle>
-            <DialogDescription
-              className={`text-xs md:text-sm text-center ${
-                theme === "light" ? "text-textColor2" : "text-textColor"
-              }`}
-            >
-              <span className="leading-relaxed">{description}</span>
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col w-full sm:pr-0 sm:pl-0 xs:pr-0 xs:pl-0">
-            {content}
           </div>
+          <div className="items-center">
+            <p className="text-black font-semibold text-lg"> {title}</p>
+          </div>
+          <div></div>
+        </div>
+      </DialogTitle>
+      <DialogContent dividers={showDividers}>
+        <div>{content}</div>
+      </DialogContent>
+      {footer && <DialogActions sx={{ justifyContent: "space-between" }}>{footer}</DialogActions>}
+    </Dialog>
+  );
+};
 
-          <DialogFooter className="w-full mt-2 md:mt-6">
-           
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  };
-  
-  const mapStateToProps = (state: RootState) => {
-    const loading = state.loading.models.authentication;
-    const { profile, showBalance } = state.profile;
-    const { isLoggedIn, authData } = state.authentication;
-    return { isLoggedIn, authData, loading, profile, showBalance };
-  };
-  
-  const mapDispatchToProps = (dispatch: any) => ({
-    setActiveModal: (modalId: ModalID) => dispatch.components.setActiveModal(modalId),
-  });
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(UniversalModal);
-  
-  
+const mapStateToProps = (state: RootState) => {
+  const loading = state.loading.models.authentication;
+  const { profile, showBalance } = state.profile;
+  const { isLoggedIn, authData } = state.authentication;
+  return { isLoggedIn, authData, loading, profile, showBalance };
+};
+
+const mapDispatchToProps = (dispatch: any) => ({
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(UniversalModal);

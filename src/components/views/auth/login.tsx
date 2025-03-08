@@ -21,6 +21,7 @@ import { ModalID } from "@/domain/components";
 import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
 import { NotificationType } from "@/domain/notification";
 import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
+import Button from "@/components/shared/button";
 
 type LoginModalContentProps = {
   emailPassowrdLoginRequestProcessing: boolean;
@@ -163,16 +164,21 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 here
               </span>
             </button>
-            <button
+            <Button
+              width="w-full md:w-[80%]"
+              bg="bg-primary"
+              borderRadius="rounded"
+              text="text-white font-base"
+              padding="py-3"
+              margin="mb-2"
               type="submit"
-              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
             >
               {emailPassowrdLoginRequestProcessing ? (
                 <CircularProgress size={18} color="inherit" />
               ) : (
                 "Sign In"
               )}
-            </button>
+            </Button>
           </div>
 
           <div className="relative my-6 mx-4">
@@ -224,12 +230,17 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
         <p className="text-sm text-black font-thin mb-4">
           <span>Don't have an account?</span>
         </p>
-        <button
+        <Button
+          width="w-full md:w-[80%]"
+          bg="bg-primary"
+          borderRadius="rounded"
+          text="text-white font-base"
+          padding="py-3"
+          margin="mb-2"
           onClick={() => setActiveModal(ModalID.register)}
-          className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
         >
           Create an account
-        </button>
+        </Button>
       </div>
     </div>
   );

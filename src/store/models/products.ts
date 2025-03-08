@@ -2,7 +2,9 @@ import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import { ProductsFilters } from "@/domain/dto/input";
 import { buildQueryString, getRequest } from "@/utilities";
-import { CartItem, CartSummary, ComprehensiveProductFilters, Product, ProductMedia } from "@/domain/product";
+import { CartItem, CartSummary, Product, ProductMedia } from "@/domain/product";
+import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
+import { County } from "@/domain/location";
 
 type ProductsState = {
   products: Array<Product>;
@@ -14,7 +16,7 @@ type ProductsState = {
   productMedia: Array<ProductMedia>;
   cart: Array<CartItem>;
   cartSummary: CartSummary | null;
-  productFilters: ComprehensiveProductFilters | null;
+  comprehensiveProductFilters: ComprehensiveProductFilters | null;
 };
 
 export const products = createModel<RootModel>()({
@@ -28,7 +30,15 @@ export const products = createModel<RootModel>()({
     productMedia: [],
     cart: [],
     cartSummary: null,
-    productFilters: null,
+    comprehensiveProductFilters: {
+      keyword: "",
+      locations: [],
+      categoies: [],
+      start_date: "",
+      end_date: "",
+      max_price: "0",
+      min_price: "0",
+    },
   } as ProductsState,
   reducers: {
     setProductDetails(state: ProductsState, product: Product) {
@@ -85,49 +95,57 @@ export const products = createModel<RootModel>()({
       );
       let updatedCart;
 
-      if (existingItem) {
-        updatedCart = state.cart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
-        );
-      } else {
+      if (!existingItem) {
         updatedCart = [...state.cart, item];
+      } else {
+        updatedCart = state.cart;
       }
-      return {
-        ...state,
-        cart: [...state.cart, item],
-        cartSummary: {
-          ...state.cartSummary,
-          total_items: updatedCart?.reduce(
-            (sum: number, cartItem: CartItem) => sum + cartItem.quantity,
-            0
-          ),
-          total_price: updatedCart?.reduce(
-            (sum: number, cartItem: CartItem) =>
-              sum + cartItem.total * cartItem.quantity,
-            0
-          ),
-        } as CartSummary,
+
+      const updatedCartSummary = {
+        ...state.cartSummary,
+        total_items: updatedCart.length,
+        total_price:
+          parseFloat(state?.cartSummary?.product_base_price as string) *
+          updatedCart.length,
       };
-    },
-    removeFromCart(state: ProductsState, id: string) {
-      const updatedCart = state.cart.filter((item: CartItem) => item.id !== id);
+
       return {
         ...state,
         cart: updatedCart,
-        cartSummary: {
-          ...state.cartSummary,
-          total_items: updatedCart?.reduce(
-            (sum: number, cartItem: CartItem) => sum + cartItem.quantity,
-            0
-          ),
-          total_price: updatedCart?.reduce(
-            (sum: number, cartItem: CartItem) =>
-              sum + cartItem.total * cartItem.quantity,
-            0
-          ),
-        } as CartSummary,
+        cartSummary: updatedCartSummary as CartSummary,
+      };
+    },
+    addUserDetailsToCart(state: ProductsState, payload: CartItem) {
+      const updatedCart = state.cart.map((cartItem) => {
+        if (cartItem.id === payload.id) {
+          return { ...cartItem, ...payload };
+        }
+        return cartItem;
+      });
+
+      return {
+        ...state,
+        cart: updatedCart,
+      };
+    },
+    removeFromCart(state: ProductsState, id: string) {
+      const itemToRemove = state.cart.find((item) => item.id === id);
+      if (!itemToRemove) return state;
+
+      const updatedCart = state.cart.filter((item) => item.id !== id);
+
+      const updatedCartSummary = {
+        ...state.cartSummary,
+        total_items: updatedCart.length,
+        total_price:
+          parseFloat(state?.cartSummary?.product_base_price as string) *
+          updatedCart.length,
+      };
+
+      return {
+        ...state,
+        cart: updatedCart,
+        cartSummary: updatedCartSummary as CartSummary,
       };
     },
     clearCart(state: ProductsState) {
@@ -154,10 +172,57 @@ export const products = createModel<RootModel>()({
         cartSummary,
       };
     },
-    setProductFilters(state: ProductsState, filters: ComprehensiveProductFilters) {
+    setComprehensiveeProductFilters(
+      state: ProductsState,
+      comprehensiveProductFilters: ComprehensiveProductFilters
+    ) {
       return {
         ...state,
-        productFilters: filters,
+        comprehensiveProductFilters,
+      };
+    },
+    toggleCategoryFilter(state: ProductsState, category: string) {
+      const existingCategories =
+        state.comprehensiveProductFilters?.categoies || [];
+      const updatedCategories = existingCategories.includes(category)
+        ? existingCategories.filter((cat) => cat !== category)
+        : [...existingCategories, category];
+
+      return {
+        ...state,
+        comprehensiveProductFilters: {
+          ...state.comprehensiveProductFilters,
+          categoies: updatedCategories,
+        },
+      };
+    },
+    toggleLocationFilter(state: ProductsState, location: County) {
+      const existingLocations =
+        state.comprehensiveProductFilters?.locations || [];
+      const updatedLocations = existingLocations.some((loc) => loc === location)
+        ? existingLocations.filter((loc) => loc !== location)
+        : [...existingLocations, location];
+
+      return {
+        ...state,
+        comprehensiveProductFilters: {
+          ...state.comprehensiveProductFilters,
+          locations: updatedLocations,
+        },
+      };
+    },
+    clearProductComprehensiveFilters(state: ProductsState) {
+      return {
+        ...state,
+        comprehensiveProductFilters: {
+          keyword: "",
+          locations: [],
+          categoies: [],
+          start_date: "",
+          end_date: "",
+          max_price: "0",
+          min_price: "0",
+        },
       };
     },
     clearProductFilters(state: ProductsState) {
@@ -171,7 +236,9 @@ export const products = createModel<RootModel>()({
     async getProducts(payload: ProductsFilters, rootState) {
       try {
         const response: any = await getRequest(
-          payload ? `/accounts/products/?${buildQueryString(payload)}` : "/accounts/products/"
+          payload
+            ? `/accounts/products/?${buildQueryString(payload)}`
+            : "/accounts/products/"
         );
 
         if (response && response?.data) {
@@ -181,7 +248,7 @@ export const products = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getPopularProducts(payload: ProductsFilters, rootState) {
+    async getPopularProducts(payload: any, rootState) {
       try {
         const response: any = await getRequest(
           payload
@@ -196,7 +263,7 @@ export const products = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getRecommendedProducts(payload: ProductsFilters, rootState) {
+    async getRecommendedProducts(payload: any, rootState) {
       try {
         const response: any = await getRequest(
           payload
@@ -211,11 +278,13 @@ export const products = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getNearByProducts(payload: ProductsFilters, rootState) {
+    async getNearByProducts(payload: any, rootState) {
       try {
         const response: any = await getRequest(
           payload
-            ? `/accounts/products/nearby?${buildQueryString(payload)}&lat=1.2921&long=36.8219`
+            ? `/accounts/products/nearby?${buildQueryString(
+                payload
+              )}&lat=1.2921&long=36.8219`
             : "/accounts/products/nearby"
         );
 
@@ -226,7 +295,7 @@ export const products = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getUpcomingProducts(payload: ProductsFilters, rootState) {
+    async getUpcomingProducts(payload: any, rootState) {
       try {
         const response: any = await getRequest(
           payload

@@ -12,6 +12,7 @@ import { CircularProgress } from "@mui/material";
 import { ModalID } from "@/domain/components";
 import { RequestOTPPayload } from "@/domain/dto/input";
 import { ArrowRight, ChevronRight, Mail, Phone } from "lucide-react";
+import Button from "@/components/shared/button";
 
 type ForgotPasswordModalContentProps = {
   loading: boolean;
@@ -104,9 +105,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   onChange={onChange}
                   value={value}
                   error={errors?.email?.message}
-                  icon={
-                    <Mail className="w-4 h-4 text-white fill-gray-500" />
-                  }
+                  icon={<Mail className="w-4 h-4 text-white fill-gray-500" />}
                 />
               )}
             />
@@ -125,9 +124,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
                   onChange={onChange}
                   value={value}
                   error={errors?.phone_number?.message}
-                  icon={
-                    <Phone className="w-4 h-4 text-white fill-gray-500" />
-                  }
+                  icon={<Phone className="w-4 h-4 text-white fill-gray-500" />}
                 />
               )}
             />
@@ -146,22 +143,28 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
               Use {""}
               {watch("otp_method") === "phone"
                 ? "email address"
-                : "phone number"} instead?
+                : "phone number"}{" "}
+              instead?
             </p>
           </div>
         </div>
 
         <div className="mt-20 text-center">
-          <button
+          <Button
+            width="w-full md:w-[80%]"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white font-base"
+            padding="py-3"
+            margin="mb-2"
             type="submit"
-            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
           >
             {loading ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
               "Continue"
             )}
-          </button>
+          </Button>
           <p className="text-sm text-black gap-1 font-thin">
             Go back to{" "}
             <button

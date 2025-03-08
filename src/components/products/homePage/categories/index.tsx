@@ -1,42 +1,86 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useRef } from "react";
 import { ProductCategory, Subcategory } from "@/domain/dto/output";
-import { Baby, Briefcase, Dumbbell, Music, PaintBucket, Car, Bike, Mountain, ChevronRight, } from "lucide-react";
-import { FaPersonBooth, FaRunning, FaSkiingNordic, FaMotorcycle, FaSwimmer } from "react-icons/fa";
+import {
+  Baby,
+  Briefcase,
+  Dumbbell,
+  Music,
+  PaintBucket,
+  Car,
+  Bike,
+  ChevronRight,
+} from "lucide-react";
+import { FaSkiingNordic, FaSwimmer } from "react-icons/fa";
 import { MdOutlineSportsMotorsports } from "react-icons/md";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { generateSlug } from "@/utilities";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
-import useIsMobile from "@/lib/hooks/useIsMobile";
+import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "../../../../domain/constants";
 
 type ProductCategoriesProps = {
   productCategories: Array<ProductCategory>;
   productCategoriesRequestProcessing: boolean;
+  toggleCategoryFilter: (categoryId: string) => void;
+  comprehensiveProductFilters: ComprehensiveProductFilters;
 };
 
 const ProductCategories: FC<ProductCategoriesProps> = ({
   productCategories,
+  toggleCategoryFilter,
+  comprehensiveProductFilters,
 }) => {
+  const devieType = useDeviceType();
   const icons = [
-    { label: "Kids", icon: Baby},
-    { label: "Safari", icon: Briefcase},
-    { label: "Swimming", icon: FaSwimmer},
-    { label: "Gym", icon: Dumbbell },
-    { label: "Concert", icon: Music },
-    { label: "Paint Balling", icon: PaintBucket },
-    { label: "Quad Biking", icon: MdOutlineSportsMotorsports },
-    { label: "Ice Skating", icon: FaSkiingNordic },
-    { label: "Car Shows", icon: Car },
-    { label: "Cycling", icon: Bike },
+    {
+      label: "Kids",
+      icon: <Baby size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Safari",
+      icon: <Briefcase size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Swimming",
+      icon: <FaSwimmer size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Gym",
+      icon: <Dumbbell size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Concert",
+      icon: <Music size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Paint Balling",
+      icon: <PaintBucket size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Quad Biking",
+      icon: (
+        <MdOutlineSportsMotorsports
+          size={devieType === DeviceType.mobile ? 24 : 30}
+        />
+      ),
+    },
+    {
+      label: "Ice Skating",
+      icon: <FaSkiingNordic size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Car Shows",
+      icon: <Car size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
+    {
+      label: "Cycling",
+      icon: <Bike size={devieType === DeviceType.mobile ? 24 : 30} />,
+    },
   ];
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const isMobile = useIsMobile();
-  const categoriesContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const categoriesContainerRef = useRef<HTMLDivElement>(null);
 
   const extractSubcategories = (
     categories: Array<ProductCategory>
@@ -83,27 +127,43 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
                 <span
                   key={index}
                   className="flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer"
-                  onClick={() => {
-                    const newSearchParams = new URLSearchParams(
-                      searchParams.toString()
-                    );
-                    newSearchParams.set(
-                      "category",
-                      generateSlug(subCategory?.name)
-                    );
-                    router.push(`${pathname}?${newSearchParams.toString()}`);
-                  }}
+                  onClick={() => toggleCategoryFilter(subCategory?.id)}
                 >
                   <div className="flex items-center justify-center">
-                    {React.createElement(
+                    <span
+                      className={`${`${
+                        comprehensiveProductFilters?.categoies?.includes(
+                          subCategory?.id
+                        )
+                          ? "text-primary"
+                          : "text-gray-500"
+                      }`}`}
+                    >
+                      {icons[Math.floor(Math.random() * icons.length)]?.icon}
+                    </span>
+                    {/* {React.createElement(
                       icons[Math.floor(Math.random() * icons.length)]?.icon,
                       {
                         size: isMobile ? 24 : 30,
-                        className: `${`${searchParams?.get("category") ===  generateSlug(subCategory?.name) ? 'text-primary' : 'text-gray-500' }`}`,
+                        className: `${`${
+                          comprehensiveProductFilters?.categoies?.includes(
+                            subCategory?.id
+                          )
+                            ? "text-primary"
+                            : "text-gray-500"
+                        }`}`,
                       }
-                    )}
+                    )} */}
                   </div>
-                  <span className={`text-sm md:text-xs text-center ${searchParams?.get("category") ===  generateSlug(subCategory?.name) ? 'text-primary' : 'text-gray-500' }`}>
+                  <span
+                    className={`text-sm md:text-xs text-center ${
+                      comprehensiveProductFilters?.categoies?.includes(
+                        subCategory?.id
+                      )
+                        ? "text-primary"
+                        : "text-gray-500"
+                    }`}
+                  >
                     {subCategory.name}
                   </span>
                 </span>
@@ -117,7 +177,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
               if (categoriesContainerRef.current) {
                 categoriesContainerRef.current.scrollBy({
                   left: 100, // Adjust the scroll amount as needed
-                  behavior: 'smooth', // Smooth scrolling
+                  behavior: "smooth", // Smooth scrolling
                 });
               }
             }}
@@ -134,12 +194,17 @@ const mapStateToProps = (state: RootState) => {
   const productCategoriesRequestProcessing =
     state.loading.effects.settings.getProductCategories;
   const { productCategories } = state.settings;
+  const { comprehensiveProductFilters } = state.products;
   return {
     productCategories,
     productCategoriesRequestProcessing,
+    comprehensiveProductFilters,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({});
+const mapDispatchToProps = (dispatch: any) => ({
+  toggleCategoryFilter: (categoryId: string) =>
+    dispatch.products.toggleCategoryFilter(categoryId),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductCategories);

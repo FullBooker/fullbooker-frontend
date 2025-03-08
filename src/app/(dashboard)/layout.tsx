@@ -261,14 +261,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<PaymentSuccessfullModal />}
         />
       )}
-      {modalId === ModalID.productFilters && (
-        <UniversalModal
-          theme={themeMode}
-          open={true}
-          content={<ComprehensiveProductFilters />}
-          fullScreen={isMobile ? true : false}
-        />
-      )}
+      {modalId === ModalID.comprehensiveProductFilters && <ComprehensiveProductFilters />}
       <BottomNavBar />
     </div>
   );
