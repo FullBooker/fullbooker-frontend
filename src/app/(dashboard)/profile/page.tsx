@@ -20,6 +20,7 @@ import {
 import ProfileSetting from "@/components/views/profile/profileSetting";
 import PasswordSetting from "@/components/views/profile/passwordSetting";
 import { withAuth } from "@/components/views/dash/authGuard";
+import MobileMiniAppBar from "@/components/layout/mobileMiniAppBar";
 
 type ProfilePageProps = {
   profileLoading: boolean;
@@ -50,13 +51,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
 
   return (
     <div>
-      <div className="md:hidden">
-        <div className="flex justify-between items-center md:justify-center mb-2 px-4 py-3 shadow">
-          <div className="flex justify-between items-center">
-            <p className="font-semibold text-lg">My Profile</p>
-          </div>
-        </div>
-      </div>
+      <MobileMiniAppBar title="My Profile"/>
       <div className="flex flex-col gap-12 h-fit py-3 md:py-10 px-4 max-w-7xl mx-auto">
         {/* BG Profile */}
         <div className="w-full flex flex-col">

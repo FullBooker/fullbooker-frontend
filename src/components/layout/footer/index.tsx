@@ -46,19 +46,34 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-3 md:mb-4">Product</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Features
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Pricing
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Case studies
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Reviews
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Updates
               </Link>
             </div>
@@ -68,19 +83,34 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-3 md:mb-4">Company</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 About
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Contact us
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Careers
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Culture
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Blog
               </Link>
             </div>
@@ -90,19 +120,34 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-3 md:mb-4">Support</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Getting started
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Help center
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Server status
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Report a bug
               </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-mainColor">
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
                 Chat support
               </Link>
             </div>
@@ -112,16 +157,33 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-12 pt-3 md:pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
-            <p className="text-xs md:tex-sm text-black">
-              Copyright © {new Date().getFullYear()} Fullbooker
-            </p>
-            <div className="flex gap-1 md:gap-3">
-              <p className="text-xs md:tex-sm text-black">All Rights Reserved |</p>
-              <Link href="#" className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent">
-                Terms and Conditions
+            <div className="flex itsems-center">
+              <p className="text-xs md:tex-sm text-black">
+                Copyright © {new Date().getFullYear()} Fullbooker
+              </p>
+              <p className="text-xs md:tex-sm text-black">
+                All Rights Reserved |
+              </p>
+            </div>
+            <div className="flex gap-1 md:gap-3 mb-10 md:mb-0">
+              <Link
+                href="/terms-of-service"
+                className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent"
+              >
+                Terms of Service
               </Link>
               <p className="text-xs md:tex-sm text-black">|</p>
-              <Link href="#" className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent">
+              <Link
+                href="/cookie-policy"
+                className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent"
+              >
+                Cookie Policy
+              </Link>
+              <p className="text-xs md:tex-sm text-black">|</p>
+              <Link
+                href="/privacy-policy"
+                className="text-xs md:tex-sm text-mainColor hover:text-text-blue-500 decoration-transparent"
+              >
                 Privacy Policy
               </Link>
             </div>

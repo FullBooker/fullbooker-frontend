@@ -193,3 +193,8 @@ export const formatProductAvailability = (
 
   return { date: "N/A", time: "N/A" };
 };
+
+export const humanReadableDate = (isoTimestamp: string): string => {
+  const date = new Date(isoTimestamp);
+  return date?.toISOString()?.split('T')[0];
+};

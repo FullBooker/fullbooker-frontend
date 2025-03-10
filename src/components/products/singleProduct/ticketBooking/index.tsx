@@ -256,6 +256,7 @@ const TicketBooking: FC<TicketBookingProps> = ({
                             (currency: Currency) =>
                               currency.id === pricing?.currency
                           )?.name || "",
+                        product_base_price: pricing?.cost
                       } as CartSummary);
                     }
                   }}

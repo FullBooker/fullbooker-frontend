@@ -136,4 +136,6 @@ export const KENYAN_COUNTIES: Array<County> = [
   { name: "West Pokot", latitude: 1.5126, longitude: 35.1182 }
 ];
 
-
+export enum CustomeEvents {
+  successfullTicketBooking = "SUCCESSFUL_TICKET_BOOKING"
+}

@@ -153,7 +153,7 @@ export const products = createModel<RootModel>()({
         ...state,
         cart: [],
         cartSummary: {
-          ...state.cartSummary,
+          prefill_all_items_with_primary_user_details: false,
           total_items: 0,
           total_price: 0,
         } as CartSummary,
