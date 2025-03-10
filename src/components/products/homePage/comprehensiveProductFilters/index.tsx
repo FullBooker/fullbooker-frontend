@@ -1,305 +1,285 @@
 "use client";
 
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC } from "react";
 import { connect } from "react-redux";
-import { RootState } from "@/store";
+import { Dispatch, RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
-import { ProductsFilters } from "@/domain/dto/input";
-import { ComprehensiveProductFilters, Product } from "@/domain/product";
 import { Currency, ProductCategory } from "@/domain/dto/output";
 import Button from "@/components/shared/button";
-import {
-  APIProvider,
-  ControlPosition,
-  MapControl,
-  AdvancedMarker,
-  Map,
-  useMap,
-  useMapsLibrary,
-  useAdvancedMarkerRef,
-  AdvancedMarkerRef,
-} from "@vis.gl/react-google-maps";
-import { ChevronDown, MapPin, Search } from "lucide-react";
-import useIsMobile from "@/lib/hooks/useIsMobile";
-const API_KEY = process.env.NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY as string;
+import UniversalModal from "@/components/layout/modal/UniversalModal";
+import { useThemeMode } from "@/lib/hooks/useTheme";
+import { Checkbox, Slider } from "@mui/material";
+import FilterAccordion from "./filterAccordion";
+import { KENYAN_COUNTIES } from "@/constants";
+import { County } from "@/domain/location";
+import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
+import { addCommaSeparators } from "@/utilities";
+import Box from "@mui/material/Box";
+import { ModalID } from "@/domain/components";
 
 type SearchFiltersProps = {
-  setProductFilters: (payload: ProductsFilters) => void;
-  clearProductFilters: () => void;
-  productFilters: ComprehensiveProductFilters | null;
+  setComprehensiveeProductFilters: (
+    payload: ComprehensiveProductFilters
+  ) => void;
+  comprehensiveProductFilters: ComprehensiveProductFilters | null;
   productCategories: Array<ProductCategory>;
-  currencies: Array<Currency>;
+  toggleCategoryFilter: (categoryId: string) => void;
+  toggleLocationFilter: (location: County) => void;
+  clearProductComprehensiveFilters: () => void;
+  fetchFilteredProducts: (filters: ComprehensiveProductFilters) => void;
 };
 
 const ComprehensiveSearchFilters: FC<SearchFiltersProps> = ({
   productCategories,
-  currencies,
-  productFilters,
-  setProductFilters,
-  clearProductFilters,
+  comprehensiveProductFilters,
+  setComprehensiveeProductFilters,
+  toggleCategoryFilter,
+  toggleLocationFilter,
+  clearProductComprehensiveFilters,
+  fetchFilteredProducts,
 }) => {
-  const [activeTab, setActiveTab] = useState<string>("location");
-  const isMobile = useIsMobile();
-  const [selectedPlace, setSelectedPlace] =
-    useState<google.maps.places.PlaceResult | null>(null);
-  const [markerRef, marker] = useAdvancedMarkerRef();
-  return (
-    <div className="flex flex-col justify-between h-full bg-white">
-      <div className="border-b border-gray-400 text-center mb-2">
-        <p className="text-black font-semibold text-lg">FILTERS</p>
-      </div>
-      <div className="text-center mb-2">
-        <p className="text-black font-semibold">
-          Recreational activities and events
-        </p>
-      </div>
-      <ul className="flex text-sm font-medium text-center rounded-sm border border-gray-400">
-        <li className="w-full focus-within:z-10">
-          <span
-            className={`inline-block w-full p-4 border-r border-gray-200 cursor-pointer hover:text-primary ${
-              activeTab === "location" ? "text-primary" : "text-black"
-            }`}
-            onClick={() => setActiveTab("location")}
-          >
-            LOCATION
-          </span>
-        </li>
-        <li className="w-full focus-within:z-10">
-          <span
-            className={`inline-block w-full p-4 border-r border-gray-200 cursor-pointer hover:text-primary ${
-              activeTab === "price-range" ? "text-primary" : "text-black"
-            }`}
-            onClick={() => setActiveTab("price-range")}
-          >
-            PRICE
-          </span>
-        </li>
-        <li className="w-full focus-within:z-10">
-          <span
-            className={`inline-block w-full p-4 border-r border-gray-200 cursor-pointer hover:text-primary ${
-              activeTab === "categories" ? "text-primary" : "text-black"
-            }`}
-            onClick={() => setActiveTab("categories")}
-          >
-            CATEGORY
-          </span>
-        </li>
-      </ul>
-      <div className="mt-4 pt-4 mb-8 border-t border-gray-400">
-        {/* Location */}
-        {activeTab === "location" && (
-          <div className="mb-4">
-            <div className="relative items-center rounded-md mb-4 row-span-4">
-              <APIProvider
-                apiKey={API_KEY}
-                solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
-              >
-                <div className="autocomplete-control w-full">
-                  <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
-                </div>
-                <MapHandler place={selectedPlace} marker={marker} />
-                <Map
-                  mapId={"bf51a910020fa25a"}
-                  defaultZoom={3}
-                  defaultCenter={
-                    selectedPlace
-                      ? {
-                          lat: selectedPlace?.geometry?.location?.lat() as number,
-                          lng: selectedPlace?.geometry?.location?.lng() as number,
-                        }
-                      : { lat: 1.286389, lng: 36.817223 }
-                  }
-                  gestureHandling={"greedy"}
-                  disableDefaultUI={true}
-                  style={{
-                    height: isMobile ? "230px" : "250px",
-                    width: "100%",
-                  }}
-                >
-                  <AdvancedMarker ref={markerRef} position={null} />
-                </Map>
-              </APIProvider>
-            </div>
-            <div className="flex justify-center">
-              <Button
-                bg="bg-primary"
-                borderRadius="rounded"
-                margin="mb-2"
-                text="text-black"
-                padding="py-1 px-2 md:px-6"
-                isSecondary
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        )}
+  const { themeMode } = useThemeMode();
+  const [value, setValue] = React.useState<number[]>([
+    parseInt(comprehensiveProductFilters?.min_price as string) || 0,
+    parseInt(comprehensiveProductFilters?.max_price as string) || 10000,
+  ]);
 
-        {/* Price Range */}
-        {activeTab === "price-range" && (
-          <div className="mb-4">
-            <div className="mb-4">
-              <h4 className="font-semibold">Price range</h4>
-              <p className="text-sm text-black">Prices include taxes</p>
-            </div>
-            <div className="flex gap-6">
-              <input
-                type="number"
-                placeholder="Min"
-                className="w-1/2 p-2 border border-gray-300 rounded"
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                className="w-1/2 p-2 border border-gray-300 rounded"
-              />
-            </div>
-            <div className="flex justify-center mt-2 mb-2">
-              <input
-                type="range"
-                min="0"
-                max="100000"
-                className="w-[80%] text-center mt-2  text-primary"
-              />
-            </div>
-            <div className="flex justify-center">
-              <span className="text-sm">KES 0 - KES 100,000</span>
-            </div>
-          </div>
-        )}
-
-        {/* Categories */}
-        {activeTab === "categories" && (
-          <div className="mb-4">
-            <h4 className="font-semibold mb-4">Amenities</h4>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                "Gear provided",
-                "Assisted living",
-                "Disability Access",
-                "Cafe nearby",
-                "Available now",
-                "High speed internet",
-              ].map((amenity) => (
-                <span
-                  key={amenity}
-                  className="bg-gray-200  py-1 rounded-lg text-xs text-center"
-                >
-                  {amenity}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="relative flex justify-between gap-6 bg-white">
-        <Button
-          width="w-full"
-          bg="bg-primary"
-          borderRadius="rounded"
-          margin="mb-2"
-          text="text-black"
-          padding="py-2 px-2 md:px-3"
-          isSecondary
-          onClick={() => clearProductFilters()}
-        >
-          Clear Filters
-        </Button>
-        <Button
-          width="w-full"
-          bg="bg-primary"
-          borderRadius="rounded"
-          margin="mb-2"
-          text="text-white"
-          padding="py-2 px-2 md:px-3"
-        >
-          Load Filters
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-interface MapHandlerProps {
-  place: google.maps.places.PlaceResult | null;
-  marker: google.maps.marker.AdvancedMarkerElement | null;
-}
-
-const MapHandler = ({ place, marker }: MapHandlerProps) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!map || !place || !marker) return;
-
-    if (place.geometry?.viewport) {
-      map.fitBounds(place.geometry?.viewport);
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    setValue(newValue as number[]);
+    if (Array.isArray(newValue)) {
+      setComprehensiveeProductFilters({
+        ...comprehensiveProductFilters,
+        min_price: newValue[0].toString(),
+        max_price: newValue[1].toString(),
+      } as ComprehensiveProductFilters);
     }
-    marker.position = place.geometry?.location;
-  }, [map, place, marker]);
-
-  return null;
-};
-
-interface PlaceAutocompleteProps {
-  onPlaceSelect: (place: google.maps.places.PlaceResult | null) => void;
-}
-
-const PlaceAutocomplete = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
-  const [placeAutocomplete, setPlaceAutocomplete] =
-    useState<google.maps.places.Autocomplete | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const places = useMapsLibrary("places");
-
-  useEffect(() => {
-    if (!places || !inputRef.current) return;
-
-    const options = {
-      fields: ["geometry", "name", "formatted_address"],
-    };
-
-    setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
-  }, [places]);
-
-  useEffect(() => {
-    if (!placeAutocomplete) return;
-
-    placeAutocomplete.addListener("place_changed", () => {
-      onPlaceSelect(placeAutocomplete.getPlace());
-    });
-  }, [onPlaceSelect, placeAutocomplete]);
+  };
 
   return (
-    <div className="autocomplete-container py-1 w-full">
-      <div className="flex justify-center items-center w-full mb-5 lg:mb-5 md:mb-5 xl:mb-5">
-        <div className="flex items-center w-[80%] border rounded-full px-3">
-          <Search className="text-gray-400" />
-          <input
-            type="text"
-            id="autocomplete"
-            placeholder="Search for locations"
-            className="w-full px-3 bg-transpatent outline-none border-none"
-            ref={inputRef}
-          />
+    <UniversalModal
+      theme={themeMode}
+      open={true}
+      title={"Filters"}
+      content={
+        <div className="md:px-2">
+          <div className="mb-3">
+            <FilterAccordion title="Pricing">
+              <Box sx={{ width: "100%" }}>
+                <Slider
+                  getAriaLabel={() => "Price range"}
+                  value={value}
+                  onChange={handleChange}
+                  valueLabelDisplay="auto"
+                  min={0}
+                  max={100000}
+                  sx={{
+                    color: "#FC8135",
+                    height: "5px",
+                    "& .MuiSlider-thumb": {
+                      backgroundColor: "#FFF",
+                    },
+                    "& .MuiSlider-track": {
+                      backgroundColor: "#FC8135",
+                    },
+                    "& .MuiSlider-rail": {
+                      backgroundColor: "#E3E3E3",
+                    },
+                  }}
+                />
+                <div className="flex justify-between items-center">
+                  <div className="text-center space-y-2">
+                    <p className="text-center">Minimum</p>
+                    <p className="text-sm border border-gray-400 rounded-lg p-2">
+                      KES{" "}
+                      {addCommaSeparators(
+                        parseInt(
+                          comprehensiveProductFilters?.min_price as string
+                        )
+                      ) || 0}
+                    </p>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-center">Maximum</p>
+                    <p className="text-sm border border-gray-400 rounded-lg p-2">
+                      KES{" "}
+                      {addCommaSeparators(
+                        parseInt(
+                          comprehensiveProductFilters?.max_price as string
+                        )
+                      ) || 0}
+                    </p>
+                  </div>
+                </div>
+              </Box>
+            </FilterAccordion>
+          </div>
+          <div className="mb-3">
+            <FilterAccordion title="Dates">
+              <div className="mb-4">
+                <div className="mb-4">
+                  <p className="font-medium">Date range</p>
+                </div>
+                <div className="flex gap-6">
+                  <div className="w-1/2">
+                    <p>From</p>
+                    <input
+                      type="date"
+                      placeholder="From"
+                      className=" p-2 border border-gray-300 rounded w-full"
+                      value={comprehensiveProductFilters?.start_date}
+                      onChange={(e) =>
+                        setComprehensiveeProductFilters({
+                          ...comprehensiveProductFilters,
+                          start_date: e.target.value,
+                        } as ComprehensiveProductFilters)
+                      }
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <p>To</p>
+                    <input
+                      type="date"
+                      placeholder="To"
+                      className=" p-2 border border-gray-300 rounded w-full"
+                      value={comprehensiveProductFilters?.end_date}
+                      onChange={(e) =>
+                        setComprehensiveeProductFilters({
+                          ...comprehensiveProductFilters,
+                          end_date: e.target.value,
+                        } as ComprehensiveProductFilters)
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </FilterAccordion>
+          </div>
+          <div className="mb-3">
+            <FilterAccordion title="Location">
+              <div className="flex">
+                <div className="w-1/2">
+                  {KENYAN_COUNTIES?.slice(
+                    0,
+                    Math.ceil(KENYAN_COUNTIES.length / 2)
+                  ).map((county: County, index: number) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Checkbox
+                        className="text-primary"
+                        checked={comprehensiveProductFilters?.locations?.some(
+                          (loc) => loc === county
+                        )}
+                        onClick={() => toggleLocationFilter(county)}
+                      />
+                      <p className="">{county?.name}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="w-1/2">
+                  {KENYAN_COUNTIES?.slice(
+                    Math.ceil(KENYAN_COUNTIES.length / 2)
+                  ).map((county: County, index: number) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Checkbox
+                        className="text-primary"
+                        checked={comprehensiveProductFilters?.locations?.some(
+                          (loc) => loc === county
+                        )}
+                        onClick={() => toggleLocationFilter(county)}
+                      />
+                      <p className="">{county?.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FilterAccordion>
+          </div>
+          <div className="mb-3">
+            <FilterAccordion title="Category">
+              <div className="mb-4 ">
+                <div>
+                  {productCategories?.map(
+                    (category: ProductCategory, index: number) => (
+                      <div key={index} className="flex items-center space-x-1">
+                        <Checkbox
+                          className="text-primary"
+                          checked={comprehensiveProductFilters?.categoies?.includes(
+                            category?.id
+                          )}
+                          onClick={() => toggleCategoryFilter(category?.id)}
+                        />
+                        <p className="">{category?.name}</p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </FilterAccordion>
+          </div>
         </div>
-      </div>
-    </div>
+      }
+      showDividers={true}
+      footer={
+        <div className="flex justify-between gap-6 bg-white w-full py-2 px-2">
+          <Button
+            width="w-full"
+            bg="bg-primary"
+            borderRadius="rounded"
+            margin="mb-2"
+            text="text-black"
+            padding="py-2 px-2 md:px-3"
+            isSecondary
+            onClick={() => clearProductComprehensiveFilters()}
+          >
+            Clear Filters
+          </Button>
+          <Button
+            width="w-full"
+            bg="bg-primary"
+            borderRadius="rounded"
+            margin="mb-2"
+            text="text-white"
+            padding="py-2 px-2 md:px-3"
+            onClick={() =>
+              fetchFilteredProducts(
+                comprehensiveProductFilters as ComprehensiveProductFilters
+              )
+            }
+          >
+            Apply Filters
+          </Button>
+        </div>
+      }
+    />
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const { productFilters } = state.products;
+  const { comprehensiveProductFilters } = state.products;
   const { productCategories, currencies } = state.settings;
   return {
-    productFilters,
+    comprehensiveProductFilters,
     productCategories,
     currencies,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
-  setProductFilters: (payload: ComprehensiveProductFilters) =>
-    dispatch.products.getProducts(payload),
-  clearProductFilters: () => dispatch.products.clearProductFilters(),
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  setComprehensiveeProductFilters: (payload: ComprehensiveProductFilters) =>
+    dispatch.products.setComprehensiveeProductFilters(payload),
+  toggleCategoryFilter: (categoryId: string) =>
+    dispatch.products.toggleCategoryFilter(categoryId),
+  toggleLocationFilter: (location: County) =>
+    dispatch.products.toggleLocationFilter(location),
+  clearProductComprehensiveFilters: () =>
+    dispatch.products.clearProductComprehensiveFilters(),
+  fetchFilteredProducts: (filters: ComprehensiveProductFilters) => {
+    dispatch.products.getPopularProducts(filters);
+    dispatch.products.getNearByProducts(filters);
+    dispatch.products.getPopularProducts(filters);
+    dispatch.products.getRecommendedProducts(filters);
+    dispatch.products.getUpcomingProducts(filters);
+    dispatch.components.setActiveModal(ModalID.none);
+  },
 });
 
 export default connect(

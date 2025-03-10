@@ -1,7 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
-import Image from "next/image";
+import React, { FC, useState } from "react";
 import Button from "@/components/shared/button";
-import { Calendar } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -10,33 +8,23 @@ import {
   CartSummary,
   Product,
   ProductPricing,
-  SessionPricingCategory,
-  TicketPricingCategory,
 } from "@/domain/product";
-import {
-  CalendarClock,
-  ChevronDownCircle,
-  Mail,
-  Phone,
-  Ticket,
-  User,
-  UserCheck,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Mail, Phone, User, UserCheck } from "lucide-react";
 import * as yup from "yup";
 import { useForm, Controller, ErrorOption } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInputAuth from "@/components/auth/FormInputAuth";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
-import { addCommaSeparators, generateUUID } from "@/utilities";
-import { Currency } from "@/domain/dto/output";
-import useIsMobile from "@/lib/hooks/useIsMobile";
+import { addCommaSeparators, generateUUID, getToken } from "@/utilities";
+import { AuthData, Currency } from "@/domain/dto/output";
+import { Checkbox, CircularProgress } from "@mui/material";
+import { ModalID } from "@/domain/components";
+import { NewTicketPayload } from "@/domain/dto/ticket";
 import {
-  TICKET_PRICING_CATEGORIES,
   SESSION_PRICING_CATEGORIES,
+  TICKET_PRICING_CATEGORIES,
 } from "@/constants";
-import Link from "next/link";
 
 type TicketBookingSummaryProps = {
   productsRequestProcessing: boolean;
@@ -49,77 +37,52 @@ type TicketBookingSummaryProps = {
   clearCart: () => void;
   setFailureAlert: (message: string) => void;
   setProductDetailsToCart: (payload: CartSummary) => void;
-  selectedPricing: ProductPricing;
-  selselectedDate: Date | null;
+  addUserDetailsToCart: (payload: CartItem) => Promise<void>;
+  authData: AuthData;
+  setActiveModal: (modalId: ModalID) => void;
+  bookTicket: (payload: Array<NewTicketPayload>) => void;
+  isProcessingRequest: boolean;
 };
-
-enum TicketType {
-  singleTicket = "SINGLE_TICKET",
-  bulkTickets = "BULK_TICKETS",
-}
-
-const defaultValues = {
-  ticket_type: TicketType.singleTicket,
-  name: "",
-  id_number: "",
-  phone_number: "",
-  email: "",
-  date: "",
-  quantity: 0,
-  pricing: "",
-};
-
-export interface FormData {
-  ticket_type?: string;
-  name: string;
-  id_number: string;
-  phone_number: string;
-  email: string;
-  date: string;
-  quantity?: number;
-  pricing: string;
-}
-
-export const schema = yup.object().shape({
-  ticket_type: yup.string(),
-  name: yup.string().required("Name is required"),
-  id_number: yup.string().required("ID Number is required"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Provide a valid email address"),
-  phone_number: yup.string().required("Phone number is required"),
-  date: yup.string().required("Date is required"),
-  quantity: yup
-    .number()
-    .min(1, "Quantity must be at least 1")
-    .required("Quantity is required"),
-  pricing: yup.string().required("Pricing is required"),
-});
 
 const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
-  productsRequestProcessing,
-  product,
-  addToCart,
   cart,
-  removeFromCart,
-  currencies,
   cartSummary,
-  clearCart,
-  setFailureAlert,
+  addUserDetailsToCart,
+  authData,
   setProductDetailsToCart,
-  selectedPricing,
-  selselectedDate,
+  setActiveModal,
+  bookTicket,
+  isProcessingRequest,
+  setFailureAlert,
 }) => {
-  const isMobile = useIsMobile();
-  const [selectedDate, setSelectedDate] = useState<any>();
+  const defaultValues = {
+    name: authData?.user
+      ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+      : "",
+    id_number: authData?.user ? authData?.user?.id_number : "",
+    phone_number: authData?.user ? authData?.user?.phone_number : "",
+    email: authData?.user ? authData?.user?.email : "",
+  };
+
+  interface FormData {
+    name: string;
+    id_number: string;
+    phone_number: string;
+    email: string;
+  }
+
+  const schema = yup.object().shape({
+    name: yup.string().required("Name is required"),
+    id_number: yup.string().required("ID Number is required"),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Provide a valid email address"),
+    phone_number: yup.string().required("Phone number is required"),
+  });
   const {
     control,
-    setError,
     handleSubmit,
-    watch,
-    setValue,
-    getValues,
     formState: { errors },
   } = useForm({
     defaultValues,
@@ -128,298 +91,339 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    const {
-      phone_number,
-      email,
-      id_number,
-      name,
-      quantity,
-      pricing,
-      ticket_type,
-    } = data;
-    const ticketQuantity = quantity ?? 0;
-    const maxTickets = selectedPricing?.maximum_number_of_tickets ?? 0;
-    if (ticket_type === TicketType.singleTicket && cart?.length === 3) {
-      setFailureAlert(
-        "For single ticket booking you can book a maximum of 3 tickets"
-      );
+    const authToken = getToken();
+    if (!authToken) {
+      setActiveModal(ModalID.login);
       return;
     }
-    if (ticket_type === TicketType.bulkTickets) {
-      if (ticketQuantity > maxTickets) {
-        setFailureAlert(
-          `For this event you can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`
-        );
-        return;
-      }
 
-      if (
-        cartSummary?.total_items === maxTickets ||
-        cartSummary?.total_items > maxTickets ||
-        cartSummary?.total_items + ticketQuantity > maxTickets
-      ) {
-        setFailureAlert(
-          `For this event you can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`
-        );
-        return;
-      }
+    const { id_number } = data;
+
+    if (!cartSummary?.prefill_all_items_with_primary_user_details) {
+      let hasMissingFields: boolean = false;
+      cart
+        ?.filter((i: CartItem, index: number) => {
+          return index !== 0;
+        })
+        .map((item: CartItem) => {
+          if (
+            item.email === "" ||
+            item.name === "" ||
+            item.phone_number === ""
+          ) {
+            hasMissingFields = true;
+            setFailureAlert("You need to fill out all missing fields");
+            return;
+          }
+        });
+      if (hasMissingFields) return;
     }
 
-    const cost = product?.pricing?.find(
-      (pType: ProductPricing) => pType?.id === pricing
-    )?.cost;
-    addToCart({
-      id: generateUUID(),
-      phone_number: phone_number,
-      email: email,
-      id_number: id_number,
-      quantity: quantity || 1,
-      name: name,
-      total: parseInt(cost as string) * (quantity as number),
-      product_id: product?.id,
-      product_thumbnail: product?.image?.file,
-      pricing_type: pricing,
-    } as CartItem);
+    bookTicket(
+      cart.map((item: CartItem) => ({
+        name: item?.name,
+        id_number: id_number,
+        phone_number: item?.phone_number,
+        email: item?.email,
+        pricing: cartSummary?.product_base_pricing_id,
+      })) as Array<NewTicketPayload>
+    );
   };
 
-  useEffect(() => {
-    const ticketType = getValues("ticket_type");
-    if (ticketType === TicketType.singleTicket) {
-      setValue("quantity", 1);
-      setValue("date", "");
-    } else {
-      setValue("quantity", 0);
-      setValue("date", "");
-    }
-  }, [watch("ticket_type")]);
-
-  useEffect(() => {
-    setProductDetailsToCart({
-      ...cartSummary,
-      product_id: product?.id,
-      product_title: product?.name,
-      product_thumbnail: product?.image?.file,
-      product_location: product?.locations[0]?.coordinates,
-    } as CartSummary);
-  }, []);
-
   return (
-    <div>
-      <div className="border-">
+      <div>
         <div className="w-full space-x-0">
           {/* Pricing Summary */}
           <div className="bg-[#FBFBFB] p-2">
-            <p className="text-lg">Summary</p>
-            <p className="flex justify-between text-gray-500 text-sm">
-              Ticket price:
+            <p className="text-lg font-medium">Summary</p>
+            <p className="flex font-light text-sm">
+              <span className="me-2">Date:</span>
+              <span>{`${cartSummary?.selected_date || "N/A"} `}</span>
+            </p>
+            <p className="flex items-center font-light text-sm">
+              <span className="me-2">Session:</span>
+              <span>{`${cartSummary?.time || "N/A"} `}</span>
+            </p>
+            <p className="flex justify-between font-light text-sm">
+              <span>
+                {cartSummary?.total_items} *{" "}
+                {
+                  TICKET_PRICING_CATEGORIES.concat(
+                    SESSION_PRICING_CATEGORIES
+                  ).find(
+                    (p: any) => p.key === cartSummary?.product_base_pricing_type
+                  )?.title
+                }
+              </span>
               <span className="font-semibold">
-                {addCommaSeparators(
-                  parseInt(cartSummary?.product_base_price)
-                ) || 0}
+                {cartSummary?.total_price
+                  ? addCommaSeparators(cartSummary?.total_price)
+                  : 0}
               </span>
             </p>
-            <p className="flex justify-between text-gray-500 text-sm">
-              Number of Tickets:{" "}
-              <span className="font-semibold">
-                {cartSummary?.total_items || 0}
-              </span>
-            </p>
-            <p className="flex justify-between text-black font-semibold">
-              Total:
+            <p className="flex items-center text-black font-medium">
+              <span className="me-1">Total =</span>
               <span>
                 <span className="me-1">
-                  {
-                    currencies?.find(
-                      (currency: Currency) =>
-                        currency.id === product?.pricing[0]?.currency
-                    )?.code
-                  }
+                  {cartSummary?.product_base_currency}
                 </span>
-                <span>{addCommaSeparators(cartSummary?.total_price) || 0}</span>
+                <span>
+                  {cartSummary?.total_price
+                    ? addCommaSeparators(cartSummary?.total_price)
+                    : 0}
+                </span>
               </span>
             </p>
           </div>
           {/* Ticket Selection */}
-          <div className="mt-4 w-full">
-            <p className="text-sm"><strong>Ticket #1</strong> -Per session</p>
-            <div className="w-full pb-1">
-              <form
-                noValidate
-                autoComplete="off"
-                onSubmit={handleSubmit(onSubmit)}
-                className=""
-              >
-                <div className="space-y-4 py-3">
-                  <Controller
-                    name="name"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field: { value, onChange } }) => (
-                      <FormInputAuth
-                        id="name"
-                        name="name"
-                        type="text"
-                        placeholder="Name"
-                        onChange={onChange}
-                        value={value}
-                        icon={
-                          <User className="w-4 h-4 text-white fill-gray-500" />
+          <div className="mt-4 w-full pb-1">
+            <form
+              noValidate
+              autoComplete="off"
+              onSubmit={handleSubmit(onSubmit)}
+              className=""
+            >
+              <div>
+                {cart
+                  ?.filter((i: CartItem, index: number) => {
+                    if (
+                      !cartSummary?.prefill_all_items_with_primary_user_details
+                    ) {
+                      return true;
+                    } else {
+                      return index === 0;
+                    }
+                  })
+                  .map((item: CartItem, index: number) => (
+                    <div className="space-y-4 py-3" key={index}>
+                      <p className="text-sm">
+                        <strong>Ticket #{index + 1}</strong> -{" "}
+                        {
+                          TICKET_PRICING_CATEGORIES.concat(
+                            SESSION_PRICING_CATEGORIES
+                          ).find(
+                            (p: any) =>
+                              p.key === cartSummary?.product_base_pricing_type
+                          )?.title
                         }
-                        error={errors?.name?.message}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="id_number"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field: { value, onChange } }) => (
-                      <FormInputAuth
-                        id="id_number"
-                        name="id_number"
-                        type="text"
-                        placeholder="ID/Passport Number"
-                        onChange={onChange}
-                        value={value}
-                        icon={
-                          <UserCheck className="w-4 h-4 text-white fill-gray-500" />
-                        }
-                        error={errors?.id_number?.message}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="phone_number"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field: { value, onChange } }) => (
-                      <FormInputAuth
-                        id="phone_number"
-                        name="phone_number"
-                        type="text"
-                        placeholder="Phone Number"
-                        onChange={onChange}
-                        value={value}
-                        icon={
-                          <Phone className="w-4 h-4 text-white fill-gray-500" />
-                        }
-                        error={errors?.phone_number?.message}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="email"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field: { value, onChange } }) => (
-                      <FormInputAuth
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        onChange={onChange}
-                        value={value}
-                        icon={
-                          <Mail className="w-4 h-4 text-white fill-gray-500" />
-                        }
-                        error={errors?.email?.message}
-                      />
-                    )}
-                  />
-                  {/* Date Selection Mobile */}
-                  {isMobile && (
-                    <Controller
-                      name="date"
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field: { value, onChange } }) => (
-                        <FormInputAuth
-                          id="date"
-                          name="date"
-                          type="date"
-                          placeholder="Date"
-                          onChange={onChange}
-                          value={value}
-                          icon={
-                            <CalendarClock className="w-4 h-4 text-white fill-gray-500" />
-                          }
-                          error={errors?.date?.message}
+                      </p>
+                      {index === 0 ? (
+                        <Controller
+                          name="name"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { value, onChange } }) => (
+                            <FormInputAuth
+                              id="name"
+                              name="name"
+                              type="text"
+                              placeholder="Name"
+                              onChange={(e) => {
+                                addUserDetailsToCart({
+                                  ...item,
+                                  name: e.target.value,
+                                } as CartItem);
+                                onChange(e);
+                              }}
+                              value={value}
+                              icon={
+                                <User className="w-4 h-4 text-white fill-gray-500" />
+                              }
+                              error={errors?.name?.message}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                  )}
-                  {watch("ticket_type") === TicketType.bulkTickets && (
-                    <Controller
-                      name="quantity"
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field: { value, onChange } }) => (
+                      ) : (
                         <FormInputAuth
-                          id="quantity"
-                          name="quantity"
-                          type="number"
-                          placeholder="Number of tickets"
+                          id={`name-${index}`}
+                          name={`name-${index}`}
+                          type="text"
+                          placeholder="Name"
                           onChange={(e) => {
-                            if (
-                              selectedPricing &&
-                              parseInt(e.target.value) >
-                                selectedPricing?.maximum_number_of_tickets
-                            ) {
-                              setError("quantity", {
-                                message: `You can book a maximum of ${selectedPricing?.maximum_number_of_tickets} tickets`,
-                              } as ErrorOption);
-                            } else {
-                              setError("quantity", {
-                                message: "",
-                              } as ErrorOption);
-                            }
-                            onChange(e);
+                            addUserDetailsToCart({
+                              ...item,
+                              name: e.target.value,
+                            } as CartItem);
                           }}
-                          value={value?.toString()}
                           icon={
-                            <Ticket className="w-4 h-4 text-white fill-gray-500" />
+                            <User className="w-4 h-4 text-white fill-gray-500" />
                           }
-                          error={errors?.quantity?.message}
                         />
                       )}
-                    />
+
+                      {index === 0 && (
+                        <Controller
+                          name="id_number"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { value, onChange } }) => (
+                            <FormInputAuth
+                              id="id_number"
+                              name="id_number"
+                              type="text"
+                              placeholder="ID/Passport Number"
+                              onChange={(e) => {
+                                addUserDetailsToCart({
+                                  ...item,
+                                  id_number: e.target.value,
+                                } as CartItem);
+                                if (index === 0) {
+                                  onChange(e);
+                                }
+                              }}
+                              value={value}
+                              icon={
+                                <UserCheck className="w-4 h-4 text-white fill-gray-500" />
+                              }
+                              error={errors?.id_number?.message}
+                            />
+                          )}
+                        />
+                      )}
+
+                      {index === 0 ? (
+                        <Controller
+                          name="phone_number"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { value, onChange } }) => (
+                            <FormInputAuth
+                              id="phone_number"
+                              name="phone_number"
+                              type="text"
+                              placeholder="Phone Number"
+                              onChange={(e) => {
+                                addUserDetailsToCart({
+                                  ...item,
+                                  phone_number: e.target.value,
+                                } as CartItem);
+                                onChange(e);
+                              }}
+                              value={value}
+                              icon={
+                                <Phone className="w-4 h-4 text-white fill-gray-500" />
+                              }
+                              error={errors?.phone_number?.message}
+                            />
+                          )}
+                        />
+                      ) : (
+                        <FormInputAuth
+                          id={`phone_number-${index}`}
+                          name={`phone_number-${index}`}
+                          type="text"
+                          placeholder="Phone Number"
+                          onChange={(e) => {
+                            addUserDetailsToCart({
+                              ...item,
+                              phone_number: e.target.value,
+                            } as CartItem);
+                          }}
+                          icon={
+                            <Phone className="w-4 h-4 text-white fill-gray-500" />
+                          }
+                        />
+                      )}
+                      {index === 0 ? (
+                        <Controller
+                          name="email"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { value, onChange } }) => (
+                            <FormInputAuth
+                              id="email"
+                              name="email"
+                              type="email"
+                              placeholder="Email"
+                              onChange={(e) => {
+                                addUserDetailsToCart({
+                                  ...item,
+                                  email: e.target.value,
+                                } as CartItem);
+                                if (index === 0) {
+                                  onChange(e);
+                                }
+                              }}
+                              value={value}
+                              icon={
+                                <Mail className="w-4 h-4 text-white fill-gray-500" />
+                              }
+                              error={errors?.email?.message}
+                            />
+                          )}
+                        />
+                      ) : (
+                        <FormInputAuth
+                          id={`email-${index}`}
+                          name={`email-${index}`}
+                          type="email"
+                          placeholder="Email"
+                          onChange={(e) => {
+                            addUserDetailsToCart({
+                              ...item,
+                              email: e.target.value,
+                            } as CartItem);
+                          }}
+                          icon={
+                            <Mail className="w-4 h-4 text-white fill-gray-500" />
+                          }
+                        />
+                      )}
+                    </div>
+                  ))}
+              </div>
+              <div className="flex justify-center items-center py-3 mt-2 rounded shadow bg-white">
+                <p className="text-black text-sm">
+                  Do you want to enter each ticket's name one by one?
+                </p>
+                <span>
+                  <Checkbox
+                    checked={
+                      cartSummary?.prefill_all_items_with_primary_user_details
+                    }
+                    onChange={() => {
+                      setProductDetailsToCart({
+                        ...cartSummary,
+                        prefill_all_items_with_primary_user_details:
+                          !cartSummary?.prefill_all_items_with_primary_user_details,
+                      } as CartSummary);
+                    }}
+                  />
+                </span>
+              </div>
+              <div className="text-center">
+                <Button
+                  width="w-full"
+                  bg="bg-primary"
+                  borderRadius="rounded"
+                  text="text-white font-base"
+                  padding="py-3"
+                  margin="mt-4"
+                  type="submit"
+                >
+                  {isProcessingRequest ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    "Proceed to pay"
                   )}
-                </div>
-                <div className="flex justify-center items-center py-2 mt-2 rounded shadow bg-white">
-                  <p className="text-black text-sm">
-                    Do you want to enter each ticket’s name one by one?
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Button
-                    width="w-full"
-                    bg="bg-primary"
-                    borderRadius="rounded"
-                    text="text-white font-base"
-                    padding="py-2"
-                    margin="mt-4"
-                  >
-                    Proceed to pay
-                  </Button>
-                </div>
-              </form>
-            </div>
+                </Button>
+              </div>
+            </form>
           </div>
           <div className=""></div>
         </div>
       </div>
-    </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.authentication;
+  const isProcessingRequest = state.loading.effects.tickets.bookTicket;
   const { isLoggedIn, authData } = state.authentication;
   const { cart, cartSummary } = state.products;
   const { message, type } = state.alert;
   const { currencies } = state.settings;
   return {
-    loading,
+    isProcessingRequest,
     isLoggedIn,
     message,
     authData,
@@ -437,6 +441,12 @@ const mapDispatchToProps = (dispatch: any) => ({
   setProductDetailsToCart: (payload: CartSummary) =>
     dispatch.products.setProductDetailsToCart(payload),
   setFailureAlert: (message: string) => dispatch.alert.setFailureAlert(message),
+  addUserDetailsToCart: async (payload: CartItem) =>
+    dispatch.products.addUserDetailsToCart(payload),
+  setActiveModal: (modalId: ModalID) =>
+    dispatch.components.setActiveModal(modalId),
+  bookTicket: (payload: Array<NewTicketPayload>) =>
+    dispatch.tickets.bookTicket(payload),
 });
 
 export default connect(

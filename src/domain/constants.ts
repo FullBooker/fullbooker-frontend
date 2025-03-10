@@ -30,3 +30,9 @@ export enum PricingTickerTier {
   last_minute = "last_minute",
   early_bird = "early_bird"
 }
+
+export enum DeviceType {
+  mobile = "mobile",
+  desktop = "desktop",
+  tablet ="tablet"
+}

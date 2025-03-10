@@ -19,6 +19,7 @@ import { CircularProgress } from "@mui/material";
 import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { KeyRound } from "lucide-react";
+import Button from "@/components/shared/button";
 
 type LoginModalContentProps = {
   loading: boolean;
@@ -104,9 +105,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 onChange={onChange}
                 value={value}
                 error={errors?.password?.message}
-                icon={
-                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<KeyRound className="w-4 h-4 text-white fill-gray-500" />}
                 is_password={true}
               />
             )}
@@ -125,9 +124,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
                 onChange={onChange}
                 value={value}
                 error={errors?.confirm_password?.message}
-                icon={
-                  <KeyRound className="w-4 h-4 text-white fill-gray-500" />
-                }
+                icon={<KeyRound className="w-4 h-4 text-white fill-gray-500" />}
                 is_password={true}
               />
             )}
@@ -135,12 +132,17 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
         </div>
 
         <div className="text-center mt-20">
-          <button
+          <Button
+            width="w-full md:w-[80%]"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white font-base"
+            padding="py-3"
+            margin="mb-2"
             type="submit"
-            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md hover:opacity-3"
           >
             {loading ? <CircularProgress size={18} color="inherit" /> : "Save"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { FC} from "react";
+import { FC } from "react";
 
 import { ModalID } from "@/domain/components";
 import { KeyRound } from "lucide-react";
+import Button from "@/components/shared/button";
 
 type PasswordResetSuccessfullModalContentProps = {
   setActiveModal: (modalId: ModalID) => void;
@@ -37,12 +38,18 @@ const PasswordResetSuccessfullModal: FC<
       </div>
 
       <div className="text-center mt-20">
-        <button
-          className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md"
+        <Button
+          width="w-full md:w-[80%]"
+          bg="bg-primary"
+          borderRadius="rounded"
+          text="text-white font-base"
+          padding="py-3"
+          margin="mb-2"
+          type="submit"
           onClick={() => setActiveModal(ModalID.login)}
         >
           Sign In
-        </button>
+        </Button>
       </div>
     </div>
   );

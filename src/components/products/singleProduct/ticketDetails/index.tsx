@@ -511,7 +511,6 @@ const TicketDetails: FC<TicketDetailsProps> = ({
                               {item?.email}
                             </td>
                             <td className="py-3 px-3 text-sm border text-center">
-                              {item?.quantity}
                             </td>
                             <td className="py-3 px-3 text-center">
                               <Button

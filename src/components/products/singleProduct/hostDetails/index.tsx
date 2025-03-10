@@ -1,27 +1,21 @@
 import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/shared/button";
+import { ProductHost } from "@/domain/product";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
+import { Star } from "lucide-react";
 
 type HostDetailsProps = {
   productsRequestProcessing: boolean;
+  host: ProductHost;
 };
 
-const HostDetails: FC<HostDetailsProps> = ({ productsRequestProcessing }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+const HostDetails: FC<HostDetailsProps> = ({
+  productsRequestProcessing,
+  host,
+}) => {
+  const device = useDeviceType();
   return (
     <div>
       {productsRequestProcessing ? (
@@ -58,13 +52,54 @@ const HostDetails: FC<HostDetailsProps> = ({ productsRequestProcessing }) => {
               src="/assets/default-profile-picture-placeholder.jpg"
               className="w-24 h-24 rounded-full mb-4 object-cover"
               alt={"Host Profile Image"}
-              width={isMobile ? 50 : 50}
-              height={isMobile ? 50 : 50}
+              width={device === DeviceType.mobile ? 50 : 50}
+              height={device === DeviceType.mobile ? 50 : 50}
             />
             {/* Host Name */}
-            <h2 className="text-xl font-semibold">Kelvin Laichen</h2>
+            <h2 className="text-xl font-semibold">
+              {" "}
+              {host?.user?.first_name
+                ? `${host?.user?.first_name} ${host?.user?.last_name}`
+                : "N/A"}
+            </h2>
             {/* Rating */}
-            <p className="text-lg font-bold">★★★★★</p>
+            <div className="flex space-x-1">
+                      <Star
+                        className="h-4 w-4"
+                        fill="#E4A70A"
+                        style={{
+                          color: "#E4A70A",
+                        }}
+                      />
+                      <Star
+                        className="h-4 w-4"
+                        fill="#E4A70A"
+                        style={{
+                          color: "#E4A70A",
+                        }}
+                      />
+                      <Star
+                        className="h-4 w-4"
+                        fill="#E4A70A"
+                        style={{
+                          color: "#E4A70A",
+                        }}
+                      />
+                      <Star
+                        className="h-4 w-4"
+                        fill="#E4A70A"
+                        style={{
+                          color: "#E4A70A",
+                        }}
+                      />
+                      <Star
+                        className="h-4 w-4"
+                        fill="#DDDDDD"
+                        style={{
+                          color: "#DDDDDD",
+                        }}
+                      />
+                    </div>
             {/* Message */}
             <p className="font-light mt-2">
               Thank you so much for considering this activity. Can't wait to see
@@ -85,7 +120,7 @@ const HostDetails: FC<HostDetailsProps> = ({ productsRequestProcessing }) => {
               extraClasses=""
               margin="mt-2"
               borderRadius="rounded-lg"
-              text="w-full md:w-[60%]"
+              text="w-full md:w-[60%] text-white"
             >
               Message Host
             </Button>

@@ -23,7 +23,7 @@ const CategoryProductsOutlet: FC<CategoryProductsOutletProps> = ({
   path,
 }) => {
   return (
-    <div className="px-2 md:px-3 lg:px-4 bg-white">
+    <div className="px-2 md:px-3 lg:px-4 bg-white mb-4">
       <div className="px-4 md:px-7">
         <div className="flex justify-between items-center mb-4 md:mb-6">
           <h2 className="text-base md:text-xl font-semibold">{title}</h2>

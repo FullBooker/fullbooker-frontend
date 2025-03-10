@@ -23,6 +23,7 @@ import { FC, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import useOtpTimer from "@/lib/useOTPTimer";
 import { hideMiddleCharacters } from "@/utilities/helpers";
+import Button from "@/components/shared/button";
 
 type PhoneOtpVerificationModalContentProps = {
   loading: boolean;
@@ -140,33 +141,43 @@ const PhoneOtpVerificationModalContent: FC<
 
         <div className="text-center">
           {!isResendDisabled && (
-          <button
-            className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
-            onClick={() => {
-              resendOTP({
-                identifier: identifierToBeVerified,
-              } as RequestOTPPayload);
-              handleResendClick();
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={18} color="inherit" />
-            ) : (
-              "Resend Code"
-            )}
-          </button>
+            <Button
+              width="w-full md:w-[80%]"
+              bg="bg-primary"
+              borderRadius="rounded"
+              text="text-white font-base"
+              padding="py-3"
+              margin="mb-2"
+              onClick={() => {
+                resendOTP({
+                  identifier: identifierToBeVerified,
+                } as RequestOTPPayload);
+                handleResendClick();
+              }}
+            >
+              {loading ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                "Resend Code"
+              )}
+            </Button>
           )}
           <div className="text-center mt-20">
-            <button
+            <Button
+              width="w-full md:w-[80%]"
+              bg="bg-primary"
+              borderRadius="rounded"
+              text="text-white font-base"
+              padding="py-3"
+              margin="mb-2"
               type="submit"
-              className="sm:w-full xs:w-full lg:w-[80%] md:w-[80%] w-full bg-primary text-white py-2 rounded-md mb-2"
             >
               {loading ? (
                 <CircularProgress size={18} color="inherit" />
               ) : (
                 "Continue"
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </form>

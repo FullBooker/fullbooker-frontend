@@ -72,7 +72,6 @@ const BottomNavBar: FC<BottomNavBarProps> = ({
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
-  ``;
 
   return (
     <div className="lg:hidden md:hidden">
