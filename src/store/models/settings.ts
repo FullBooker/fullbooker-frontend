@@ -67,7 +67,7 @@ export const settings = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getCurrencies(payload, rootState) {
+    async getCurrencies() {
       try {
         const response: any = await getRequest("/currencies/");
 
