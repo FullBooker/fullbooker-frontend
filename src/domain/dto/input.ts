@@ -1,5 +1,5 @@
 import { MediaType, PricingTickerTier, PricingType } from "../constants";
-import { ProductPricing } from "../product";
+import { ProductMedia, ProductPricing } from "../product";
 
 export type NewUserPayload = {
   phone_number: string;
@@ -70,13 +70,19 @@ export type NewProductPayload = {
   subcategory?: string;
   locations: Array<any>;
   availability?: {
-    duration?: number,
-    start?: string;
-    end?: string;
-    start_time?: string;
-    end_time?: string;
+    id?: string;
+    product: string;
+    product_name: string;
+    start: string | null;
+    end: string | null;
+    start_time: string | null;
+    end_time: string | null;
+    duration: number;
+    open_days: Array<OpenDay>;
+    closed_dates: Array<string>;
   };
-  pricing: Array<ProductPricing>
+  pricing: Array<ProductPricing>;
+  image?: ProductMedia;
 };
 
 export type UpdateProductPayload = {
@@ -91,8 +97,8 @@ export type UpdateProductPayload = {
 export type ProductsFilters = {
   page: number;
   page_size: number;
+  category?: string;
 };
-
 
 export type VendorProductsFilters = {
   page: number;
@@ -109,16 +115,18 @@ export type AddProductLocationPayload = {
   product: string;
   lat: number;
   long: number;
-  address: string;
+  address: any;
 };
 
 export type UpdateProductLocationPayload = {
+  id: string;
   product: string;
   lat: number;
   long: number;
 };
 
 export interface OpenDay {
+  id: string;
   day: string;
   opening_at: string;
   closing_at: string;
@@ -139,6 +147,18 @@ export interface ProductAvailabilityPayload {
   closed_dates?: ClosedDate[];
 }
 
+export interface UpdateProductAvailabilityPayload {
+  id: string;
+  product?: string;
+  start?: string;
+  start_time?: string;
+  end_time?: string;
+  end?: string;
+  duration?: number;
+  open_days?: OpenDay[];
+  closed_dates?: ClosedDate[];
+}
+
 export type DeleteProductMediaPayload = {
   file_id: any;
   media_type: MediaType;
@@ -151,6 +171,14 @@ export interface ProductPricingPayload {
   cost: number;
   type?: PricingType | string;
   ticket_tier?: PricingTickerTier | string;
+  maximum_number_of_tickets: number;
+}
+
+export interface UpdateProductPricingPayload {
+  product: string;
+  id: string;
+  currency: string;
+  cost: number;
   maximum_number_of_tickets: number;
 }
 

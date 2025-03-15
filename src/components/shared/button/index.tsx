@@ -1,7 +1,7 @@
 interface ButtonAuthProps {
   children: React.ReactNode;
   type?: any;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: () => any;
   disabled?: boolean;
   bg?: string;
   padding?: string;
@@ -29,19 +29,19 @@ const Button: React.FC<ButtonAuthProps> = ({
   extraClasses,
   isSecondary = false,
 }) => {
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+  const handleClick = () => {
     if (onClick) {
-      onClick(event);
+      onClick();
     }
   };
 
   return (
     <button
       type={type}
-      className={`${padding || ''} ${margin || ''} ${borderRadius || ''} ${bg || ''} ${width || ''} ${height || ''} ${text || ''} transition-opacity duration-200 hover:opacity-40 ${
+      className={`cursor-pointer ${padding || ''} ${margin || ''} ${borderRadius || ''} ${bg || ''} ${width || ''} ${height || ''} ${text || ''} transition-opacity duration-200 hover:opacity-40 ${
         isSecondary ? "bg-transparent border border-black text-black" : ""
       } ${extraClasses}`}
-      onClick={handleClick}
+      onClick={() => handleClick()}
       disabled={disabled}
     >
       {children}

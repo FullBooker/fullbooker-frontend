@@ -1,17 +1,24 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { ProductType } from "@/domain/constants";
-import EventsPricing from "./eventsPricing";
-import OtherProductsPricing from "./otherProductsPricing";
+import EventsPricing from "./pricing/eventsPricing";
+import OtherProductsPricing from "./pricing/otherProductsPricing";
 
 type ProductPricingProps = {
   productType: ProductType;
+  getCurrencies: () => void;
 };
 
-const ProductPricing: FC<ProductPricingProps> = ({ productType }) => {
+const ProductPricing: FC<ProductPricingProps> = ({
+  productType,
+  getCurrencies,
+}) => {
+  useEffect(() => {
+    getCurrencies();
+  }, []);
   return (
     <div>
       {productType === ProductType.event ? (
@@ -30,6 +37,8 @@ const mapStateToProps = (state: RootState) => {
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({});
+const mapDispatchToProps = (dispatch: any) => ({
+  getCurrencies: () => dispatch.settings.getCurrencies(),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductPricing);

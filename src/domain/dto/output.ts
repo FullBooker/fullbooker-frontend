@@ -1,3 +1,5 @@
+import { Product } from "../product";
+
 export type AuthData = {
   user: User;
 };
@@ -17,6 +19,7 @@ export interface User {
   address: string;
   national_id: string;
   phone: string;
+  image?: string;
 }
 
 export interface VendorDetails {
@@ -63,4 +66,20 @@ export interface Currency {
   active: boolean;
   name: string;
   code: string;
+}
+
+export interface ProductTag {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  active: boolean;
+  name: string;
+  icon: string;
+}
+
+export interface VendorProductsAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<Product>;
 }

@@ -2,6 +2,7 @@ import {
   Currency,
   DayOfWeek,
   ProductCategory,
+  ProductTag,
   VendorDetails,
 } from "@/domain/dto/output";
 import type { RootModel } from ".";
@@ -13,6 +14,7 @@ type SettingsState = {
   productCategories: Array<ProductCategory>;
   daysOfWeek: Array<DayOfWeek>;
   currencies: Array<Currency>;
+  productTags: Array<ProductTag>;
 };
 
 export const settings = createModel<RootModel>()({
@@ -20,6 +22,7 @@ export const settings = createModel<RootModel>()({
     productCategories: [],
     daysOfWeek: [],
     currencies: [],
+    productTags: [],
   } as SettingsState,
   reducers: {
     setProductCategories(
@@ -29,6 +32,15 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         productCategories,
+      };
+    },
+    setProductTags(
+      state: SettingsState,
+      productTags: Array<ProductTag>
+    ) {
+      return {
+        ...state,
+        productTags,
       };
     },
     setDaysOfWeek(state: SettingsState, daysOfWeek: Array<DayOfWeek>) {
@@ -45,12 +57,23 @@ export const settings = createModel<RootModel>()({
     },
   },
   effects: (dispatch: any) => ({
-    async getProductCategories(payload, rootState) {
+    async getProductCategories() {
       try {
         const response: any = await getRequest("/categories/");
 
         if (response && response?.data) {
           dispatch.settings.setProductCategories(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getProductTags(payload, rootState) {
+      try {
+        const response: any = await getRequest("/tags/");
+
+        if (response && response?.data) {
+          dispatch.settings.setProductTags(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

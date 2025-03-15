@@ -1,65 +1,62 @@
 "use client";
 
 import React, { FC, useEffect } from "react";
-import { RootState } from "@/store";
+import { Dispatch, RootState } from "@/store";
 import { connect } from "react-redux";
-import { PricingType, ProductType } from "@/domain/constants";
-import { Currency } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addCommaSeparators } from "@/utilities";
-import { NewProductPayload, ProductPricingPayload } from "@/domain/dto/input";
+import {
+  NewProductPayload,
+  ProductPricingPayload,
+  UpdateProductPricingPayload,
+} from "@/domain/dto/input";
+import { ProductPricing, SessionPricingCategory } from "@/domain/product";
+import Button from "@/components/shared/button";
 
-type MonthlySubscriptionPricingProps = {
-  getCurrencies: () => void;
-  currencies: Array<Currency>;
-  fetchingCurrencies: boolean;
-  loading: boolean;
+type ActivityPricingProps = {
+  isProcessingRequest: boolean;
   addProductPricing: (payload: ProductPricingPayload) => void;
+  updateProductPricing: (payload: UpdateProductPricingPayload) => void;
   newProduct: NewProductPayload;
   currency: string;
+  pricingType: SessionPricingCategory;
 };
 
-const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
-  getCurrencies,
-  currencies,
-  fetchingCurrencies,
-  loading,
+const ActivityPricing: FC<ActivityPricingProps> = ({
+  isProcessingRequest,
   addProductPricing,
   newProduct,
   currency,
+  pricingType,
+  updateProductPricing,
 }) => {
-  useEffect(() => {
-    getCurrencies();
-  }, []);
-
-  interface PricingFormData {
-    currency: string;
-    pricePerSession: number;
-    bulkDiscount: number;
-    maximum_number_of_tickets: number;
-    pricePerDayPass: number;
-    bulkDayPassDiscount: number;
-    maxDayPassTickets: number;
-    pricePerSubscription: number;
-    bulkSubscriptionDiscount: number;
-    maxSubscriptionTickets: number;
-  }
-
   const schema = yup.object().shape({
-    currency: yup.string().required("Currency selection is required"),
-    pricePerSession: yup
-      .number()
-      .positive()
-      .required("Price per session is required"),
-    bulkDiscount: yup.number().min(0),
+    id: yup.string(),
+    currency: yup.string().required("Currency is required"),
+    cost: yup.number().positive().required("Price is required"),
+    bulk_discount: yup.number().min(0),
     maximum_number_of_tickets: yup
       .number()
       .positive()
-      .required("Maximum tickets per session is required"),
+      .required("Maximum tickets for this pricing is required"),
   });
+
+  const checkIdProductHasCurrentPricingInContext = (): boolean => {
+    return (
+      newProduct?.pricing?.filter(
+        (pricing: ProductPricing) => pricing.type === pricingType.key
+      )?.length > 0
+    );
+  };
+
+  const getExisitngProductPricing = (): ProductPricing => {
+    return newProduct?.pricing?.find(
+      (pricing: ProductPricing) => pricing.type === pricingType.key
+    ) as ProductPricing;
+  };
 
   const {
     control,
@@ -69,24 +66,46 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      currency: currency,
-      bulkDiscount: 0
-    },
+    defaultValues: checkIdProductHasCurrentPricingInContext()
+      ? (() => {
+          const existingPricing = getExisitngProductPricing();
+          return {
+            id: existingPricing?.id,
+            currency: existingPricing?.currency,
+            cost: parseInt(existingPricing?.cost),
+            bulk_discount: existingPricing?.bulk_discount,
+            maximum_number_of_tickets:
+              existingPricing?.maximum_number_of_tickets,
+          };
+        })()
+      : {
+          currency: currency,
+          bulk_discount: 0,
+        },
     mode: "onBlur",
   });
 
-  const onSubmitCostPerSession = (data: any) => {
-    addProductPricing({
-      product: newProduct?.id,
-      currency: currency,
-      cost:
-        data?.pricePerSession -
-        data?.bulkDiscount +
-        (0.05 * data?.pricePerSession - data?.bulkDiscount),
-      type: PricingType.monthly_subscription,
-      maximum_number_of_tickets: data?.maximum_number_of_tickets,
-    } as ProductPricingPayload);
+  const onSubmitPricing = (data: any) => {
+    const productHasCurrentPricingInContext =
+      checkIdProductHasCurrentPricingInContext();
+    const existingPricing = getExisitngProductPricing();
+    if (productHasCurrentPricingInContext) {
+      updateProductPricing({
+        id: existingPricing.id,
+        product: newProduct?.id,
+        currency: currency,
+        cost: data.cost,
+        maximum_number_of_tickets: data?.maximum_number_of_tickets,
+      } as UpdateProductPricingPayload);
+    } else {
+      addProductPricing({
+        product: newProduct?.id,
+        currency: currency,
+        cost: data.cost,
+        type: pricingType.key,
+        maximum_number_of_tickets: data?.maximum_number_of_tickets,
+      } as ProductPricingPayload);
+    }
   };
 
   useEffect(() => {
@@ -97,18 +116,18 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
     <div className="space-y-4 pb-6 col-span-1 grid md:grid-flow-col w-full gap-4">
       <div className="flex border-b border-primary pb-3 md:pb-12">
         <h3 className="flex items-center justify-center w-6 h-6 p-5 md:w-12 lg:w-12 xl:w-12 md:h-12 lg:h-12 xl:h-12 bg-black text-primary text-lg font-bold rounded-full shadow-lg me-4">
-          C
+          A
         </h3>
         <div className="space-y-2 w-full">
-          <form onSubmit={handleSubmit(onSubmitCostPerSession)}>
-            <p className="font-medium">Monthly Subscription</p>
+          <form onSubmit={handleSubmit(onSubmitPricing)}>
+            <p className="font-medium">{pricingType.title}</p>
             <label className="flex justify-between">
               <p className="font-light me-1">
-                Please enter the price per person per subscription
+                Please enter the price per person per {pricingType.label}
               </p>
               <div className="w-full">
                 <Controller
-                  name="pricePerSession"
+                  name="cost"
                   control={control}
                   render={({ field }) => (
                     <input
@@ -118,20 +137,20 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
                     />
                   )}
                 />
-                {errors.pricePerSession && (
+                {errors.cost && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.pricePerSession.message}
+                    {errors.cost.message}
                   </p>
                 )}
               </div>
             </label>
             <label className="flex justify-between mt-2">
               <p className="font-light me-1">
-                Any bulk booking discounts?(Optional)
+                Bulk booking discounts (Optional)
               </p>
               <div className="w-full">
                 <Controller
-                  name="bulkDiscount"
+                  name="bulk_discount"
                   control={control}
                   render={({ field }) => (
                     <input
@@ -141,16 +160,17 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
                     />
                   )}
                 />
-                {errors.bulkDiscount && (
+                {errors.bulk_discount && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.bulkDiscount.message}
+                    {errors.bulk_discount.message}
                   </p>
                 )}
               </div>
             </label>
+
             <label className="flex justify-between mt-2">
               <p className="font-light me-1">
-                Maximum number of tickets per subscription
+                Maximum number of tickets per session
               </p>
               <div className="w-full">
                 <Controller
@@ -179,57 +199,61 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
               )}
             </div>
             <div className="flex justify-end">
-              <button
+              <Button
+                margin="mt-6"
+                bg="bg-primary"
+                borderRadius="rounded"
+                text="text-white"
+                padding="py-1 px-3"
                 type="submit"
-                className="w-[50%] bg-primary text-black py-2 rounded-md mb-2 mt-4"
+                width="w-[50%]"
               >
-                {loading ? (
+                {isProcessingRequest ? (
                   <CircularProgress size={18} color="inherit" />
                 ) : (
                   "Save"
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
-
-        <div></div>
       </div>
       <div className="border border-primary px-6 py-4 space-y-3">
-        <h4 className="font-medium">TOTAL CHARGEABLE (PER SESSION)</h4>
+        <h4 className="font-medium">
+          TOTAL CHARGEABLE {`(PER ${pricingType.label.toUpperCase()})`}
+        </h4>
         <ul className="space-y-1">
           <li className="flex justify-between">
             <p>Amount:</p>{" "}
             <span>
-              {(watch("pricePerSession") &&
-                addCommaSeparators(watch("pricePerSession") as number)) ||
+              {(watch("cost") && addCommaSeparators(watch("cost") as number)) ||
                 0.0}
             </span>
           </li>
           <li className="flex justify-between">
             <p> Discount:</p>
             <span>
-              {(watch("bulkDiscount") &&
-                addCommaSeparators(watch("bulkDiscount") as number)) ||
+              {(watch("bulk_discount") &&
+                addCommaSeparators(watch("bulk_discount") as number)) ||
                 0.0}
             </span>
           </li>
           <li className="flex justify-between">
             <p>Service fee (5%):</p>
             <span>
-              {Math.round(0.05 *
-                ((watch("pricePerSession") ?? 0) -
-                  (watch("bulkDiscount") ?? 0)))}
+              {Math.round(
+                0.05 * ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
+              )}
             </span>
           </li>
           <li className="font-bold text-green-600 flex justify-between">
             <p>Total:</p>{" "}
             <span>
-              {Math.round((watch("pricePerSession") ?? 0) -
-                (watch("bulkDiscount") ?? 0) +
-                0.05 *
-                  ((watch("pricePerSession") ?? 0) -
-                    (watch("bulkDiscount") ?? 0)))}
+              {Math.round(
+                (watch("cost") ?? 0) -
+                  (watch("bulk_discount") ?? 0) +
+                  0.05 * ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
+              )}
             </span>
           </li>
         </ul>
@@ -239,23 +263,22 @@ const MonthlySubscriptionPricing: FC<MonthlySubscriptionPricingProps> = ({
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.vendor;
-  const { currencies } = state.settings;
+  const isProcessingRequest =
+    state.loading.effects.vendor.addProductPricing ||
+    state.loading.effects.vendor.updateProductPricing;
   const { newProduct } = state.vendor;
   return {
-    currencies,
-    loading,
+    isProcessingRequest,
     newProduct,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   getCurrencies: () => dispatch.settings.getCurrencies(),
   addProductPricing: (payload: ProductPricingPayload) =>
     dispatch.vendor.addProductPricing(payload),
+  updateProductPricing: (payload: UpdateProductPricingPayload) =>
+    dispatch.vendor.updateProductPricing(payload),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(MonthlySubscriptionPricing);
+export default connect(mapStateToProps, mapDispatchToProps)(ActivityPricing);

@@ -1,36 +1,34 @@
 "use client";
 
 import React, { FC, useEffect, useState } from "react";
-import {
-  Calendar,
-  MapPin,
-  ChevronDown,
-  CalendarDays,
-  Trash,
-  Plus,
-} from "lucide-react";
-import NavigationButtons from "./navigationButtons";
+import { Trash, Plus } from "lucide-react";
+import NavigationButtons from "../navigationButtons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-import { ProductType } from "@/domain/constants";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import {
   NewProductPayload,
   OpenDay,
   ProductAvailabilityPayload,
+  UpdateProductAvailabilityPayload,
 } from "@/domain/dto/input";
 import { DayOfWeek } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
-import LocationSearch from "./locationSearch";
+import LocationSearch from "../locationSearch";
+import StepHeader from "../stepHeader";
 
 type OtherProductsAvailabilityProps = {
+  isProcessingRequest: boolean;
   daysOfWeek: Array<DayOfWeek>;
   fetchingDaysOfTheWeek: boolean;
   getDaysOfWeek: () => void;
   newProduct: NewProductPayload;
   addProductAvailability: (payload: ProductAvailabilityPayload) => void;
+  updateProductAvailability: (
+    payload: UpdateProductAvailabilityPayload
+  ) => void;
 };
 
 const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
@@ -39,10 +37,12 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
   getDaysOfWeek,
   newProduct,
   addProductAvailability,
+  updateProductAvailability,
+  isProcessingRequest,
 }) => {
   const schema = yup.object().shape({
     durationHours: yup.string().required("Required"),
-    durationMinutes: yup.string().required("Required"),
+    durationMinutes: yup.string(),
     open_days: yup
       .array()
       .of(
@@ -54,18 +54,42 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             is: (day: string | undefined) => !!day,
             then: (schema) => schema.required("Opening time is required"),
           }),
-          closing_at: yup.string().when("day", {
-            is: (day: string | undefined) => !!day,
-            then: (schema) => schema.required("Closing time is required"),
-          }),
+          closing_at: yup
+            .string()
+            .when("day", {
+              is: (day: string | undefined) => !!day,
+              then: (schema) => schema.required("Closing time is required"),
+            })
+            .test(
+              "is-greater",
+              "Closing time must be later than opening time",
+              function (value) {
+                const { opening_at } = this.parent;
+                if (!opening_at || !value) return true;
+                return value > opening_at;
+              }
+            ),
         })
       )
-      .min(1, "At least one open day must be selected"),
+      .test(
+        "at-least-one-selected",
+        "At least one open day must be selected",
+        (days) => (days ? days.some((day) => day.selected) : false)
+      ),
     closed_dates: yup.array().of(
       yup.object().shape({
         date: yup.string(),
       })
     ),
+    location: yup
+      .object()
+      .nullable()
+      .required("Location is required")
+      .test(
+        "valid-location",
+        "Please select a valid location",
+        (value) => !!value && Object.keys(value).length > 0
+      ),
   });
 
   function convertMinutesToHoursAndMinutes(minutes: number) {
@@ -97,6 +121,16 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             newProduct?.availability?.duration
           )?.minutes?.toString()
         : "",
+      open_days:
+        newProduct?.availability &&
+        newProduct?.availability?.open_days?.length > 0
+          ? newProduct?.availability?.open_days?.map((day: OpenDay) => ({
+              id: day?.day,
+              selected: true,
+              opening_at: day?.opening_at,
+              closing_at: day?.closing_at,
+            }))
+          : [],
     },
     mode: "onBlur",
   });
@@ -114,16 +148,33 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
   };
 
   const onSubmit = (data: any) => {
-    addProductAvailability({
-      product: newProduct?.id,
-      duration:
-        parseInt(data?.durationHours || "0") * 60 +
-        parseInt(data?.durationMinutes || "0"),
-      open_days: processOpenDay(
-        data?.open_days?.filter((day: any) => day?.selected === true)
-      ),
-      closed_dates: data?.closed_dates,
-    } as ProductAvailabilityPayload);
+    if (
+      newProduct?.availability?.open_days &&
+      newProduct?.availability?.open_days?.length > 0
+    ) {
+      updateProductAvailability({
+        id: newProduct?.availability.id,
+        product: newProduct?.id,
+        duration:
+          parseInt(data?.durationHours || "0") * 60 +
+          parseInt(data?.durationMinutes || "0"),
+        open_days: processOpenDay(
+          data?.open_days?.filter((day: any) => day?.selected === true)
+        ),
+        closed_dates: data?.closed_dates,
+      } as UpdateProductAvailabilityPayload);
+    } else {
+      addProductAvailability({
+        product: newProduct?.id,
+        duration:
+          parseInt(data?.durationHours || "0") * 60 +
+          parseInt(data?.durationMinutes || "0"),
+        open_days: processOpenDay(
+          data?.open_days?.filter((day: any) => day?.selected === true)
+        ),
+        closed_dates: data?.closed_dates,
+      } as ProductAvailabilityPayload);
+    }
   };
 
   useEffect(() => {
@@ -151,16 +202,20 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
 
     setValue("closed_dates", updatedDates);
   };
-  
+
+  useEffect(() => {
+    setValue("location", selectedLocation as any);
+  }, [selectedLocation]);
+
   return (
     <div className="px-0 md:px-5">
-      <p className="font-base mt-4 ml-5 text-center mb-3">
-        Where and when does this activity happen?
-      </p>
+      <StepHeader title="Where and when does this activity happen?" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">
-          <LocationSearch setSelectedLocation={setSelectedLocation} />
-
+          <LocationSearch
+            setSelectedLocation={setSelectedLocation}
+            validationErrors={errors}
+          />
           <div className="border rounded-sm border-primary p-4 col-span-2 text-center">
             <h3 className="text-md font-light">How long is this activity?</h3>
             <div className="flex justify-center gap-4 mt-2 text-center">
@@ -222,7 +277,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             {fetchingDaysOfTheWeek ? (
               <div className="flex justify-center items-center mt-4 mb-4">
                 <CircularProgress size={18} color="inherit" className="me-2" />
-                <span>Fetching categories..</span>
+                <span>Fetching days of the week..</span>
               </div>
             ) : (
               <div className="gap-2 mt-4 w-full">
@@ -278,7 +333,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                           )}
                         />
                         {errors.open_days?.[index] && (
-                          <p className="text-red-500 text-sm text-sm">
+                          <p className="text-red-500 text-sm">
                             {errors?.open_days?.[index]?.opening_at?.message}
                           </p>
                         )}
@@ -296,7 +351,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                           )}
                         />
                         {errors.open_days?.[index] && (
-                          <p className="text-red-500 text-sm text-sm">
+                          <p className="text-red-500 text-sm">
                             {errors?.open_days?.[index]?.closing_at?.message}
                           </p>
                         )}
@@ -305,8 +360,8 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                   </div>
                 ))}
                 {errors.open_days && (
-                  <p className="text-red-500 text-sm text-sm">
-                    {errors.open_days.message}
+                  <p className="text-red-500 text-sm">
+                    {errors.open_days?.root?.message}
                   </p>
                 )}
               </div>
@@ -321,7 +376,6 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             <div className="flex justify-between mb-3 gap-4">
               <div className="w-full">
                 <div className="flex justify-between items-center mt-2">
-                  {/* <CalendarDays className="text-primary w-10 h-10 me-1" /> */}
                   <Controller
                     name="closed_dates"
                     control={control}
@@ -382,7 +436,15 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             </div>
           </div>
         </div>
-        <NavigationButtons disableNext={true} />
+        <NavigationButtons
+          isProcessingRequest={isProcessingRequest}
+          isFormSubmit={
+            newProduct.availability?.open_days?.length === 0 ||
+            newProduct?.locations?.length === 0
+              ? true
+              : false
+          }
+        />
       </form>
     </div>
   );
@@ -390,6 +452,9 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const fetchingDaysOfTheWeek = state.loading.models.settings;
+  const isProcessingRequest =
+    state.loading.effects.vendor.addProductAvailability ||
+    state.loading.effects.vendor.updateProductAvailability;
   const { daysOfWeek } = state.settings;
   const { newProduct, productType } = state.vendor;
   return {
@@ -397,6 +462,7 @@ const mapStateToProps = (state: RootState) => {
     fetchingDaysOfTheWeek,
     newProduct,
     productType,
+    isProcessingRequest,
   };
 };
 
@@ -404,6 +470,8 @@ const mapDispatchToProps = (dispatch: any) => ({
   getDaysOfWeek: () => dispatch.settings.getDaysOfWeek(),
   addProductAvailability: (payload: ProductAvailabilityPayload) =>
     dispatch.vendor.addProductAvailability(payload),
+  updateProductAvailability: (payload: UpdateProductAvailabilityPayload) =>
+    dispatch.vendor.updateProductAvailability(payload),
 });
 
 export default connect(

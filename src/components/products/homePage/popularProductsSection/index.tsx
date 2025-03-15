@@ -34,7 +34,7 @@ const PopularProductsSection: FC<PopularProductsSectionProps> = ({
 
   return (
     <CategoryProductsOutlet
-      title="Popular"
+      title="Popular now"
       path="/products/popular"
       products={popularProducts}
       currencies={currencies}

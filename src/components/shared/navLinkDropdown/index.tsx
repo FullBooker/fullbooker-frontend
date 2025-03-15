@@ -27,14 +27,14 @@ const NavLinkDropDown: FC<NavLinkDropDownProps> = ({
       href={encodedHref}
     >
       <button
-        className={`px-4 py-2 text-sm font-medium text-black bg-white hover:bg-primary hover:text-white flex items-center justify-between transition-opacity duration-300 hover:opacity-4 w-full`}
+        className={`px-4 py-2 text-sm font-medium text-black bg-white hover:text-primary flex items-center justify-between transition-opacity duration-300 w-full`}
         onClick={() => setOpen(!open)}
       >
-        <span className="text-black me-2 hover:text-white">{label}</span>
+        <span className="text-black me-2 hover:text-primary">{label}</span>
         {children && <ChevronDown />}
       </button>
       {open && children && (
-        <div className="absolute left-10 top-10 mt-0 bg-white shadow-lg transition-opacity duration-300 hover:bg-primary hover:text-white w-48 z-50">
+        <div className="absolute left-10 top-10 mt-0 bg-white shadow-lg transition-opacity duration-300 hover:bg-primary hover:text-primary w-48 z-50">
           {children}
         </div>
       )}

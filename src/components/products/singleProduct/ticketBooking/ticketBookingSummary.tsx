@@ -39,6 +39,7 @@ type TicketBookingSummaryProps = {
   setActiveModal: (modalId: ModalID) => void;
   bookTicket: (payload: BookTicketPayload) => void;
   isProcessingRequest: boolean;
+  isActivity: boolean;
 };
 
 const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
@@ -52,6 +53,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
   isProcessingRequest,
   setFailureAlert,
   clearCart,
+  isActivity,
 }) => {
   const router = useRouter();
   const defaultValues = {
@@ -79,6 +81,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
       .email("Provide a valid email address"),
     phone_number: yup.string().required("Phone number is required"),
   });
+
   const {
     control,
     handleSubmit,
@@ -96,7 +99,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
       return;
     }
 
-    const { id_number } = data;
+    const { name, id_number, phone_number, email } = data;
 
     if (!cartSummary?.prefill_all_items_with_primary_user_details) {
       let hasMissingFields: boolean = false;
@@ -120,13 +123,27 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
 
     bookTicket({
       product: cartSummary?.product_id,
-      tickets: cart.map((item: CartItem) => ({
-        name: item?.name,
-        id_number: id_number,
-        phone_number: item?.phone_number,
-        email: item?.email,
-        pricing: cartSummary?.product_base_pricing_id,
-      })),
+      tickets: cartSummary?.prefill_all_items_with_primary_user_details
+        ? cart.map((item: CartItem) => ({
+            name: name,
+            id_number: id_number,
+            phone_number: phone_number,
+            email: email,
+            pricing: item.pricing_type_id,
+            ...(isActivity && {
+              start: cartSummary?.time,
+            }),
+          }))
+        : cart.map((item: CartItem) => ({
+            name: item?.name,
+            id_number: id_number,
+            phone_number: item?.phone_number,
+            email: item?.email,
+            pricing: item.pricing_type_id,
+            ...(isActivity && {
+              start: cartSummary?.time,
+            }),
+          })),
     } as BookTicketPayload);
   };
 
@@ -139,12 +156,26 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
       CustomeEvents.successfullTicketBooking,
       async (event: any) => {
         clearTicketSummary().then(() => {
-          setActiveModal(ModalID.none)
+          setActiveModal(ModalID.none);
           router.push(`/product/booking/${event?.detail?.booking_id}`);
         });
       }
     );
   }, []);
+
+  useEffect(() => {
+    if (cart?.length > 0) {
+      const { user } = authData || {};
+      const firstItemInCart: CartItem = cart[0];
+      addUserDetailsToCart({
+        ...firstItemInCart,
+        name: user ? `${user.first_name} ${user.last_name}` : "",
+        id_number: user ? user.id_number : "",
+        phone_number: user ? user.phone_number : "",
+        email: user ? user.email : "",
+      } as CartItem);
+    }
+  }, [authData]);
 
   return (
     <div>
@@ -156,36 +187,18 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
             <span className="me-2">Date:</span>
             <span>{`${cartSummary?.selected_date || "N/A"} `}</span>
           </p>
-          <p className="flex items-center font-light text-sm">
-            <span className="me-2">Session:</span>
-            <span>{`${cartSummary?.time || "N/A"} `}</span>
-          </p>
+          {isActivity && (
+            <p className="flex items-center font-light text-sm">
+              <span className="me-2">Session:</span>
+              <span>{`${cartSummary?.time || "N/A"} `}</span>
+            </p>
+          )}
           <p className="flex justify-between font-light text-sm">
-            <span>
-              {cartSummary?.total_items} *{" "}
-              {
-                TICKET_PRICING_CATEGORIES.concat(
-                  SESSION_PRICING_CATEGORIES
-                ).find(
-                  (p: any) => p.key === cartSummary?.product_base_pricing_type
-                )?.title
-              }
-            </span>
+            <span>{cart?.length} Tickets</span>
             <span className="font-semibold">
               {cartSummary?.total_price
                 ? addCommaSeparators(cartSummary?.total_price)
                 : 0}
-            </span>
-          </p>
-          <p className="flex items-center text-black font-medium">
-            <span className="me-1">Total =</span>
-            <span>
-              <span className="me-1">{cartSummary?.product_base_currency}</span>
-              <span>
-                {cartSummary?.total_price
-                  ? addCommaSeparators(cartSummary?.total_price)
-                  : 0}
-              </span>
             </span>
           </p>
         </div>
@@ -215,10 +228,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
                       {
                         TICKET_PRICING_CATEGORIES.concat(
                           SESSION_PRICING_CATEGORIES
-                        ).find(
-                          (p: any) =>
-                            p.key === cartSummary?.product_base_pricing_type
-                        )?.title
+                        ).find((p: any) => p.key === item?.pricing_type)?.title
                       }
                     </p>
                     {index === 0 ? (
@@ -393,7 +403,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
               <span>
                 <Checkbox
                   checked={
-                    cartSummary?.prefill_all_items_with_primary_user_details
+                    !cartSummary?.prefill_all_items_with_primary_user_details
                   }
                   onChange={() => {
                     setProductDetailsToCart({

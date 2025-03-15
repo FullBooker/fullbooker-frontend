@@ -23,6 +23,7 @@ import {
 } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
 import { ChangePasswordPayload } from "@/domain/auth";
+import { CustomeEvents } from "@/constants";
 
 type Authentication = {
   isLoggedIn: boolean;
@@ -98,7 +99,7 @@ export const authentication = createModel<RootModel>()({
         const response: any = await postRequest("/accounts/signup/", payload);
         if (response && response?.data?.user) {
           const data: any = response?.data;
-          const token = data?.access_token;
+          const token = data?.access;
           const decodedJWT = jwtDecode<JwtPayload>(token);
           const jwtExpiry = new Date((decodedJWT?.exp as number) * 1000);
 
@@ -118,6 +119,7 @@ export const authentication = createModel<RootModel>()({
             purgeAnonymousAuthToken();
           }
           dispatch.alert.setSuccessAlert(response?.data?.message);
+          dispatch.profile.getUserProfile()
           dispatch.components.setActiveModal(ModalID.none);
           const flow = getQueryParam("user_flow");
           if (flow && flow === "vendor") {
@@ -145,7 +147,7 @@ export const authentication = createModel<RootModel>()({
 
         if (response && response?.data) {
           const data: any = response?.data;
-          const token = data?.access_token;
+          const token = data?.access;
           const decodedJWT = jwtDecode<JwtPayload>(token);
           const jwtExpiry = new Date((decodedJWT?.exp as number) * 1000);
 
@@ -166,12 +168,23 @@ export const authentication = createModel<RootModel>()({
               response?.data?.message || "Login successful!"
             );
             dispatch.components.setActiveModal(ModalID.none);
+            dispatch.profile.getUserProfile()
             const flow = getQueryParam("user_flow");
             if (flow && flow === "vendor") {
-              dispatch.authentication.switchToHost({
+              return dispatch.authentication.switchToHost({
                 user: data?.user?.id,
               } as SwitchToHostPayload);
             }
+
+            const userAuthenticationSuccessfullEvent = new CustomEvent(
+              CustomeEvents.successfullUserAuthentication,
+              {
+                detail: {},
+                bubbles: true,
+                cancelable: true,
+              }
+            );
+            document.dispatchEvent(userAuthenticationSuccessfullEvent);
           }
         } else {
           dispatch.alert.setFailureAlert("Incorrect password or email!");
@@ -268,6 +281,15 @@ export const authentication = createModel<RootModel>()({
         const response: any = await postRequest("/hosts/", payload);
         if (response && response?.data) {
           dispatch.vendor.setVendorDetails(response?.data);
+          const switchedToHostingSuccessfullEvent = new CustomEvent(
+            CustomeEvents.switchedToHostingSuccessfullEvent,
+            {
+              detail: {},
+              bubbles: true,
+              cancelable: true,
+            }
+          );
+          document.dispatchEvent(switchedToHostingSuccessfullEvent);
           dispatch.alert.setSuccessAlert("Switched to hosting successfully!");
         }
       } catch (error: any) {
@@ -307,17 +329,28 @@ export const authentication = createModel<RootModel>()({
                 id: data?.user?.pk,
               } as User,
             } as AuthData);
-            purgeAnonymousAuthToken()
+            purgeAnonymousAuthToken();
             dispatch.alert.setSuccessAlert(
               response?.data?.message || "Login successful!"
             );
             dispatch.components.setActiveModal(ModalID.none);
             const flow = getQueryParam("user_flow");
             if (flow && flow === "vendor") {
-              dispatch.authentication.switchToHost({
+              return dispatch.authentication.switchToHost({
                 user: data?.user?.id,
               } as SwitchToHostPayload);
             }
+
+            dispatch.profile.getUserProfile()
+            const userAuthenticationSuccessfullEvent = new CustomEvent(
+              CustomeEvents.successfullUserAuthentication,
+              {
+                detail: {},
+                bubbles: true,
+                cancelable: true,
+              }
+            );
+            document.dispatchEvent(userAuthenticationSuccessfullEvent);
           }
         } else {
           dispatch.alert.setFailureAlert("Incorrect password or email!");

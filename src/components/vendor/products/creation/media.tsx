@@ -4,7 +4,7 @@ import React, { FC, useEffect, useState } from "react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import NavigationButtons from "./navigationButtons";
-import { Images, Video } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, Video } from "lucide-react";
 import {
   DeleteProductMediaPayload,
   NewProductPayload,
@@ -14,11 +14,15 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Image from "next/image";
-import { MediaType } from "@/domain/constants";
+import { DeviceType, MediaType } from "@/domain/constants";
 import { ProductMedia } from "@/domain/product";
+import StepHeader from "./stepHeader";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import CircularProgress from "@mui/material/CircularProgress";
+import { Dialog } from "@headlessui/react";
 
 type ProductMediaProps = {
-  loading: boolean;
+  isProcessingRequest: boolean;
   newProduct: NewProductPayload;
   uploadProductMedia: (payload: ProductMediaPayload) => void;
   productMedia: Array<ProductMedia>;
@@ -27,7 +31,7 @@ type ProductMediaProps = {
 };
 
 const ProductMediaComponent: FC<ProductMediaProps> = ({
-  loading,
+  isProcessingRequest,
   newProduct,
   uploadProductMedia,
   productMedia,
@@ -49,6 +53,26 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
 
   const [photos, setPhotos] = useState<string[]>([]);
   const [video, setVideo] = useState<string | null>(null);
+  const deviceType = useDeviceType();
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+
+  const handleNext = () => {
+    if (currentIndex !== null) {
+      setCurrentIndex(
+        (prevIndex) => ((prevIndex as number) + 1) % productMedia.length
+      );
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentIndex !== null) {
+      setCurrentIndex(
+        (prevIndex) =>
+          ((prevIndex as number) - 1 + productMedia.length) %
+          productMedia.length
+      );
+    }
+  };
 
   const {
     control,
@@ -117,8 +141,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
     } as DeleteProductMediaPayload);
   };
 
-  const onSubmit = (data: FormData) => {
-  };
+  const onSubmit = (data: FormData) => {};
 
   useEffect(() => {
     getProductMedia(newProduct?.id as string);
@@ -126,14 +149,12 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
 
   return (
     <div>
-      <p className="font-base mt-4 ml-0 md:ml-5 lg:ml-5 xl:ml-5">
-        Upload Photos and Videos
-      </p>
+      <StepHeader title="Upload Photos and Videos" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="px-0 md:px-5 w-full">
-          <div className="col-span-1 grid md:grid-flow-col gap-4 w-full mb-4">
-            <div className="grid grid-cols-1">
-              <div className="bg-white px-6 py-12 rounded shadow-xl text-center mt-3">
+          <div className="col-span-2 grid md:grid-cols-2 gap-4 w-full mb-4">
+            <div className="grid grid-cols-1 w-full">
+              <div className="bg-white px-6 py-12 rounded shadow-xl text-center w-full">
                 <span className="text-center mb-4 md:mb-4 flex justify-center">
                   <Images className="text-center text-primary w-8 h-8 md:h-12 md:w-12" />
                 </span>
@@ -141,7 +162,11 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                   Drag and drop or browse for photos
                 </p>
                 <label className="mt-3 inline-block bg-primary text-white px-6 py-2 rounded cursor-pointer">
-                  Browse
+                  {isProcessingRequest ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    "Browse"
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -152,47 +177,52 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                 </label>
               </div>
             </div>
-            <div className="gap-4 mt-4 ">
+            <div className="gap-4">
               {productMedia?.filter(
                 (media: ProductMedia) => media?.media_type === MediaType.image
               )?.length === 0 ? (
-                <div className="flex justify-center">
-                  <p className="font-base text-red-500">
-                    No photos selected yet!
+                <div className="flex items-center justify-center h-full py-8 md:py-0 border border-dashed border-gray-500">
+                  <p className="font-base text-gray-500">
+                    Your photos will appear here
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-1">
-                  {productMedia
-                    ?.filter(
-                      (media: ProductMedia) =>
-                        media?.media_type === MediaType.image
-                    )
-                    ?.map((photo: ProductMedia, index: number) => (
-                      <div key={index} className="relative mb-2">
-                        <Image
-                          src={photo?.file}
-                          alt={`Photo ${index + 1}`}
-                          className="rounded-lg shadow-lg"
-                          width={149}
-                          height={164}
-                          unoptimized={true}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => deletePhoto(photo.id)}
-                          className="absolute bottom-2 left-2 px-2 py-1 rounded-full text-xs text-center bg-white"
-                        >
-                          Delete Photo
-                        </button>
-                      </div>
-                    ))}
+                <div className="grid grid-cols-3 gap-1 w-full">
+                  <div className="col-span-3 grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full min-w-full">
+                    {productMedia
+                      ?.filter(
+                        (media: ProductMedia) =>
+                          media?.media_type === MediaType.image
+                      )
+                      ?.map((photo: ProductMedia, index: number) => (
+                        <div key={index} className="relative mb-2">
+                          <Image
+                            src={photo?.file}
+                            alt={`Photo ${index + 1}`}
+                            width={deviceType === DeviceType.mobile ? 150 : 150}
+                            height={
+                              deviceType === DeviceType.mobile ? 150 : 150
+                            }
+                            className="w-full h-[150px] md:h-[150px] object-cover cursor-pointer"
+                            unoptimized={true}
+                            onClick={() => setCurrentIndex(index)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => deletePhoto(photo.id)}
+                            className="absolute bottom-2 left-2 px-2 py-1 rounded-full text-xs text-center bg-white"
+                          >
+                            Delete Photo
+                          </button>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
             </div>
           </div>
           <p className="text-gray-700">Upload Videos (Optional)</p>
-          <div className="col-span-1 grid md:grid-flow-col gap-4 w-full">
+          <div className="col-span-2 grid md:grid-cols-2 gap-4 w-full mb-4">
             <div className="grid grid-cols-1">
               <div className="bg-white px-6 py-12 rounded shadow-xl text-center mt-3">
                 <span className="text-center mb-4 md:mb-4 flex justify-center">
@@ -202,7 +232,11 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                   Drag and drop or browse for Videos
                 </p>
                 <label className="mt-3 inline-block bg-primary text-white px-6 py-2 rounded cursor-pointer">
-                  Browse
+                  {isProcessingRequest ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    "Browse"
+                  )}
                   <input
                     type="file"
                     accept="video/*"
@@ -217,12 +251,14 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
               {productMedia?.filter(
                 (media: ProductMedia) => media?.media_type === MediaType.video
               )?.length === 0 && (
-                <div className="flex justify-center">
-                  <p className="font-base text-red-500">
-                    No video selected yet!
+                <div className="flex items-center justify-center h-full py-8 md:py-0 border border-dashed border-gray-500">
+                  <p className="font-base text-gray-500">
+                    Your videos will appear here
                   </p>
                 </div>
               )}
+               <div className="grid grid-cols-3 gap-1 w-full">
+               <div className="col-span-3 grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full min-w-full">
               {productMedia
                 ?.filter(
                   (media: ProductMedia) => media?.media_type === MediaType.video
@@ -231,8 +267,13 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                   <div className="relative" key={index}>
                     <video
                       src={video?.file}
-                      controls
-                      className="w-full h-40 object-cover rounded-lg"
+                      width={deviceType === DeviceType.mobile ? 150 : 150}
+                      height={
+                        deviceType === DeviceType.mobile ? 150 : 150
+                      }
+                      className="w-full h-[150px] md:h-[150px] object-cover cursor-pointer"
+                      controls={false}
+                      onClick={() => setCurrentIndex(index)}
                     />
                     <button
                       type="button"
@@ -243,22 +284,81 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
                     </button>
                   </div>
                 ))}
+                </div>
+                </div>
             </div>
           </div>
         </div>
         <div className="px-2 md:px-10 mt-4 md:mt-10">
-          <NavigationButtons />
+          <NavigationButtons isProcessingRequest={isProcessingRequest} />
         </div>
       </form>
+      <Dialog
+        open={currentIndex !== null}
+        onClose={() => setCurrentIndex(null)}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
+          <Dialog.Panel className="max-w-3xl w-full bg-transaparent rounded-lg p-4">
+            <button
+              onClick={() => setCurrentIndex(null)}
+              className="absolute top-3 right-3 text-white text-2xl"
+            >
+              &times;
+            </button>
+
+            {/* Navigation Buttons */}
+            {currentIndex !== null && (
+              <>
+                <button
+                  onClick={handlePrev}
+                  className="absolute -left-2 md:left-2 top-1/2 transform -translate-y-1/2 bg-transparent text-white p-2 rounded-full"
+                >
+                  <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="absolute -right-2 md:right-2 top-1/2 transform -translate-y-1/2 bg-transparent text-white p-2 rounded-full"
+                >
+                  <ChevronRight className="w-8 h-8 md:h-14 md:w-14" />
+                </button>
+              </>
+            )}
+
+            {/* Image Preview */}
+            {currentIndex !== null && (
+              <div>
+                {productMedia[currentIndex]?.media_type === MediaType.image && (
+                  <Image
+                    src={productMedia[currentIndex]?.file}
+                    alt="Preview"
+                    width={400}
+                    height={400}
+                    className="w-full h-auto object-contain"
+                    unoptimized
+                  />
+                )}
+                {productMedia[currentIndex]?.media_type === MediaType.video && (
+                  <video
+                    src={productMedia[currentIndex]?.file}
+                    className="w-full h-auto object-contain"
+                    controls
+                  />
+                )}
+              </div>
+            )}
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.vendor;
+  const isProcessingRequest = state.loading.effects.vendor.uploadProductMedia;
   const { newProduct, productMedia } = state.vendor;
   return {
-    loading,
+    isProcessingRequest,
     newProduct,
     productMedia,
   };

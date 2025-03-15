@@ -20,8 +20,6 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import ProductLocation from "@/components/products/singleProduct/productLocation";
-import ProductReviews from "@/components/products/singleProduct/reviews";
-import HostDetails from "@/components/products/singleProduct/hostDetails";
 import ProductGallery from "@/components/products/singleProduct/gallery";
 import {
   addCommaSeparators,
@@ -29,7 +27,6 @@ import {
   formatProductAvailability,
 } from "@/utilities";
 import LocationIdentifier from "@/components/shared/locationidentifier";
-import ProductsByVendor from "@/components/products/singleProduct/productsByVendor";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import TicketBooking from "@/components/products/singleProduct/ticketBooking";
 import { useRouter } from "next/navigation";
@@ -119,7 +116,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     }
   };
 
-  const renderPricingRange = (pricing: Array<ProductPricing>): string => {
+  const getPricingRangeString = (pricing: Array<ProductPricing>): string => {
     if (pricing?.length === 1) {
       return addCommaSeparators(Math.round(parseFloat(pricing[0]?.cost)));
     } else if (pricing?.length > 0) {
@@ -255,7 +252,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                               currency?.id === product?.pricing[0]?.currency
                           )?.code
                         : "KES"}{" "}
-                      {renderPricingRange(product?.pricing)}
+                      {getPricingRangeString(product?.pricing)}
                     </span>
                   )}
                 </p>
@@ -320,7 +317,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                         height={35}
                         className="rounded-lg me-2"
                       />
-                      <div className="text-xs">
+                      <div className="text-xs space-y-2">
                         <p className="me-2">Hosted by</p>
                         <p>
                           {product?.host?.user?.first_name
@@ -388,7 +385,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 
                 {/* Map Section */}
                 <div
-                  className="mt-0 md:mt-6 md:border-t border-b border-gray-400 py-8 h-[300px] md:h-[550px]"
+                  className="mt-0 md:mt-6 md:border-t border-gray-400 py-8 h-[300px] md:h-[550px]"
                   ref={mapRef}
                 >
                   {product?.locations?.length > 0 && (
@@ -398,20 +395,6 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                     />
                   )}
                 </div>
-
-                {/* Reviews Section */}
-                <ProductReviews
-                  productsRequestProcessing={productsRequestProcessing}
-                />
-
-                {/* Host Details */}
-                <HostDetails
-                  productsRequestProcessing={productsRequestProcessing}
-                  host={product?.host}
-                />
-
-                {/* More products by vendor */}
-                <ProductsByVendor />
               </div>
             )}
           </div>

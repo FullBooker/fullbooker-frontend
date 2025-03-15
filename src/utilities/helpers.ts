@@ -104,6 +104,7 @@ export const purgeAnonymousAuthToken = () => {
 };
 
 import { format, parseISO } from "date-fns";
+import { ProductPricing } from "@/domain/product";
 
 interface OpenDay {
   id: string;
@@ -196,5 +197,19 @@ export const formatProductAvailability = (
 
 export const humanReadableDate = (isoTimestamp: string): string => {
   const date = new Date(isoTimestamp);
-  return date?.toISOString()?.split('T')[0];
+  return date?.toISOString()?.split("T")[0];
+};
+
+export const getPricingRange = (pricing: Array<ProductPricing> = []): string => {
+  if (pricing.length === 1) {
+    const cost = parseFloat(pricing[0]?.cost);
+    return isNaN(cost) ? "N/A" : addCommaSeparators(Math.round(cost));
+  } else if (pricing.length > 0) {
+    const prices = pricing.map((p: ProductPricing) => Math.round(parseFloat(p.cost) || 0));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    return `${addCommaSeparators(minPrice)} - ${addCommaSeparators(maxPrice)}`;
+  } else {
+    return "N/A";
+  }
 };

@@ -30,7 +30,7 @@ const ReverseGeocoding: FC<ReverseGeocodingProps> = ({ lat, lng }) => {
     fetchAddress();
   }, []);
 
-  return <div>{address}</div>;
+  return address;
 };
 
 export default ReverseGeocoding;
