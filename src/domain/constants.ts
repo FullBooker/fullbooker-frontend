@@ -17,7 +17,7 @@ export enum ProductType {
 export enum PricingType {
   session = "session",
   dayPass = "day_pass",
-  monthly_subscription = "monthly_subscription",
+  monthlySubscription = "monthly_subscription",
   ticket = "ticket"
 }
 

@@ -1,61 +1,42 @@
-import React, { FC, useEffect, useState } from "react";
-import { RootState } from "@/store";
-import { connect } from "react-redux";
-import { NewProductPayload, VendorProductsFilters } from "@/domain/dto/input";
-import { Product, ProductPricing } from "@/domain/product";
-import { ProductType, ViewType } from "@/domain/constants";
-import { ProductCategory } from "@/domain/dto/output";
+import React, { FC } from "react";
+import { Product } from "@/domain/product";
+import { DeviceType } from "@/domain/constants";
+import {
+  ProductCategory,
+  VendorProductsAPIResponse,
+} from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
-import { addCommaSeparators } from "@/utilities";
-import useIsMobile from "@/lib/hooks/useIsMobile";
+import { addCommaSeparators, getPricingRange } from "@/utilities";
 import Button from "@/components/shared/button";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { VendorProductsFilters } from "@/domain/dto/input";
+import Link from "next/link";
 
 type VendorProductsListViewProps = {
-  loading: boolean;
-  getVendorProducts: (payload?: VendorProductsFilters) => void;
-  vendorProducts: Array<Product>;
-  setProductPageViewType: (viewType: ViewType) => void;
+  isProcessingRequest: boolean;
+  vendorProducts: VendorProductsAPIResponse;
   productCategories: Array<ProductCategory>;
-  setNewProductDetails: (payload: NewProductPayload) => void;
-  setActiveStep: (payload: number) => void;
-  setProductType: (payload: ProductType) => void;
-  getProductCategories: () => void;
+  setProductFilters: (filters: VendorProductsFilters) => void;
+};
+
+const getImageDimensions = (deviceType: DeviceType) => {
+  return deviceType === DeviceType.mobile
+    ? { width: 250, height: 250 }
+    : { width: 400, height: 400 };
 };
 
 const VendorProductsListView: FC<VendorProductsListViewProps> = ({
-  loading,
-  getVendorProducts,
+  isProcessingRequest,
   vendorProducts,
-  setProductPageViewType,
   productCategories,
-  setNewProductDetails,
-  setActiveStep,
-  setProductType,
-  getProductCategories,
+  setProductFilters,
 }) => {
-  const [filters, setFilters] = useState<VendorProductsFilters>({
-    page: 1,
-    page_size: 10,
-  });
-  const isMobile = useIsMobile();
-
-  const handleViewOrEditProduct = (product: any) => {
-    setNewProductDetails(product);
-    setProductType(
-      productCategories
-        ?.find((category: ProductCategory) => category.id === product?.category)
-        ?.name?.includes("Events")
-        ? ProductType.event
-        : ProductType.others
-    );
-    setActiveStep(1);
-    setProductPageViewType(ViewType.onboardingView);
-  };
+  const deviceType = useDeviceType();
 
   const categoryHasProducts = (category: string) => {
     let products = 0;
-    vendorProducts?.map((product: Product) => {
+    vendorProducts?.results?.map((product: Product) => {
       if (product.category === category) {
         products++;
       }
@@ -63,58 +44,98 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
     return products > 0;
   };
 
-  useEffect(() => {
-    getProductCategories();
-    getVendorProducts();
-  }, []);
+  const renderHeader = () => (
+    <div className="flex justify-between items-center mb-2 mt-12 md:mt-0">
+      <h2 className="text-lg font-medium">My Products</h2>
+      <Link
+        href={`/vendor/products/new?step=${
+          (vendorProducts?.count as number) > 0 ? "classification" : "intro"
+        }`}
+      >
+        <Button
+          margin="m-0"
+          bg="bg-primary"
+          borderRadius="rounded"
+          text="text-white"
+          padding="py-1 px-3"
+        >
+          Add New Product
+        </Button>
+      </Link>
+    </div>
+  );
 
   return (
     <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
-      {isMobile ? (
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-medium">My Products</h2>
-          <Button
-            margin="m-0"
-            bg="bg-primary"
-            borderRadius="rounded-md"
-            text="text-black"
-            padding="py-1 px-3"
-            onClick={() => setProductPageViewType(ViewType.onboardingView)}
-          >
-            Add Product +
-          </Button>
-        </div>
+      {deviceType === DeviceType.mobile ? (
+        renderHeader()
       ) : (
         <h2 className="text-lg font-medium text-center mb-3">My Products</h2>
       )}
-      {loading ? (
-        <div className="flex justify-center items-center h-[200px] md:h-screen">
-          <CircularProgress size={18} color="inherit" className="me-2" />
-          <span>Fetching your products..</span>
+      {isProcessingRequest ? (
+        <div className="flex flex-col items-center mt-8">
+          {[...Array(5)].map((_, index: number) => (
+            <div key={index} className="mb-6 animate-pulse w-full">
+              <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
+              <div className="overflow-auto whitespace-nowrap w-full">
+                <table className="w-full border border-gray-200 rounded-lg">
+                  <thead className="border">
+                    <tr className="text-left border-b">
+                      {[...Array(5)].map((_, idx) => (
+                        <th key={idx} className="p-3 pl-2 border font-medium">
+                          <div className="h-4 bg-gray-300 w-24 rounded-md"></div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(3)].map((_, idx) => (
+                      <tr key={idx} className="border-b">
+                        {[...Array(5)].map((_, idx2) => (
+                          <td key={idx2} className="p-3 pl-2 border-r">
+                            <div className="h-4 bg-gray-300 w-full rounded-md"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="rounded-lg md:border px-1 py-2 md:px-6 md:py-6">
-          {vendorProducts?.length === 0 ? (
+          {vendorProducts?.results?.length === 0 ? (
             <div className="grid place-items-center text-center mt-4 mb-12 md:mt-8 md:mb-20 px-2 md:px-0">
               <div className="grid place-items-center text-center">
                 <Image
                   src="/assets/no-records.jpg"
                   alt="Fullbooker Logo"
-                  width={isMobile ? 250 : 400}
-                  height={isMobile ? 250 : 400}
+                  width={getImageDimensions(deviceType).width}
+                  height={getImageDimensions(deviceType).height}
                   className="mb-4"
                 />
                 <p className="text-xl font-semibold text-black">
                   Oops! You have no products in your catalogue
                 </p>
-                <button
-                  className="bg-primary px-6 py-2 rounded-lg mt-4 text-black"
-                  onClick={() =>
-                    setProductPageViewType(ViewType.onboardingView)
-                  }
+                <Link
+                  href={`/vendor/products/new?step=${
+                    (vendorProducts?.count as number) > 0
+                      ? "classification"
+                      : "intro"
+                  }`}
                 >
-                  Add a new product
-                </button>
+                  <Button
+                    margin="m-0"
+                    bg="bg-primary"
+                    borderRadius="rounded"
+                    text="text-white"
+                    padding="py-1 px-3"
+                  >
+                    Add New Product
+                  </Button>
+                </Link>
               </div>
             </div>
           ) : (
@@ -147,72 +168,43 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                             </th>
                           </tr>
                         </thead>
-                        {vendorProducts?.filter(
+                        {vendorProducts?.results?.filter(
                           (product: Product) =>
                             product.category === category?.id
                         ).length > 0 ? (
                           <tbody>
-                            {vendorProducts
+                            {vendorProducts?.results
                               ?.filter(
                                 (product: Product) =>
                                   product.category === category?.id
                               )
                               .map((product: Product, idx: number) => (
-                                <tr
-                                  key={idx}
-                                  className="border-b cursor-pointer"
-                                  onClick={() =>
-                                    handleViewOrEditProduct(product)
-                                  }
-                                >
-                                  <td
-                                    className="p-3 pl-2 border-r font-thin cursor-pointer"
-                                    onClick={() =>
-                                      handleViewOrEditProduct(product)
-                                    }
-                                  >
+                                <tr key={idx} className="border-b">
+                                  <td className="p-3 pl-2 border-r font-thin">
                                     {product?.number}
                                   </td>
-                                  <td
-                                    className="p-3 border-r text-center font-thin cursor-pointer"
-                                    onClick={() =>
-                                      handleViewOrEditProduct(product)
-                                    }
-                                  >
+                                  <td className="p-3 border-r text-center font-thin">
                                     {product?.name}
                                   </td>
-                                  <td
-                                    className="p-3 text-blue-600 border-r text-center font-thin cursor-pointer"
-                                    onClick={() =>
-                                      handleViewOrEditProduct(product)
-                                    }
-                                  >
-                                    {product?.pricing[0]?.cost &&
-                                      addCommaSeparators(
-                                        parseInt(product?.pricing[0]?.cost)
-                                      )}
+                                  <td className="p-3 text-blue-600 border-r text-center font-thin">
+                                    {getPricingRange(product?.pricing)}
                                   </td>
                                   <td
                                     className={`p-3 font-semibold ${
                                       product?.active
                                         ? "text-green-600"
                                         : "text-red-600"
-                                    } border-r text-center font-base cursor-pointer`}
-                                    onClick={() =>
-                                      handleViewOrEditProduct(product)
-                                    }
+                                    } border-r text-center font-base`}
                                   >
                                     {product?.active ? "Active" : "Inactive"}
                                   </td>
                                   <td className="p-3 text-center flex justify-center space-x-2">
-                                    <button
+                                    <Link
+                                      href={`/vendor/products/edit/${product?.id}?step=classification`}
                                       className="bg-orange-200 text-orange-700 px-4 py-0 rounded"
-                                      onClick={() =>
-                                        handleViewOrEditProduct(product)
-                                      }
                                     >
                                       Edit
-                                    </button>
+                                    </Link>
                                   </td>
                                 </tr>
                               ))}
@@ -229,16 +221,25 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                     </div>
                   </div>
                 ))}
-              {!isMobile && (
+              {deviceType !== DeviceType.mobile && (
                 <div className="flex justify-end">
-                  <button
-                    className=" bg-primary px-6 py-2 rounded-lg mt-4 text-black"
-                    onClick={() =>
-                      setProductPageViewType(ViewType.onboardingView)
-                    }
+                  <Link
+                    href={`/vendor/products/new?step=${
+                      (vendorProducts?.count as number) > 0
+                        ? "classification"
+                        : "intro"
+                    }`}
                   >
-                    Add a new product
-                  </button>
+                    <Button
+                      margin="m-0"
+                      bg="bg-primary"
+                      borderRadius="rounded"
+                      text="text-white"
+                      padding="py-1 px-3"
+                    >
+                      Add New Product
+                    </Button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -249,31 +250,4 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
   );
 };
 
-export const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.vendor;
-  const { vendorProducts } = state.vendor;
-  const { productCategories } = state.settings;
-  return {
-    loading,
-    vendorProducts,
-    productCategories,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => ({
-  getVendorProducts: (payload: VendorProductsFilters) =>
-    dispatch.vendor.getVendorProducts(payload),
-  getProductCategories: () => dispatch.settings.getProductCategories(),
-  setProductPageViewType: (viewType: ViewType) =>
-    dispatch.vendor.setProductPageViewType(viewType),
-  setNewProductDetails: (payload: any) =>
-    dispatch.vendor.setNewProductDetails(payload),
-  setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
-  setProductType: (payload: ProductType) =>
-    dispatch.vendor.setProductType(payload),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(VendorProductsListView);
+export default VendorProductsListView;

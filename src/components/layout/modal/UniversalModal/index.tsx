@@ -87,22 +87,26 @@ const UniversalModal: FC<UniversalModalProps> = ({
     >
       <DialogTitle id="scroll-dialog-title">
         <div className="flex justify-between items-center">
+          <div></div>
+          <div className="items-center">
+            <p className="text-black font-semibold text-lg"> {title}</p>
+          </div>
           <div
             className="flex justify-start cursor-pointer"
             onClick={() => handleclose()}
           >
             <X className="h-4 w-4" />
           </div>
-          <div className="items-center">
-            <p className="text-black font-semibold text-lg"> {title}</p>
-          </div>
-          <div></div>
         </div>
       </DialogTitle>
       <DialogContent dividers={showDividers}>
         <div>{content}</div>
       </DialogContent>
-      {footer && <DialogActions sx={{ justifyContent: "space-between" }}>{footer}</DialogActions>}
+      {footer && (
+        <DialogActions sx={{ justifyContent: "space-between" }}>
+          {footer}
+        </DialogActions>
+      )}
     </Dialog>
   );
 };

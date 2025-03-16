@@ -104,9 +104,7 @@ export const products = createModel<RootModel>()({
       const updatedCartSummary = {
         ...state.cartSummary,
         total_items: updatedCart.length,
-        total_price:
-          parseFloat(state?.cartSummary?.product_base_price as string) *
-          updatedCart.length,
+        total_price: updatedCart.reduce((sum, item) => sum + item.cost, 0),
       };
 
       return {
@@ -136,10 +134,7 @@ export const products = createModel<RootModel>()({
 
       const updatedCartSummary = {
         ...state.cartSummary,
-        total_items: updatedCart.length,
-        total_price:
-          parseFloat(state?.cartSummary?.product_base_price as string) *
-          updatedCart.length,
+        total_price: updatedCart.reduce((sum, item) => sum + item.cost, 0),
       };
 
       return {
@@ -153,8 +148,7 @@ export const products = createModel<RootModel>()({
         ...state,
         cart: [],
         cartSummary: {
-          prefill_all_items_with_primary_user_details: false,
-          total_items: 0,
+          prefill_all_items_with_primary_user_details: true,
           total_price: 0,
         } as CartSummary,
       };

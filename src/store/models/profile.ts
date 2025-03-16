@@ -6,7 +6,6 @@ import { createModel } from "@rematch/core";
 
 type ProfileState = {
   profile: UserProfile | null;
-  showBalance: boolean;
 };
 
 export const profile = createModel<RootModel>()({
@@ -31,10 +30,10 @@ export const profile = createModel<RootModel>()({
   effects: (dispatch: any) => ({
     async getUserProfile(payload, rootState) {
       try {
-        const response: any = await getRequest("/api/v1/user/auth/profile");
+        const response: any = await getRequest("/accounts/profile");
 
-        if (response && response?.data?.success) {
-          dispatch.profile.setProfile(response?.data?.data);
+        if (response && response?.data) {
+          dispatch.profile.setProfile(response?.data);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

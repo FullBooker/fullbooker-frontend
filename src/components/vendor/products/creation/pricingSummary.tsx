@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import NavigationButtons from "./navigationButtons";
 import { NewProductPayload } from "@/domain/dto/input";
 import { ProductPricing } from "@/domain/product";
+import StepHeader from "./stepHeader";
 
 type ProductPricingSummaryProps = {
   newProduct: NewProductPayload;
@@ -45,9 +46,7 @@ const ProductPricingSummary: FC<ProductPricingSummaryProps> = ({
 
   return (
     <div>
-      <p className="font-base mt-4 ml-0 md:ml-5 lg:ml-5 xl:ml-5 text-center mb-3">
-        Charges summary
-      </p>
+      <StepHeader title="Charges summary" />
       <div className="px-1 md:px-6 bg-white space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {newProduct?.pricing?.map(
@@ -74,14 +73,10 @@ const ProductPricingSummary: FC<ProductPricingSummaryProps> = ({
                     </div>
                     <div className="flex justify-between">
                       <span>Discount</span>
-                      <span>
-                        {0}
-                      </span>
+                      <span>{0}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>
-                        Service fee (0%)
-                      </span>
+                      <span>Service fee (0%)</span>
                       <span>{0}</span>
                     </div>
                     <div className="flex justify-between font-bold text-green-600">

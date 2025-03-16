@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import Image from "next/image";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
@@ -8,10 +8,13 @@ import { connect } from "react-redux";
 import { ModalID } from "@/domain/components";
 import { NewProductPayload, PauseProductPayload } from "@/domain/dto/input";
 import { CircularProgress } from "@mui/material";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
+import { useRouter } from "next/navigation";
 
 type ProductPausingConfirmationModalContentProps = {
   setActiveModal: (modalId: ModalID) => void;
-  pauseProduct: (payload: PauseProductPayload) => void;
+  pauseProduct: (payload: PauseProductPayload) => Promise<void>;
   newProduct: NewProductPayload;
   loading: boolean;
 };
@@ -19,21 +22,8 @@ type ProductPausingConfirmationModalContentProps = {
 const ProductPausingConfirmationModal: FC<
   ProductPausingConfirmationModalContentProps
 > = ({ setActiveModal, pauseProduct, newProduct, loading }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const deviceType = useDeviceType();
+  const router = useRouter();
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -41,8 +31,8 @@ const ProductPausingConfirmationModal: FC<
         <Image
           src="/assets/pause.jpg"
           alt="Fullbooker Logo"
-          width={isMobile ? 250 : 400}
-          height={isMobile ? 250 : 400}
+          width={deviceType === DeviceType.mobile ? 250 : 400}
+          height={deviceType === DeviceType.mobile ? 250 : 400}
           className="mx-auto"
         />
         <div className="text-center items-center mb-2 flex justify-center">
@@ -66,7 +56,9 @@ const ProductPausingConfirmationModal: FC<
             pauseProduct({
               product: newProduct?.id as string,
               active: false,
-            } as PauseProductPayload);
+            } as PauseProductPayload).then(() => {
+              router.push("/vendor/products");
+            });
           }}
         >
           {loading ? (
@@ -92,7 +84,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
-  pauseProduct: (payload: PauseProductPayload) =>
+  pauseProduct: async (payload: PauseProductPayload) =>
     dispatch.vendor.pauseProduct(payload),
 });
 

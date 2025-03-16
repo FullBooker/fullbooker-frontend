@@ -146,7 +146,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                   <tr className="border-b pb-4 mb-4">
                     <td className="py-3 flex items-center gap-2">
                       <Image
-                        src={cartSummary?.product_thumbnail}
+                        src={cartSummary?.product_thumbnail as string}
                         alt={`${cartSummary?.product_title} Image`}
                         width={isMobile ? 45 : 45}
                         height={isMobile ? 45 : 50}
@@ -166,11 +166,9 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                     </td>
                     <td className="py-3 text-green-600 font-medium">
                       {baseCurrency}{" "}
-                      {addCommaSeparators(
-                        parseInt(cartSummary?.product_base_price)
-                      )}
+                      {0}
                     </td>
-                    <td className="py-3">{cartSummary?.total_items}</td>
+                    <td className="py-3">{0}</td>
                     <td className="py-3 text-green-600 font-medium">
                       {baseCurrency}{" "}
                       {addCommaSeparators(

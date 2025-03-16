@@ -1,3 +1,4 @@
+import { FC, useEffect, useState } from "react";
 import Button from "@/components/shared/button";
 import {
   SESSION_PRICING_CATEGORIES,
@@ -5,6 +6,7 @@ import {
 } from "@/constants";
 import { Currency } from "@/domain/dto/output";
 import {
+  Availability,
   CartItem,
   CartSummary,
   Product,
@@ -16,13 +18,10 @@ import useIsMobile from "@/lib/hooks/useIsMobile";
 import { RootState } from "@/store";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
-import { FC, useEffect, useState } from "react";
 import { connect } from "react-redux";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   addCommaSeparators,
-  formatProductAvailability,
   generateUUID,
 } from "../../../../utilities/helpers";
 import { ModalID } from "@/domain/components";
@@ -31,9 +30,11 @@ import TicketBookingSummary from "./ticketBookingSummary";
 import { useThemeMode } from "@/lib/hooks/useTheme";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
+import DateSlotSelector from "./dateSlotSelector";
+import CustomTimePicker from "@/components/shared/customerTimePicker";
+import CustomDatePicker from "@/components/shared/customDatePicker";
 
 type TicketBookingProps = {
-  productsRequestProcessing: boolean;
   product: Product;
   addToCart: (item: CartItem) => void;
   cart: Array<CartItem>;
@@ -48,7 +49,6 @@ type TicketBookingProps = {
 };
 
 const TicketBooking: FC<TicketBookingProps> = ({
-  productsRequestProcessing,
   product,
   addToCart,
   cart,
@@ -61,98 +61,135 @@ const TicketBooking: FC<TicketBookingProps> = ({
   setActiveModal,
   modalId,
 }) => {
-  const [tickets, setTickets] = useState({
-    earlyBird: 0,
-    standard: 0,
-    vip: 1,
-    vvip: 0,
-  });
+  const isMobile = useIsMobile();
+  const { themeMode } = useThemeMode();
+  const [isEvent, setIsEvent] = useState<boolean>();
+  const [isActivity, setIsActivity] = useState<any>();
 
-  const dates = [
-    {
-      day: "Wednesday",
-      month: "March",
-      date: "20",
-      time: "8:30 PM",
-      active: true,
-    },
-    { day: "Thursday", month: "Feb", date: "27", time: "8:30 PM" },
-    { day: "Friday", month: "Feb", date: "27", time: "8:30 PM" },
-    { day: "Saturday", month: "Feb", date: "27", time: "8:30 PM" },
-    { day: "Sunday", month: "Feb", date: "27", time: "8:30 PM" },
-    { day: "Monday", month: "Feb", date: "27", time: "8:30 PM" },
-  ];
-
-  const [selectedPricing, setSelectedPricing] = useState<ProductPricing | null>(
-    null
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-  };
-
-  const getDefaultPricingOption = (
-    pricingOptions: Array<ProductPricing>
-  ): {
-    currency: Currency;
-    pricingOption: ProductPricing;
-  } => {
-    if (pricingOptions?.length > 0) {
-      const defaultPricingOption = pricingOptions[0];
-      return {
-        currency: currencies?.find(
-          (currency: Currency) =>
-            currency?.id === defaultPricingOption?.currency
-        ) as Currency,
-        pricingOption: defaultPricingOption,
-      };
-    } else {
-      return {
-        currency: {} as Currency,
-        pricingOption: {} as ProductPricing,
-      };
-    }
-  };
-
-  // Save the default product metdata on render
   useEffect(() => {
-    const defaultPricing = getDefaultPricingOption(product?.pricing);
-    const availaibility = formatProductAvailability(product?.availability);
     setProductDetailsToCart({
       ...cartSummary,
       product_id: product?.id,
       product_title: product?.name,
       product_thumbnail: product?.image?.file,
       product_location: product?.locations[0]?.coordinates,
-      product_base_pricing_id: defaultPricing?.pricingOption?.id || "",
-      product_base_price: defaultPricing?.pricingOption?.cost || 0,
-      product_base_pricing_type:
-        (defaultPricing?.pricingOption?.type === "ticket"
-          ? defaultPricing?.pricingOption?.ticket_tier
-          : defaultPricing?.pricingOption?.type) || "",
-      product_base_currency: defaultPricing?.currency?.name || "",
-      time: availaibility?.time,
     } as CartSummary);
-    if (cart?.length === 0) {
-      addToCart({
-        id: generateUUID(),
-        name: "",
-        email: "",
-        phone_number: "",
-        id_number: "",
-      } as CartItem);
-    }
   }, []);
 
-  const isMobile = useIsMobile();
-  const { themeMode } = useThemeMode();
+  useEffect(() => {
+    setIsEvent(
+      !!product?.availability?.start_time && !!product?.availability?.end_time
+    );
+    setIsActivity(
+      product?.availability?.open_days?.length > 0 &&
+        product?.availability?.duration
+    );
+  }, []);
+
+  const generateAvailableDates = (availability: Availability) => {
+    if (!availability?.start || !availability?.end) return [];
+
+    const startDate = new Date(availability.start);
+    const endDate = new Date(availability.end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return [];
+
+    const availableDates: Date[] = [];
+    const isEvent = !!availability.start_time && !!availability.end_time;
+    const isActivity =
+      availability.open_days.length > 0 && availability.duration;
+
+    if (isEvent) {
+      for (
+        let d = new Date(startDate);
+        d <= endDate;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const formattedDate = d.toISOString().split("T")[0]; // Ensure proper format
+        if (!availability.closed_dates.includes(formattedDate)) {
+          availableDates.push(new Date(d)); // Push Date object, not string
+        }
+      }
+    } else if (isActivity) {
+      availability.open_days.forEach((openDay) => {
+        let openDate = new Date(startDate);
+        while (openDate <= endDate) {
+          if (
+            openDay.day_name.toLowerCase() ===
+            openDate
+              .toLocaleDateString("en-US", { weekday: "long" })
+              .toLowerCase()
+          ) {
+            const formattedDate = openDate.toISOString().split("T")[0];
+            if (!availability.closed_dates.includes(formattedDate)) {
+              availableDates.push(new Date(openDate));
+            }
+          }
+          openDate.setDate(openDate.getDate() + 1);
+        }
+      });
+    }
+
+    return availableDates;
+  };
+
+  const showTicketSummaryIfValid = () => {
+    if (cart?.length === 0) {
+      return setFailureAlert("You need to select atleast one ticket");
+    }
+
+    if (!cartSummary?.selected_date) {
+      return setFailureAlert("You need to select a date to proceed");
+    }
+
+    if (isActivity && !cartSummary?.time) {
+      return setFailureAlert("You need to select a session to proceed");
+    }
+    setActiveModal(ModalID.ticketBookingSummary);
+  };
+
+  const checkIfCartHasItemsWithPricingType = (
+    pricingTypeId: string
+  ): boolean => {
+    return cart.some(
+      (item: CartItem) => item.pricing_type_id === pricingTypeId
+    );
+  };
+
+  const getTotalTicketsByPricingType = (pricingType: string): number => {
+    return cart.filter((item: CartItem) => item.pricing_type_id === pricingType)
+      .length;
+  };
+
+  const addItemToCartByPricingType = (pricing: ProductPricing): void => {
+    const cost = parseInt(pricing?.cost) || 0;
+    addToCart({
+      id: generateUUID(),
+      phone_number: "",
+      email: "",
+      id_number: "",
+      name: "",
+      pricing_type:
+        pricing?.type === "ticket"
+          ? pricing?.ticket_tier || ""
+          : pricing?.type || "",
+      pricing_type_id: pricing?.id || "",
+      cost,
+    } as CartItem);
+  };
+
+  const removeItemFromCartByPricingType = (pricing: ProductPricing): void => {
+    const filteredCartItemsByPricingType: Array<CartItem> = cart.filter(
+      (item: CartItem) => item.pricing_type_id === pricing?.id
+    );
+
+    if (filteredCartItemsByPricingType.length > 0) {
+      removeFromCart(
+        filteredCartItemsByPricingType[
+          filteredCartItemsByPricingType.length - 1
+        ]?.id
+      );
+    }
+  };
 
   return (
     <div className="md:border-t md:border-gray-400 pt-3 pb-0 md:pt-10 md:pb-10">
@@ -162,50 +199,44 @@ const TicketBooking: FC<TicketBookingProps> = ({
           <div className="flex justify-between items-center mb-3">
             <p className="text-black">Pick a date</p>
             <div className="relative right-0">
-              {" "}
-              <DatePicker
-                selected={selectedDate}
+              <CustomDatePicker
                 onChange={(date) =>
                   setProductDetailsToCart({
                     ...cartSummary,
                     selected_date: moment(date).format("l"),
                   } as CartSummary)
                 }
-                popperPlacement="bottom-start"
                 customInput={
                   <p className="text-primary cursor-pointer text-right">
                     View more
                   </p>
                 }
+                placement={"bottom-start"}
+                availableDates={generateAvailableDates(product?.availability)}
               />
             </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto w-full">
-            {dates.map((d, index) => (
-              <div
-                key={index}
-                className={`flex flex-col items-center justify-center md:w-full min-w-[100px] md:min-w-[80px] h-28 md:h-36 p-2 rounded-lg border md:space-y-2 ${
-                  d.active
-                    ? "border-primary text-primary"
-                    : "border-gray-500 text-gray-500"
-                }`}
-              >
-                <span className="text-sm">{d.day}</span>
-                <span className="text-xs">{d.month}</span>
-                <div
-                  className={`w-6 h-6 rounded-full text-center ${
-                    d.active
-                      ? "bg-primary text-white"
-                      : "bg-gray-500 text-white"
-                  }`}
-                >
-                  <span className="text-xs">{d.date}</span>
-                </div>
-                <span className="text-xs">{d.time}</span>
-              </div>
-            ))}
-          </div>
+          <DateSlotSelector availability={product?.availability} />
         </div>
+
+        {isActivity && (
+          <div
+            className="flex justify-between items-center p-4 rounded-lg cursor-pointer
+            border border-primary mb-6"
+          >
+            <div className="">
+              <p className="text-black mb-2">Pick a session</p>
+              <CustomTimePicker
+                onChange={(time: any) =>
+                  setProductDetailsToCart({
+                    ...cartSummary,
+                    time: time,
+                  })
+                }
+              />
+            </div>
+          </div>
+        )}
 
         {/* Available Tickets */}
         <div className="rounded-sm md:border md:border-gray-300 md:p-3">
@@ -224,42 +255,13 @@ const TicketBooking: FC<TicketBookingProps> = ({
                       (spCat: SessionPricingCategory) =>
                         spCat.key === pricing?.type
                     )?.title;
-
+              const isSelected = checkIfCartHasItemsWithPricingType(pricing.id);
               return (
                 <div
                   key={index}
-                  className={`flex justify-between items-center p-4 rounded-lg cursor-pointer ${
-                    (!selectedPricing && index === 0) ||
-                    selectedPricing?.id === pricing.id
-                      ? "border border-primary"
-                      : "shadow"
+                  className={`flex justify-between items-center p-4 rounded-lg h-[80px] md:h-[88px] ${
+                    isSelected ? "border border-primary" : "shadow"
                   }`}
-                  onClick={() => {
-                    setSelectedPricing(pricing);
-                    if (
-                      cartSummary?.product_base_pricing_type !==
-                        pricing?.ticket_tier &&
-                      cartSummary?.product_base_pricing_type !== pricing?.type
-                    ) {
-                      setProductDetailsToCart({
-                        ...cartSummary,
-                        product_id: product?.id,
-                        product_title: product?.name,
-                        product_thumbnail: product?.image?.file,
-                        product_location: product?.locations[0]?.coordinates,
-                        product_base_pricing_type:
-                          (pricing?.type === "ticket"
-                            ? pricing?.ticket_tier
-                            : pricing?.type) || "",
-                        product_base_currency:
-                          currencies?.find(
-                            (currency: Currency) =>
-                              currency.id === pricing?.currency
-                          )?.name || "",
-                        product_base_price: pricing?.cost
-                      } as CartSummary);
-                    }
-                  }}
                 >
                   <div className="flex items-center">
                     <div className="me-4">
@@ -295,62 +297,56 @@ const TicketBooking: FC<TicketBookingProps> = ({
                           Math.round(parseInt(pricing?.cost))
                         )}
                       </p>
-                      <p className="text-xs text-orange-500">
-                        {pricing?.maximum_number_of_tickets} tickets left
-                      </p>
+                      {pricing?.remaining_tickets > 0 && (
+                        <p
+                          className={`text-xs ${
+                            pricing?.remaining_tickets < 10
+                              ? "text-orange-500"
+                              : "text-[#808080]"
+                          }`}
+                        >
+                          {pricing?.remaining_tickets} tickets left
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div
-                    className={`flex items-center gap-2 ${
-                      (!selectedPricing && index === 0) ||
-                      selectedPricing?.id === pricing.id
-                        ? "text-black"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    <button
-                      className={`p-1 md:p-2 border rounded ${
-                        (!selectedPricing && index === 0) ||
-                        selectedPricing?.id === pricing.id
-                          ? "border-black"
-                          : "border-gray-400"
+                  {pricing?.remaining_tickets === 0 ? (
+                    <div className="flex justify-center items-center text-center">
+                      <span className="text-red-500 text-sm">Sold Out</span>
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex items-center gap-2 ${
+                        isSelected ? "text-black" : "text-gray-500"
                       }`}
-                      disabled={cart.length === 0}
-                      onClick={() => removeFromCart(cart[cart.length - 1].id)}
                     >
-                      <Minus />
-                    </button>
-                    <span className="">
-                      {cartSummary?.product_base_pricing_type ===
-                        pricing.ticket_tier ||
-                      cartSummary?.product_base_pricing_type === pricing.type
-                        ? cart?.length | 0
-                        : 0}
-                    </span>
-                    <button
-                      className={`p-1 md:p-2 border rounded ${
-                        (!selectedPricing && index === 0) ||
-                        selectedPricing?.id === pricing.id
-                          ? "border-black"
-                          : "border-gray-400"
-                      }`}
-                      onClick={() =>
-                        addToCart({
-                          id: generateUUID(),
-                          phone_number: "",
-                          email: "",
-                          id_number: "",
-                          name: "",
-                        } as CartItem)
-                      }
-                    >
-                      <Plus />
-                    </button>
-                    {/* <span className="text-red-500 text-sm font-semibold">
-                Sold Out
-              </span> */}
-                  </div>
+                      <button
+                        className={`p-1 md:p-2 border rounded cursor-pointer ${
+                          isSelected ? "border-black" : "border-gray-400"
+                        }`}
+                        disabled={cart.length === 0}
+                        onClick={() => removeItemFromCartByPricingType(pricing)}
+                      >
+                        <Minus />
+                      </button>
+                      <span className="">
+                        {getTotalTicketsByPricingType(pricing?.id)}
+                      </span>
+                      <button
+                        className={`p-1 md:p-2 border rounded cursor-pointer ${
+                          isSelected ? "border-black" : "border-gray-400"
+                        }`}
+                        disabled={
+                          pricing?.remaining_tickets ===
+                          getTotalTicketsByPricingType(pricing?.id)
+                        }
+                        onClick={() => addItemToCartByPricingType(pricing)}
+                      >
+                        <Plus />
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -366,7 +362,7 @@ const TicketBooking: FC<TicketBookingProps> = ({
             text="text-white font-base"
             padding="py-2"
             margin="mt-4 md:mt-6 md:mb-6"
-            onClick={() => setActiveModal(ModalID.ticketBookingSummary)}
+            onClick={() => showTicketSummaryIfValid()}
           >
             Continue
           </Button>
@@ -375,12 +371,7 @@ const TicketBooking: FC<TicketBookingProps> = ({
       {modalId === ModalID.ticketBookingSummary && (
         <UniversalModal
           theme={themeMode}
-          content={
-            <TicketBookingSummary
-              selectedPricing={selectedPricing}
-              selselectedDate={selectedDate}
-            />
-          }
+          content={<TicketBookingSummary isActivity={isActivity} />}
           fullScreen={true}
         />
       )}

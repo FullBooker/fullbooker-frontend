@@ -1,131 +1,166 @@
-import { ProductType, ViewType } from "@/domain/constants";
-import { NewProductPayload } from "@/domain/dto/input";
-import { ProductCategory } from "@/domain/dto/output";
-import { RootState } from "@/store";
+import Button from "@/components/shared/button";
+import { ProductType } from "@/domain/constants";
+import { ActivateProductPayload, NewProductPayload } from "@/domain/dto/input";
+import { Dispatch, RootState } from "@/store";
 import { CircularProgress } from "@mui/material";
-import React, { FC, useEffect } from "react";
+import Link from "next/link";
+import React, { FC } from "react";
 import { connect } from "react-redux";
 
-
 type NavigationButtonsProps = {
-  loading: boolean;
+  isProcessingRequest: boolean;
   activeStep: number;
-  setActiveStep: (payload: number) => void;
+  setActiveStep: (step: number) => void;
   newProduct: NewProductPayload;
-  disableNext?: boolean;
-  productCategories: Array<ProductCategory>;
+  isFormSubmit?: boolean;
   productType: ProductType;
-  setProductPageViewType: (viewType: ViewType) => void;
-  setNewProductDetails: (payload: any) => void;
-  setProductType: (payload: ProductType) => void;
+  setFailureAlert: (message: string) => void;
 };
 
 const NavigationButtons: FC<NavigationButtonsProps> = ({
-  loading,
+  isProcessingRequest,
+  newProduct,
+  isFormSubmit = false,
+  productType,
   activeStep,
   setActiveStep,
-  newProduct,
-  disableNext,
-  productCategories,
-  productType,
-  setProductPageViewType,
-  setNewProductDetails,
-  setProductType
+  setFailureAlert,
 }) => {
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
-
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
 
-  const publishProduct = () => {
-    handleNext()
-    // setNewProductDetails(null);
-    // setProductType(ProductType.default)
-    // setProductPageViewType(ViewType.productsListView);
-    // setActiveStep(a);
+  const backButtonProps = {
+    margin: "m-0",
+    borderRadius: "rounded",
+    text: "text-black",
+    padding: "py-1 px-4",
+    isSecondary: true,
+  };
+
+  const continueButtonProps = {
+    margin: "m-0",
+    borderRadius: "rounded",
+    text: "text-white",
+    padding: "py-1 px-4",
+  };
+
+  const renderButtonContent = (title: string) => {
+    return isProcessingRequest ? (
+      <CircularProgress size={18} color="inherit" />
+    ) : (
+      title
+    );
   };
 
   return (
     <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10 mt-8 md:mt-4">
-      <button
-        type="button"
-        className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-secondary text-black py-2 rounded-md mb-2 font-medium"
-        onClick={() =>
-          activeStep === 0
-            ? setProductPageViewType(ViewType.productsListView)
-            : handleBack()
-        }
-      >
-        Back
-      </button>
+      {activeStep === 0 || activeStep === 1 ? (
+        <Link href={"/vendor/products"} className="w-full">
+          <Button {...backButtonProps}>Back</Button>
+        </Link>
+      ) : (
+        <Button {...backButtonProps} onClick={() => handleBack()}>
+          Back
+        </Button>
+      )}
       {productType === ProductType.others &&
       activeStep === 5 &&
       newProduct?.pricing?.length > 0 ? (
-        <button
-          type="submit"
-          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
-          disabled={loading}
-          onClick={() => publishProduct()}
+        <Button
+          {...continueButtonProps}
+          disabled={isProcessingRequest}
+          onClick={() => setActiveStep(activeStep + 2)}
         >
-          {loading ? <CircularProgress size={18} color="inherit" /> : "Publish"}
-        </button>
+          {renderButtonContent("Continue")}
+        </Button>
       ) : productType === ProductType.event &&
         activeStep === 6 &&
         newProduct?.pricing?.length > 0 ? (
-        <button
+        <Link href={"/vendor/products"}>
+          <Button
+            {...continueButtonProps}
+            disabled={isProcessingRequest}
+            type="button"
+            onClick={() => setActiveStep(activeStep + 1)}
+          >
+            {renderButtonContent("Continue")}
+          </Button>
+        </Link>
+      ) : isFormSubmit ? (
+        <Button
+          {...continueButtonProps}
           type="submit"
-          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
-          disabled={loading}
-          onClick={() => publishProduct()}
-        >
-          {loading ? <CircularProgress size={18} color="inherit" /> : "Publish"}
-        </button>
-      ) : (
-        <button
-          type="submit"
-          className="sm:w-full xs:w-full lg:w-[10%] md:w-[20%] w-full bg-primary text-black py-2 rounded-md mb-2 font-medium"
           disabled={
-            loading ||
+            isProcessingRequest ||
             (productType === ProductType.event
               ? activeStep === 6
               : activeStep === 5)
           }
-          onClick={() => (disableNext ? {} : handleNext())}
         >
-          {loading ? (
-            <CircularProgress size={18} color="inherit" />
-          ) : (
-            "Continue"
-          )}
-        </button>
+          {renderButtonContent("Continue")}
+        </Button>
+      ) : activeStep === 4 ? (
+        <Button
+          {...continueButtonProps}
+          onClick={() => {
+            if (!newProduct.image) {
+              setFailureAlert("You need to upload atleast one image");
+            } else {
+              handleNext();
+            }
+          }}
+          disabled={isProcessingRequest}
+        >
+          {renderButtonContent("Continue")}
+        </Button>
+      ) : activeStep === 5 ? (
+        <Button
+          {...continueButtonProps}
+          onClick={() => {
+            if (newProduct?.pricing?.length === 0) {
+              setFailureAlert("You need to add atleast one pricing option");
+            } else {
+              handleNext();
+            }
+          }}
+          disabled={isProcessingRequest}
+        >
+          {renderButtonContent("Continue")}
+        </Button>
+      ) : (
+        <Button
+          {...continueButtonProps}
+          onClick={handleNext}
+          disabled={
+            isProcessingRequest ||
+            (productType === ProductType.event
+              ? activeStep === 6
+              : activeStep === 5)
+          }
+        >
+          {renderButtonContent("Continue")}
+        </Button>
       )}
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const loading = state.loading.models.vendor;
-  const { activeStep, newProduct, productType } = state.vendor;
-  const { productCategories } = state.settings;
+  const { newProduct, productType, activeStep, productMedia } = state.vendor;
   return {
-    loading,
-    activeStep,
     newProduct,
-    productCategories,
     productType,
+    activeStep,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
-  setActiveStep: (payload: number) => dispatch.vendor.setActiveStep(payload),
-  setProductPageViewType: (viewType: ViewType) =>
-    dispatch.vendor.setProductPageViewType(viewType),
-  setNewProductDetails: (payload: any) =>
-    dispatch.vendor.setNewProductDetails(payload),
-  setProductType: (payload: ProductType) => dispatch.vendor.setProductType(payload),
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  setActiveStep: (step: number) => dispatch.vendor.setActiveStep(step),
+  setFailureAlert: (message: string) => dispatch.alert.setFailureAlert(message),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationButtons);

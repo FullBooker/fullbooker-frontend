@@ -25,6 +25,7 @@ import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/
 import BottomNavBar from "@/components/layout/bottomNavbar";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import ComprehensiveProductFilters from "@/components/products/homePage/comprehensiveProductFilters";
+import { CustomeEvents } from "@/constants";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -119,23 +120,23 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   }, [theme]);
 
   useEffect(() => {
-    const flow = searchParams.get("user_flow");
-    if (
-      flow &&
-      flow === "vendor" &&
-      type === NotificationType.success &&
-      message === "Switched to hosting successfully!"
-    ) {
-      navigation.push("/vendor/products");
-    }
+    document.addEventListener(
+      CustomeEvents.switchedToHostingSuccessfullEvent,
+      async (event: any) => {
+        navigation.push("/vendor/products");
+      }
+    );
 
-    if (
-      type === NotificationType.success &&
-      message === "Switched to hosting successfully!"
-    ) {
-      navigation.push("/vendor/products");
-    }
-  }, [message, type]);
+    document.addEventListener(
+      CustomeEvents.successfullUserAuthentication,
+      async (event: any) => {
+        const redirect = searchParams?.get("redirect");
+          if (redirect) {
+            navigation.push(`/${redirect}`);
+          }
+      }
+    );
+  }, []);
 
   // useGoogleOneTap();
 
@@ -261,7 +262,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           content={<PaymentSuccessfullModal />}
         />
       )}
-      {modalId === ModalID.comprehensiveProductFilters && <ComprehensiveProductFilters />}
+      {modalId === ModalID.comprehensiveProductFilters && (
+        <ComprehensiveProductFilters />
+      )}
       <BottomNavBar />
     </div>
   );

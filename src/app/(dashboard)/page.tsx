@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ModalID } from "@/domain/components";
-import { ProductCategory } from "@/domain/dto/output";
+import { ProductCategory, ProductTag } from "@/domain/dto/output";
 import ProductCategories from "@/components/products/homePage/categories";
 import Button from "@/components/shared/button";
 import DashBoardLayout from "./layout";
@@ -19,15 +19,19 @@ type HomePageProps = {
   getProductCategories: () => void;
   productCategories: Array<ProductCategory>;
   getCurrencies: () => void;
+  productTags: Array<ProductTag>
+  getProductTags: () => void;
 };
 
 const HomePage: FC<HomePageProps> & { layout: any } = ({
   getProductCategories,
   getCurrencies,
+  getProductTags,
 }) => {
   useEffect(() => {
     getProductCategories();
     getCurrencies();
+    getProductTags();
   }, []);
 
   return (
@@ -75,13 +79,14 @@ const mapStateToProps = (state: RootState) => {
   const productsRequestProcessing = state.loading.models.products;
   const { isLoggedIn } = state.authentication;
   const { products } = state.products;
-  const { productCategories, currencies } = state.settings;
+  const { productCategories, currencies, productTags } = state.settings;
   return {
     isLoggedIn,
     products,
     productCategories,
     productsRequestProcessing,
     currencies,
+    productTags
   };
 };
 
@@ -89,6 +94,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
   getProductCategories: () => dispatch.settings.getProductCategories(),
+  getProductTags: () => dispatch.settings.getProductTags(),
   getCurrencies: () => dispatch.settings.getCurrencies(),
 });
 

@@ -1,48 +1,70 @@
 "use client";
 
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { CalendarDays } from "lucide-react";
-import NavigationButtons from "./navigationButtons";
+import NavigationButtons from "../navigationButtons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-import { ProductType } from "@/domain/constants";
-import { RootState } from "@/store";
+import { Dispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import {
   NewProductPayload,
-  OpenDay,
   ProductAvailabilityPayload,
+  UpdateProductAvailabilityPayload,
 } from "@/domain/dto/input";
-import LocationSearch from "./locationSearch";
-import ReverseGeocoding from "./locationPointer";
+import LocationSearch from "../locationSearch";
+import ReverseGeocoding from "../locationPointer";
 import { extractCoordinates } from "@/utilities";
+import StepHeader from "../stepHeader";
 
 type EventAvailabilityProps = {
-  getDaysOfWeek: () => void;
   newProduct: NewProductPayload;
   addProductAvailability: (payload: ProductAvailabilityPayload) => void;
-  productType: ProductType;
+  updateProductAvailability: (
+    payload: UpdateProductAvailabilityPayload
+  ) => void;
+  isProcessingRequest: boolean;
 };
 
 const EventAvailability: FC<EventAvailabilityProps> = ({
-  getDaysOfWeek,
   newProduct,
   addProductAvailability,
-  productType,
+  updateProductAvailability,
+  isProcessingRequest,
 }) => {
   const schema = yup.object().shape({
     start: yup.string().required("Start date is required"),
     end: yup.string().required("End date is required"),
     start_time: yup.string().required("Start time is required"),
-    end_time: yup.string().required("End time is required"),
+    end_time: yup
+      .string()
+      .required("End time is required")
+      .test(
+        "is-greater",
+        "End time must be later than start time",
+        function (value) {
+          const { start_time } = this.parent;
+          if (!start_time || !value) return true;
+          return value > start_time;
+        }
+      ),
+    location: yup
+      .object()
+      .nullable()
+      .required("Location is required")
+      .test(
+        "valid-location",
+        "Please select a valid location",
+        (value) => !!value && Object.keys(value).length > 0
+      ),
   });
 
   const {
     control,
     handleSubmit,
-    getValues,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -55,40 +77,43 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
     mode: "onBlur",
   });
 
-  const processOpenDay = (openDays: any) => {
-    let selectedDays: Array<OpenDay> = [];
-    openDays?.map((day: any) => {
-      selectedDays.push({
-        day: day?.id,
-        opening_at: day?.opening_at,
-        closing_at: day?.closing_at,
-      } as OpenDay);
-    });
-    return selectedDays;
-  };
-
   const onSubmit = (data: any) => {
-    addProductAvailability({
-      product: newProduct?.id,
-      start: data?.start,
-      end: data?.end,
-      start_time: data?.start_time,
-      end_time: data?.end_time,
-    } as ProductAvailabilityPayload);
+    if (newProduct?.availability) {
+      updateProductAvailability({
+        id: newProduct?.availability?.id,
+        product: newProduct?.id,
+        start: data?.start,
+        end: data?.end,
+        start_time: data?.start_time,
+        end_time: data?.end_time,
+      } as UpdateProductAvailabilityPayload);
+    } else {
+      addProductAvailability({
+        product: newProduct?.id,
+        start: data?.start,
+        end: data?.end,
+        start_time: data?.start_time,
+        end_time: data?.end_time,
+      } as ProductAvailabilityPayload);
+    }
   };
 
   const [selectedLocation, setSelectedLocation] =
     useState<google.maps.places.PlaceResult | null>(null);
 
+  useEffect(() => {
+    setValue("location", selectedLocation as any);
+  }, [selectedLocation]);
+
   return (
     <div className="px-0 md:px-5">
-      <p className="font-base mt-4 ml-5 text-center mb-3">
-        Where and when does this activity happen?
-      </p>
+      <StepHeader title="Where and when does this activity happen?" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">
-          <LocationSearch setSelectedLocation={setSelectedLocation} />
-
+          <LocationSearch
+            setSelectedLocation={setSelectedLocation}
+            validationErrors={errors}
+          />
           <div className="border rounded-sm border-primary px-3 md:px-4 py-4 col-span-2">
             <h3 className="font-base mb-3">When will this event happen?</h3>
             <div className="flex justify-between items-center gap-1 md:gap-4">
@@ -248,27 +273,34 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
             </div>
           </div>
         </div>
-        <NavigationButtons disableNext={true} />
+        <NavigationButtons
+          isFormSubmit
+          isProcessingRequest={isProcessingRequest}
+        />
       </form>
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const fetchingDaysOfTheWeek = state.loading.models.settings;
+  const isProcessingRequest =
+    state.loading.effects.vendor.addProductAvailability ||
+    state.loading.effects.vendor.updateProductAvailability;
   const { daysOfWeek } = state.settings;
   const { newProduct, productType } = state.vendor;
   return {
     daysOfWeek,
-    fetchingDaysOfTheWeek,
+    isProcessingRequest,
     newProduct,
     productType,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   addProductAvailability: (payload: ProductAvailabilityPayload) =>
     dispatch.vendor.addProductAvailability(payload),
+  updateProductAvailability: (payload: UpdateProductAvailabilityPayload) =>
+    dispatch.vendor.updateProductAvailability(payload),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventAvailability);

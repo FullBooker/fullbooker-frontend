@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef, FC } from "react";
-import { createRoot } from "react-dom/client";
 import {
   APIProvider,
-  ControlPosition,
-  MapControl,
   AdvancedMarker,
   Map,
   useMap,
   useMapsLibrary,
   useAdvancedMarkerRef,
-  AdvancedMarkerRef,
+  MapMouseEvent,
 } from "@vis.gl/react-google-maps";
 import { ChevronDown, MapPin } from "lucide-react";
 import {
@@ -19,6 +16,7 @@ import {
 } from "@/domain/dto/input";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
+import { extractCoordinates } from "@/utilities/helpers";
 
 const API_KEY = process.env.NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY as string;
 
@@ -28,19 +26,63 @@ type LocationSearchProps = {
   addProductLocation: (payload: AddProductLocationPayload) => void;
   updateProductLocation: (payload: UpdateProductLocationPayload) => void;
   setSelectedLocation: (payload: google.maps.places.PlaceResult | null) => void;
+  validationErrors: any;
 };
 
 const LocationSearch: FC<LocationSearchProps> = ({
-  loading,
   newProduct,
   addProductLocation,
   updateProductLocation,
   setSelectedLocation,
+  validationErrors,
 }) => {
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
   const [markerRef, marker] = useAdvancedMarkerRef();
+  const [markerPosition, setMarkerPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  const saveProductLocation = (
+    payload: AddProductLocationPayload | AddProductLocationPayload
+  ): void => {
+    if (newProduct?.locations?.length > 0) {
+      updateProductLocation({
+        ...payload,
+        id: newProduct.locations[0].id,
+      });
+    } else {
+      addProductLocation(payload);
+    }
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLoc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(userLoc);
+          setMarkerPosition(userLoc);
+        },
+        () => {
+          setUserLocation({ lat: 1.286389, lng: 36.817223 });
+          setMarkerPosition({ lat: 1.286389, lng: 36.817223 });
+        }
+      );
+    } else {
+      setUserLocation({ lat: 1.286389, lng: 36.817223 });
+      setMarkerPosition({ lat: 1.286389, lng: 36.817223 });
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,7 +101,7 @@ const LocationSearch: FC<LocationSearchProps> = ({
   useEffect(() => {
     setSelectedLocation(selectedPlace);
     if (selectedPlace && selectedPlace?.geometry?.location) {
-      addProductLocation({
+      saveProductLocation({
         product: newProduct?.id,
         lat: selectedPlace?.geometry?.location?.lat(),
         long: selectedPlace?.geometry?.location?.lng(),
@@ -68,15 +110,57 @@ const LocationSearch: FC<LocationSearchProps> = ({
     }
   }, [selectedPlace]);
 
-  function extractCoordinates(coordinateString: string) {
-    const parts = coordinateString?.split("POINT (");
-    if (parts.length < 2) return null;
-    const coordinates = parts[1].replace(")", "").trim().split(" ");
-    return {
-      latitude: parseFloat(coordinates[1]),
-      longitude: parseFloat(coordinates[0]),
+  const fetchFormattedAddress = async (newPos: {
+    lat: number;
+    lng: number;
+  }) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${newPos.lat},${newPos.lng}&key=${API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.status === "OK" && data.results.length > 0) {
+        const formattedAddress = data.results[0].formatted_address;
+
+        setMarkerPosition(newPos);
+        saveProductLocation({
+          product: newProduct?.id as string,
+          lat: newPos.lat,
+          long: newPos.lng,
+          address: formattedAddress,
+        });
+      } else {
+        console.error("No address found for this location");
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+    }
+  };
+
+  const handleMarkerDragEnd = (event: any) => {
+    const location: google.maps.LatLngLiteral | null = event?.detail?.latLng;
+    if (!location) return;
+
+    const newPos = {
+      lat: location?.lat,
+      lng: location?.lng,
     };
-  }
+
+    fetchFormattedAddress(newPos);
+  };
+
+  const handleMapClick = async (event: MapMouseEvent) => {
+    const location: google.maps.LatLngLiteral | null = event?.detail?.latLng;
+    if (!location) return;
+
+    const newPos = {
+      lat: location?.lat,
+      lng: location?.lng,
+    };
+
+    fetchFormattedAddress(newPos);
+  };
 
   return (
     <div className="relative items-center rounded-md mb-4 row-span-4">
@@ -90,7 +174,7 @@ const LocationSearch: FC<LocationSearchProps> = ({
         <MapHandler place={selectedPlace} marker={marker} />
         <Map
           mapId={"bf51a910020fa25a"}
-          defaultZoom={3}
+          defaultZoom={10}
           defaultCenter={
             newProduct?.locations?.length > 0
               ? {
@@ -103,18 +187,31 @@ const LocationSearch: FC<LocationSearchProps> = ({
                       ?.coordinates
                   )?.longitude as number,
                 }
-              : { lat: 1.286389, lng: 36.817223 }
+              : userLocation ?? { lat: 1.286389, lng: 36.817223 }
           }
           gestureHandling={"greedy"}
           disableDefaultUI={true}
           style={{
-            height: isMobile ? "150px" : "85%",
+            height: isMobile ? "150px" : "80%",
             width: "100%",
           }}
+          onClick={handleMapClick}
         >
-          <AdvancedMarker ref={markerRef} position={null} />
+          {markerPosition && (
+            <AdvancedMarker
+              ref={markerRef}
+              position={markerPosition}
+              draggable={true}
+              onDragEnd={handleMarkerDragEnd}
+            />
+          )}
         </Map>
       </APIProvider>
+      {validationErrors && (
+        <p className="text-red-500 text-sm mt-3">
+          {validationErrors?.location?.message}
+        </p>
+      )}
     </div>
   );
 };

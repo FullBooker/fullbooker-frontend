@@ -4,6 +4,7 @@ interface TicketPayload {
   phone_number: string;
   email: string;
   pricing: string;
+  start?: string
 }
 
 export interface BookTicketPayload {

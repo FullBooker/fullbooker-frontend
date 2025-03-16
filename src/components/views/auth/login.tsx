@@ -1,24 +1,18 @@
 "use client";
 
-import { Switch } from "@/components/themeToggle/auth/switch";
 import Image from "next/image";
 import FormInputAuth from "../../../components/auth/FormInputAuth";
-import ButtonAuth from "../../../components/auth/ButtonAuth";
-import Card from "../../../components/auth/Card";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { RootState } from "@/store";
 import { UserCredentials } from "@/domain/auth";
 import { connect } from "react-redux";
-import { FC, ReactNode, useEffect } from "react";
+import { FC } from "react";
 
 import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
-import { getToken } from "@/utilities/auth.cookie";
 import { ModalID } from "@/domain/components";
-import { Key, KeyRound, KeySquare, Lock, Phone, User } from "lucide-react";
+import { KeyRound, Mail, Phone } from "lucide-react";
 import { NotificationType } from "@/domain/notification";
 import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 import Button from "@/components/shared/button";
@@ -36,36 +30,29 @@ type LoginModalContentProps = {
 };
 
 const defaultValues = {
-  phone_number: "",
+  email: "",
   password: "",
 };
 
 export interface FormData {
-  phone_number: string;
+  email: string;
   password: string;
 }
 
 export const schema = yup.object().shape({
-  phone_number: yup
+  email: yup
     .string()
-    .min(10, "Phone number must be atleast 10 digits")
-    .required("Phone number is required"),
+    .email("Provide a valid email address")
+    .required("Email is required"),
   password: yup.string().required("Password is required"),
 });
 
 const LoginModalContent: FC<LoginModalContentProps> = ({
   emailPassowrdLoginRequestProcessing,
-  isLoggedIn,
   signIn,
-  message,
-  authData,
-  getUserProfile,
   setActiveModal,
-  type,
   googleLoginRequestProcessing,
 }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const {
     control,
     setError,
@@ -78,24 +65,10 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   });
 
   const onSubmit = (data: FormData) => {
-    const { phone_number, password } = data;
-    signIn({ phone_number, password } as UserCredentials);
+    const { email, password } = data;
+    signIn({ email, password } as UserCredentials);
   };
   const { login } = useGoogleLogin();
-
-  useEffect(() => {
-    return () => {
-      const redirect = searchParams?.get("redirect");
-      if (
-        type === NotificationType.success &&
-        message === "Login successful!"
-      ) {
-        if (redirect) {
-          router.push(`/${redirect}`);
-        }
-      }
-    };
-  }, [type, message]);
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -117,19 +90,19 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <Controller
-            name="phone_number"
+            name="email"
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <FormInputAuth
-                id="phone_number"
-                name="phone_number"
-                type="text"
-                placeholder="Phone Number"
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Email Address"
                 onChange={onChange}
                 value={value}
-                icon={<Phone className="w-4 h-4 text-white fill-gray-500" />}
-                error={errors?.phone_number?.message}
+                icon={<Mail className="w-4 h-4 text-white fill-gray-500" />}
+                error={errors?.email?.message}
               />
             )}
           />

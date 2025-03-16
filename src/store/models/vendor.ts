@@ -1,4 +1,8 @@
-import { VendorDetails } from "@/domain/dto/output";
+import {
+  ProductCategory,
+  VendorDetails,
+  VendorProductsAPIResponse,
+} from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
 import {
@@ -10,8 +14,10 @@ import {
   ProductAvailabilityPayload,
   ProductMediaPayload,
   ProductPricingPayload,
+  UpdateProductAvailabilityPayload,
   UpdateProductLocationPayload,
   UpdateProductPayload,
+  UpdateProductPricingPayload,
   VendorProductsFilters,
 } from "@/domain/dto/input";
 import { MediaType, ProductType, ViewType } from "@/domain/constants";
@@ -30,7 +36,7 @@ type VendorState = {
   vendorDetails: VendorDetails;
   newProduct: NewProductPayload | null;
   activeStep: number;
-  vendorProducts: Array<Product>;
+  vendorProducts: VendorProductsAPIResponse;
   productPageViewType: ViewType;
   productType: ProductType;
   productMedia: Array<ProductMedia>;
@@ -41,7 +47,9 @@ export const vendor = createModel<RootModel>()({
     vendorDetails: {} as VendorDetails,
     newProduct: null,
     activeStep: 0,
-    vendorProducts: [],
+    vendorProducts: {
+      results: [],
+    } as VendorProductsAPIResponse,
     productPageViewType: ViewType.productsListView,
     productType: ProductType.default,
     productMedia: [],
@@ -53,7 +61,10 @@ export const vendor = createModel<RootModel>()({
         vendorDetails,
       };
     },
-    setNewProductDetails(state: VendorState, newProduct: NewProductPayload) {
+    setNewProductDetails(
+      state: VendorState,
+      newProduct: NewProductPayload | null
+    ) {
       return {
         ...state,
         newProduct,
@@ -65,7 +76,10 @@ export const vendor = createModel<RootModel>()({
         activeStep,
       };
     },
-    setVendorProducts(state: VendorState, vendorProducts: Array<Product>) {
+    setVendorProducts(
+      state: VendorState,
+      vendorProducts: VendorProductsAPIResponse
+    ) {
       return {
         ...state,
         vendorProducts,
@@ -95,8 +109,12 @@ export const vendor = createModel<RootModel>()({
       try {
         const response: any = await postRequest("/products/", payload);
         if (response && response?.data) {
+          const product: Product = response?.data;
+          const url = new URL(window.location.href);
+          url.searchParams.set("product_id", product?.id);
+          window.history.pushState({}, "", url);
           const previousStep = rootState.vendor.activeStep;
-          dispatch.vendor.setNewProductDetails(response?.data);
+          dispatch.vendor.setNewProductDetails(product);
           dispatch.vendor.setActiveStep(previousStep + 1);
         }
       } catch (error: any) {
@@ -129,10 +147,7 @@ export const vendor = createModel<RootModel>()({
         );
 
         if (response && response?.data) {
-          if (response?.data?.length > 0) {
-            dispatch.vendor.setProductPageViewType(ViewType.productsListView);
-          }
-          dispatch.vendor.setVendorProducts(response?.data?.results);
+          dispatch.vendor.setVendorProducts(response?.data);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -143,6 +158,17 @@ export const vendor = createModel<RootModel>()({
         const response: any = await getRequest(`/products/${id}/`);
 
         if (response && response?.data) {
+          const product = response?.data as Product;
+          if (product.category) {
+            const isEvent = rootState.settings.productCategories
+              .find(
+                (category: ProductCategory) => category.id === product.category
+              )
+              ?.name?.includes("Event");
+            dispatch.vendor.setProductType(
+              isEvent ? ProductType.event : ProductType.others
+            );
+          }
           dispatch.vendor.setNewProductDetails(response?.data);
         }
       } catch (error: any) {
@@ -180,7 +206,6 @@ export const vendor = createModel<RootModel>()({
       }
     },
     async addProductLocation(payload: AddProductLocationPayload, rootState) {
-      console.log("PAYLOAD:", payload)
       try {
         const response: any = await postRequest("/location/", payload);
         if (response && response?.data) {
@@ -191,7 +216,9 @@ export const vendor = createModel<RootModel>()({
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
-          error?.data?.identifier[0] || error?.message
+          error?.data?.address
+            ? `Address: ${error?.data?.address}`
+            : error?.data?.detail || error?.message
         );
       }
     },
@@ -201,7 +228,7 @@ export const vendor = createModel<RootModel>()({
     ) {
       try {
         const response: any = await putRequest(
-          `/location/${payload?.product}/`,
+          `/location/${payload?.id}/`,
           payload
         );
         if (response && response?.data) {
@@ -212,7 +239,9 @@ export const vendor = createModel<RootModel>()({
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
-          error?.data?.identifier[0] || error?.message
+          error?.data?.address
+            ? `Address: ${error?.data?.address}`
+            : error?.data?.detail || error?.message
         );
       }
     },
@@ -234,6 +263,30 @@ export const vendor = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(
           error?.data?.identifier[0] || error?.message
         );
+      }
+    },
+    async updateProductAvailability(
+      payload: UpdateProductAvailabilityPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await patchRequest(
+          `/availability/${payload?.id}/`,
+          {
+            ...payload,
+            product: undefined,
+          }
+        );
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product availability updated successfully!"
+          );
+          const previousStep = rootState.vendor.activeStep;
+          dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.include || error?.message);
       }
     },
     async deleteProductMedia(payload: DeleteProductMediaPayload, rootState) {
@@ -262,6 +315,27 @@ export const vendor = createModel<RootModel>()({
         if (response && response?.data) {
           dispatch.vendor.getVendorProductById(payload?.product);
           dispatch.alert.setSuccessAlert("Product pricing added successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async updateProductPricing(
+      payload: UpdateProductPricingPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await patchRequest(
+          `/pricing/${payload?.id}/`,
+          payload
+        );
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product pricing updated added successfully!"
+          );
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(

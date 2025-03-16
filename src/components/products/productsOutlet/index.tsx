@@ -18,6 +18,8 @@ type ProductsOutletProps = {
   productsRequestProcessing: boolean;
   getCurrencies: () => void;
   currencies: Array<Currency>;
+  filters?: ProductsFilters;
+  setFilters?: (filters: ProductsFilters) => void;
 };
 
 const ProductsOutlet: FC<ProductsOutletProps> = ({
@@ -28,15 +30,12 @@ const ProductsOutlet: FC<ProductsOutletProps> = ({
   getProductCategories,
   getCurrencies,
   currencies,
+  filters,
+  setFilters,
 }) => {
-  const [filters, setFilters] = useState<ProductsFilters>({
-    page: 1,
-    page_size: 10,
-  });
-
   useEffect(() => {
     getProductCategories();
-    getProducts();
+    getProducts(filters);
     getCurrencies();
   }, []);
 

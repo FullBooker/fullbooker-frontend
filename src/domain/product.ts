@@ -14,6 +14,9 @@ export interface ProductPricing {
   type: PricingType | string;
   ticket_tier: string | null;
   maximum_number_of_tickets: number;
+  remaining_tickets: number;
+  sold_tickets: number;
+  bulk_discount: number;
 }
 
 interface ProductLocation {
@@ -59,6 +62,15 @@ export interface Availability {
   closed_dates: Array<string>;
 }
 
+export interface DateSlot {
+  day: string;
+  month: string;
+  date: number;
+  time: string;
+  isActive: boolean;
+  fullDate: Date | string
+}
+
 export interface Product {
   id: string;
   created_at: string;
@@ -93,31 +105,32 @@ export interface CartItem {
   id_number: string;
   phone_number: string;
   email: string;
+  pricing_type_id: string;
+  pricing_type: string;
+  cost: number;
 }
 
 export interface CartSummary {
-  product_id: string;
-  product_title: string;
-  product_thumbnail: string;
-  product_base_currency: string;
-  product_base_pricing_id: string;
-  product_base_price: string;
-  product_base_pricing_type: string;
+  product_id?: string;
+  product_title?: string;
   product_location: string;
-  base_currency: string;
-  selected_date: Date | string;
-  time: string;
+  product_thumbnail?: string;
+  currency?: string;
+  base_currency?: string;
+  selected_date?: Date | string;
+  time?: string;
   prefill_all_items_with_primary_user_details: boolean;
   total_price: number;
-  total_items: number;
 }
 
 export type TicketPricingCategory = {
   key: string;
   title: string;
+  label: string;
 };
 
 export type SessionPricingCategory = {
-  key: string;
+  key: PricingType;
   title: string;
+  label: string;
 };

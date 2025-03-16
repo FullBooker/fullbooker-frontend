@@ -4,7 +4,11 @@ import React, { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { Product, ProductMedia } from "@/domain/product";
 import { MediaType } from "@/domain/constants";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  PlayIcon,
+} from "lucide-react";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import { Dialog } from "@headlessui/react";
 
@@ -15,7 +19,6 @@ type ProductGalleryProps = {
 };
 
 const ProductGallery: FC<ProductGalleryProps> = ({
-  product,
   productMedia,
   productsRequestProcessing,
 }) => {
@@ -75,17 +78,34 @@ const ProductGallery: FC<ProductGalleryProps> = ({
             ref={galleryContainerRef}
             className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
           >
-            {productMedia?.map((photo: ProductMedia, index: number) => (
-              <Image
-                key={index}
-                src={`${photo?.file || "/assets/quad.png"}`}
-                alt={"Event"}
-                width={isMobile ? 150 : 250}
-                height={isMobile ? 150 : 250}
-                className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
-                onClick={() => setCurrentIndex(index)}
-                unoptimized={true}
-              />
+            {productMedia?.map((media: ProductMedia, index: number) => (
+              <div key={index} onClick={() => setCurrentIndex(index)}>
+                {media?.media_type === MediaType.image ? (
+                  <Image
+                    src={`${media?.file || "/assets/quad.png"}`}
+                    alt={"Event"}
+                    width={isMobile ? 150 : 250}
+                    height={isMobile ? 150 : 250}
+                    className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                    unoptimized={true}
+                  />
+                ) : media?.media_type === MediaType.video ? (
+                  <div className="relative">
+                    <video
+                      src={media?.file}
+                      className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                      controls={false}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <button className="bg-white rounded-full p-2">
+                        <PlayIcon className="w-8 h-8" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
             ))}
           </div>
           {!currentIndex && (
@@ -126,7 +146,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
                   onClick={handlePrev}
                   className="absolute -left-2 md:left-2 top-1/2 transform -translate-y-1/2 bg-transparent text-white p-2 rounded-full"
                 >
-                <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
+                  <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
                 </button>
                 <button
                   onClick={handleNext}
@@ -139,14 +159,25 @@ const ProductGallery: FC<ProductGalleryProps> = ({
 
             {/* Image Preview */}
             {currentIndex !== null && (
-              <Image
-                src={productMedia[currentIndex]?.file}
-                alt="Preview"
-                width={400}
-                height={400}
-                className="w-full h-auto object-contain"
-                unoptimized
-              />
+              <div>
+                {productMedia[currentIndex]?.media_type === MediaType.image && (
+                  <Image
+                    src={productMedia[currentIndex]?.file}
+                    alt="Preview"
+                    width={400}
+                    height={400}
+                    className="w-full h-auto object-contain"
+                    unoptimized
+                  />
+                )}
+                {productMedia[currentIndex]?.media_type === MediaType.video && (
+                  <video
+                    src={productMedia[currentIndex]?.file}
+                    className="w-full h-auto object-contain"
+                    controls
+                  />
+                )}
+              </div>
             )}
           </Dialog.Panel>
         </div>
