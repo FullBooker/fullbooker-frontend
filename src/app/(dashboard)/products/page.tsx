@@ -1,14 +1,20 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
 import ProductsOutlet from "@/components/products/productsOutlet";
+import { ProductsFilters } from "@/domain/dto/input";
 
-type UniversalProductsPagePageProps = {};
+type UniversalProductsPageProps = {
+};
 
-const UniversalProductsPagePage: FC<UniversalProductsPagePageProps> = ({}) => {
-  return <ProductsOutlet />;
+const UniversalProductsPage: FC<UniversalProductsPageProps> = ({  }) => {
+  const [filters, setFilters] = useState<ProductsFilters>({
+    page: 1,
+    page_size: 25,
+  });
+  return <ProductsOutlet filters={filters} setFilters={setFilters} />;
 };
 
 const mapStateToProps = (state: RootState) => {
@@ -19,4 +25,4 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = (dispatch: any) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(UniversalProductsPagePage);
+export default connect(mapStateToProps, mapDispatchToProps)(UniversalProductsPage);

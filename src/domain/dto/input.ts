@@ -1,5 +1,5 @@
 import { MediaType, PricingTickerTier, PricingType } from "../constants";
-import { ProductMedia, ProductPricing } from "../product";
+import { ProductLocation, ProductMedia, ProductPricing } from "../product";
 
 export type NewUserPayload = {
   phone_number: string;
@@ -68,7 +68,7 @@ export type NewProductPayload = {
   description: string;
   category: string;
   subcategory?: string;
-  locations: Array<any>;
+  locations: Array<ProductLocation>;
   availability?: {
     id?: string;
     product: string;

@@ -19,7 +19,7 @@ export interface ProductPricing {
   bulk_discount: number;
 }
 
-interface ProductLocation {
+export interface ProductLocation {
   id: string;
   active: boolean;
   coordinates: string;

@@ -131,6 +131,10 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
               closing_at: day?.closing_at,
             }))
           : [],
+      location:
+        newProduct?.locations && newProduct?.locations?.length > 0
+          ? (newProduct?.locations[0] as any)
+          : null,
     },
     mode: "onBlur",
   });
@@ -439,6 +443,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
         <NavigationButtons
           isProcessingRequest={isProcessingRequest}
           isFormSubmit={
+            !newProduct.availability ||
             newProduct.availability?.open_days?.length === 0 ||
             newProduct?.locations?.length === 0
               ? true

@@ -73,6 +73,10 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
       end: newProduct.availability?.end || "",
       start_time: newProduct.availability?.start_time || "",
       end_time: newProduct.availability?.end_time || "",
+      location:
+        newProduct?.locations && newProduct?.locations?.length > 0
+          ? (newProduct?.locations[0] as any)
+          : null,
     },
     mode: "onBlur",
   });
