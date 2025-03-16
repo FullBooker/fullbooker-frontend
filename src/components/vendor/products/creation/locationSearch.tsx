@@ -25,7 +25,7 @@ type LocationSearchProps = {
   newProduct: NewProductPayload;
   addProductLocation: (payload: AddProductLocationPayload) => void;
   updateProductLocation: (payload: UpdateProductLocationPayload) => void;
-  setSelectedLocation: (payload: google.maps.places.PlaceResult | null) => void;
+  setSelectedLocation: (payload: any) => void;
   validationErrors: any;
 };
 
@@ -129,6 +129,10 @@ const LocationSearch: FC<LocationSearchProps> = ({
           lat: newPos.lat,
           long: newPos.lng,
           address: formattedAddress,
+        });
+        setSelectedLocation({
+          lat: newPos.lat,
+          long: newPos.lng,
         });
       } else {
         console.error("No address found for this location");

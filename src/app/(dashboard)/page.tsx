@@ -14,6 +14,7 @@ import PopularProductsSection from "@/components/products/homePage/popularProduc
 import ProductsNearYouSection from "@/components/products/homePage/productsNearYou";
 import ProductsRecommendeForYouSection from "@/components/products/homePage/productsRecommendeForYou";
 import UpcomingProductsSection from "@/components/products/homePage/upcomingProducts";
+import MoreProductsSection from "@/components/products/homePage/more";
 
 type HomePageProps = {
   getProductCategories: () => void;
@@ -53,6 +54,9 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
 
       {/* Products recommeded for you section */}
       <ProductsRecommendeForYouSection />
+
+       {/* More Products section */}
+       <MoreProductsSection />
 
       <div className="py-8 px-2 md:px-3 lg:px-4 bg-white text-center flex justify-center">
         <div className="flex justify-center px-4 sm:px-7">

@@ -247,9 +247,9 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
 
 const mapStateToProps = (state: RootState) => {
   const loading = state.loading.models.authentication;
-  const { profile, showBalance } = state.profile;
+  const { profile } = state.profile;
   const { isLoggedIn, authData } = state.authentication;
-  return { isLoggedIn, authData, loading, profile, showBalance };
+  return { isLoggedIn, authData, loading, profile };
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
