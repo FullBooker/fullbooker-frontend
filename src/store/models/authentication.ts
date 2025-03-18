@@ -119,7 +119,7 @@ export const authentication = createModel<RootModel>()({
             purgeAnonymousAuthToken();
           }
           dispatch.alert.setSuccessAlert(response?.data?.message);
-          dispatch.profile.getUserProfile()
+          dispatch.profile.getUserProfile();
           dispatch.components.setActiveModal(ModalID.none);
           const flow = getQueryParam("user_flow");
           if (flow && flow === "vendor") {
@@ -168,7 +168,7 @@ export const authentication = createModel<RootModel>()({
               response?.data?.message || "Login successful!"
             );
             dispatch.components.setActiveModal(ModalID.none);
-            dispatch.profile.getUserProfile()
+            dispatch.profile.getUserProfile();
             const flow = getQueryParam("user_flow");
             if (flow && flow === "vendor") {
               return dispatch.authentication.switchToHost({
@@ -195,21 +195,24 @@ export const authentication = createModel<RootModel>()({
         );
       }
     },
-    async signOut(credentials, rootState) {
+    async updatePassword(payload) {},
+    async signOut() {
       const autToken = getToken();
       try {
         dispatch.authentication.setAuthStatusLoggedOut();
         dispatch.authentication.initializeAnonymousAuthTokenProcurement();
-        // const response: any = await postRequest(
-        //   "/api/v1/user/auth/logout",
-        //   credentials
-        // );
-        // if (response && response?.data?.success) {
         removeToken();
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      } finally {
+        autToken && removeToken();
         localStorage.removeItem("authData");
-        // } else {
-        //   dispatch.alert.setFailureAlert(response?.data?.message);
-        // }
+      }
+    },
+    async logOut() {
+      const autToken = getToken();
+      try {
+        dispatch.authentication.setAuthStatusLoggedOut();
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
       } finally {
@@ -341,7 +344,7 @@ export const authentication = createModel<RootModel>()({
               } as SwitchToHostPayload);
             }
 
-            dispatch.profile.getUserProfile()
+            dispatch.profile.getUserProfile();
             const userAuthenticationSuccessfullEvent = new CustomEvent(
               CustomeEvents.successfullUserAuthentication,
               {

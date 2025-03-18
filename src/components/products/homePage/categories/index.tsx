@@ -134,7 +134,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
                   <div className="flex items-center justify-center">
                     <span
                       className={`${`${
-                        comprehensiveProductFilters?.categoies?.includes(
+                        comprehensiveProductFilters?.categories?.includes(
                           subCategory?.id
                         )
                           ? "text-primary"
@@ -159,7 +159,7 @@ const ProductCategories: FC<ProductCategoriesProps> = ({
                   </div>
                   <span
                     className={`text-sm md:text-xs text-center ${
-                      comprehensiveProductFilters?.categoies?.includes(
+                      comprehensiveProductFilters?.categories?.includes(
                         subCategory?.id
                       )
                         ? "text-primary"

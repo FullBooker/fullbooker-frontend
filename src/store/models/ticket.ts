@@ -3,7 +3,7 @@ import type { RootModel } from ".";
 import { buildQueryString, getRequest, postRequest } from "../../utilities";
 
 import { createModel } from "@rematch/core";
-import { Ticket, TicketBookingOrder } from "@/domain/ticket";
+import { Ticket, TicketBooking, TicketBookingOrder } from "@/domain/ticket";
 import { CustomeEvents } from "@/constants";
 
 type TicketState = {
@@ -47,7 +47,7 @@ export const tickets = createModel<RootModel>()({
         const response: any = await postRequest("/bookings/", payload);
 
         if (response && response) {
-          const ticketBookingOrder: TicketBookingOrder = response?.data;
+          const ticketBookingOrder: TicketBooking = response?.data;
           dispatch.alert.setSuccessAlert("Booking created successfully!");
           const ticketBookingSuccessfullEvent = new CustomEvent(
             CustomeEvents.successfullTicketBooking,
@@ -91,7 +91,7 @@ export const tickets = createModel<RootModel>()({
     },
     async getTicketBookingOrderById(bookingId: string) {
       try {
-        const response: any = await getRequest(`/bookings/${bookingId}/`);
+        const response: any = await getRequest(`/accounts/tickets/?booking=${bookingId}`);
 
         if (response && response?.data) {
           dispatch.tickets.setTicketBookingOrder(

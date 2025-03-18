@@ -99,7 +99,7 @@ const UniversalModal: FC<UniversalModalProps> = ({
           </div>
         </div>
       </DialogTitle>
-      <DialogContent dividers={showDividers}>
+      <DialogContent dividers={showDividers} sx={{ backgroundColor: "white" }}>
         <div>{content}</div>
       </DialogContent>
       {footer && (

@@ -92,12 +92,12 @@ export const SESSION_PRICING_CATEGORIES: Array<SessionPricingCategory> = [
     label: "session",
   },
   {
-    key:  PricingType.dayPass,
+    key: PricingType.dayPass,
     title: "Day Pass",
     label: "day pass",
   },
   {
-    key:  PricingType.monthlySubscription,
+    key: PricingType.monthlySubscription,
     title: "Monthly Subscription",
     label: "subscription",
   },
@@ -169,3 +169,10 @@ export const productProfileSteps = [
   { key: "pricing-summary", step: 6 },
   { key: "publishing", step: 7 },
 ];
+
+export enum HomePageProductSection {
+  popularNowProducts = "popular",
+  upcomingProducts = "upcoming",
+  nearByProducts = 'nearby',
+  recommendedProducts = "recommended",
+}

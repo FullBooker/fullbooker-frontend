@@ -13,7 +13,7 @@ import FilterAccordion from "./filterAccordion";
 import { KENYAN_COUNTIES } from "@/constants";
 import { County } from "@/domain/location";
 import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
-import { addCommaSeparators } from "@/utilities";
+import { addCommaSeparators, formatProductFilters } from "@/utilities";
 import Box from "@mui/material/Box";
 import { ModalID } from "@/domain/components";
 
@@ -202,7 +202,7 @@ const ComprehensiveSearchFilters: FC<SearchFiltersProps> = ({
                       <div key={index} className="flex items-center space-x-1">
                         <Checkbox
                           className="text-primary"
-                          checked={comprehensiveProductFilters?.categoies?.includes(
+                          checked={comprehensiveProductFilters?.categories?.includes(
                             category?.id
                           )}
                           onClick={() => toggleCategoryFilter(category?.id)}
@@ -273,11 +273,17 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   clearProductComprehensiveFilters: () =>
     dispatch.products.clearProductComprehensiveFilters(),
   fetchFilteredProducts: (filters: ComprehensiveProductFilters) => {
-    dispatch.products.getPopularProducts(filters);
-    dispatch.products.getNearByProducts(filters);
-    dispatch.products.getPopularProducts(filters);
-    dispatch.products.getRecommendedProducts(filters);
-    dispatch.products.getUpcomingProducts(filters);
+    const formattedFilters = formatProductFilters(filters);
+    const finalFilters = {
+      ...formattedFilters,
+      page: 1,
+      page_size: 5,
+    } as any;
+    dispatch.products.getPopularProducts(finalFilters);
+    dispatch.products.getNearByProducts(finalFilters);
+    dispatch.products.getPopularProducts(finalFilters);
+    dispatch.products.getRecommendedProducts(finalFilters);
+    dispatch.products.getUpcomingProducts(finalFilters);
     dispatch.components.setActiveModal(ModalID.none);
   },
 });

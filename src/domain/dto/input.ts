@@ -159,6 +159,13 @@ export interface UpdateProductAvailabilityPayload {
   closed_dates?: ClosedDate[];
 }
 
+export interface UpdateProductOpenDayAvailability {
+  day: string;
+  product: string;
+  opening_at: string;
+  closing_at: string;
+}
+
 export type DeleteProductMediaPayload = {
   file_id: any;
   media_type: MediaType;

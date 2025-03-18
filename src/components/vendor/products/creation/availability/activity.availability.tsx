@@ -13,11 +13,14 @@ import {
   OpenDay,
   ProductAvailabilityPayload,
   UpdateProductAvailabilityPayload,
+  UpdateProductOpenDayAvailability,
 } from "@/domain/dto/input";
 import { DayOfWeek } from "@/domain/dto/output";
 import { CircularProgress } from "@mui/material";
 import LocationSearch from "../locationSearch";
 import StepHeader from "../stepHeader";
+import { extractCoordinates } from "@/utilities/helpers";
+import Button from "@/components/shared/button";
 
 type OtherProductsAvailabilityProps = {
   isProcessingRequest: boolean;
@@ -29,6 +32,9 @@ type OtherProductsAvailabilityProps = {
   updateProductAvailability: (
     payload: UpdateProductAvailabilityPayload
   ) => void;
+  updateProductOpenDayAvailability: (
+    payload: UpdateProductOpenDayAvailability
+  ) => void;
 };
 
 const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
@@ -39,6 +45,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
   addProductAvailability,
   updateProductAvailability,
   isProcessingRequest,
+  updateProductOpenDayAvailability,
 }) => {
   const schema = yup.object().shape({
     durationHours: yup.string().required("Required"),
@@ -83,13 +90,17 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
     ),
     location: yup
       .object()
-      .nullable()
-      .required("Location is required")
-      .test(
-        "valid-location",
-        "Please select a valid location",
-        (value) => !!value && Object.keys(value).length > 0
-      ),
+      .shape({
+        lat: yup
+          .number()
+          .required("Latitude is required")
+          .typeError("Latitude must be a number"),
+        lng: yup
+          .number()
+          .required("Longitude is required")
+          .typeError("Longitude must be a number"),
+      })
+      .required("Location is required"),
   });
 
   function convertMinutesToHoursAndMinutes(minutes: number) {
@@ -125,7 +136,8 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
         newProduct?.availability &&
         newProduct?.availability?.open_days?.length > 0
           ? newProduct?.availability?.open_days?.map((day: OpenDay) => ({
-              id: day?.day,
+              id: day?.id,
+              day: day?.day,
               selected: true,
               opening_at: day?.opening_at,
               closing_at: day?.closing_at,
@@ -133,8 +145,13 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
           : [],
       location:
         newProduct?.locations && newProduct?.locations?.length > 0
-          ? (newProduct?.locations[0] as any)
-          : null,
+          ? {
+              lat: extractCoordinates(newProduct?.locations[0]?.coordinates)
+                ?.latitude as number,
+              lng: extractCoordinates(newProduct?.locations[0]?.coordinates)
+                ?.longitude as number,
+            }
+          : undefined,
     },
     mode: "onBlur",
   });
@@ -207,23 +224,42 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
     setValue("closed_dates", updatedDates);
   };
 
+  const isAvailabilityDatUpdateDisabled = (
+    openDays: Array<{
+      id: string;
+      day: string;
+      selected: boolean;
+      opening_at: string;
+      closing_at: string;
+    }>,
+    dayId: string,
+    isProcessing: boolean
+  ): boolean => {
+    const selectedDay = openDays?.find((d: any) => d.day === dayId);
+    return isProcessing || !selectedDay?.opening_at || !selectedDay?.closing_at;
+  };
+
   useEffect(() => {
-    setValue("location", selectedLocation as any);
-  }, [selectedLocation]);
+    if (newProduct?.locations && newProduct?.locations?.length > 0) {
+      setValue("location", {
+        lat: extractCoordinates(newProduct?.locations[0]?.coordinates)
+          ?.latitude as number,
+        lng: extractCoordinates(newProduct?.locations[0]?.coordinates)
+          ?.longitude as number,
+      });
+    }
+  }, [newProduct?.locations]);
 
   return (
     <div className="px-0 md:px-5">
       <StepHeader title="Where and when does this activity happen?" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">
-          <LocationSearch
-            setSelectedLocation={setSelectedLocation}
-            validationErrors={errors}
-          />
+          <LocationSearch validationErrors={errors} />
           <div className="border rounded-sm border-primary p-4 col-span-2 text-center">
             <h3 className="text-md font-light">How long is this activity?</h3>
             <div className="flex justify-center gap-4 mt-2 text-center">
-              <div className="">
+              <div className="w-full">
                 <p className="font-light">Hours</p>
                 <Controller
                   name="durationHours"
@@ -248,7 +284,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                   </p>
                 )}
               </div>
-              <div className="">
+              <div className="w-full">
                 <p className="font-light">Minutes</p>
                 <Controller
                   name="durationMinutes"
@@ -271,6 +307,35 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                   </p>
                 )}
               </div>
+              {newProduct?.availability && (
+                <div className="w-full pt-6">
+                  <Button
+                    width="w-[80%]"
+                    bg="bg-primary"
+                    borderRadius="rounded"
+                    text="text-white text-xs"
+                    padding="py-1"
+                    margin="mb-2"
+                    type="button"
+                    onClick={() =>
+                      updateProductAvailability({
+                        id: newProduct?.availability?.id,
+                        product: newProduct?.id,
+                        duration:
+                          parseInt(getValues("durationHours") || "0") * 60 +
+                          parseInt(getValues("durationMinutes") || "0"),
+                      } as UpdateProductAvailabilityPayload)
+                    }
+                    disabled={isProcessingRequest}
+                  >
+                    {isProcessingRequest ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      "Update"
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -286,18 +351,19 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
             ) : (
               <div className="gap-2 mt-4 w-full">
                 <div className="flex justify-between">
-                  <div></div>
-                  <div className="flex justify-between items-center gap-2 w-[50%]">
-                    <p className="text-md font-light">Opening at</p>
+                  <div className="w-[30%]"></div>
+                  <div className="flex items-center w-[70%]">
+                    <p className="text-md font-light me-10">Opening at</p>
                     <p className="text-md font-light">Closing at</p>
                   </div>
                 </div>
                 {daysOfWeek.map((day: DayOfWeek, index: number) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center gap-2 w-full m-2"
+                    className="flex items-center justify-between gap-4 w-full p-2 border-b"
                   >
-                    <div className="flex items-center gap-2">
+                    {/* Day Selection */}
+                    <div className="flex items-center gap-2 w-[20%]">
                       <Controller
                         name={`open_days.${index}.id` as const}
                         control={control}
@@ -307,7 +373,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                         )}
                       />
 
-                      {/* Checkbox to track selection */}
+                      {/* Checkbox */}
                       <Controller
                         name={`open_days.${index}.selected` as const}
                         control={control}
@@ -317,12 +383,15 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                             ref={field.ref}
                             checked={field.value || false}
                             onChange={(e) => field.onChange(e.target.checked)}
+                            className="w-5 h-5"
                           />
                         )}
                       />
-                      <span className="text-sm font-light">{day.name}</span>
+                      <span className="text-sm font-medium">{day.name}</span>
                     </div>
-                    <div className="flex items-center gap-2 w-[50%]">
+
+                    {/* Time Inputs */}
+                    <div className="flex items-center gap-4 w-[50%]">
                       <div className="w-full">
                         <Controller
                           name={`open_days.${index}.opening_at`}
@@ -331,17 +400,17 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                             <input
                               {...field}
                               type="time"
-                              className="border p-1 text-sm w-full"
-                              placeholder="Opening at"
+                              className="border rounded p-1 text-sm w-full"
                             />
                           )}
                         />
-                        {errors.open_days?.[index] && (
-                          <p className="text-red-500 text-sm">
-                            {errors?.open_days?.[index]?.opening_at?.message}
+                        {errors.open_days?.[index]?.opening_at && (
+                          <p className="text-red-500 text-xs">
+                            {errors.open_days[index]?.opening_at?.message}
                           </p>
                         )}
                       </div>
+
                       <div className="w-full">
                         <Controller
                           name={`open_days.${index}.closing_at`}
@@ -350,16 +419,54 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                             <input
                               {...field}
                               type="time"
-                              className="border p-1 text-sm w-full"
+                              className="border rounded p-1 text-sm w-full"
                             />
                           )}
                         />
-                        {errors.open_days?.[index] && (
-                          <p className="text-red-500 text-sm">
-                            {errors?.open_days?.[index]?.closing_at?.message}
+                        {errors.open_days?.[index]?.closing_at && (
+                          <p className="text-red-500 text-xs">
+                            {errors.open_days[index]?.closing_at?.message}
                           </p>
                         )}
                       </div>
+                    </div>
+
+                    {/* Update Button */}
+                    <div className="w-[20%] flex justify-end">
+                      <Button
+                        width="w-full"
+                        bg="bg-primary"
+                        borderRadius="rounded"
+                        text="text-white text-xs"
+                        padding="py-1"
+                        margin="mb-2 mt-2 ml-2 md:ml-0"
+                        type="button"
+                        onClick={() =>
+                          updateProductOpenDayAvailability({
+                            day: getValues("open_days")?.find(
+                              (d: any) => d.day === day.id
+                            )?.id,
+                            product: newProduct?.id,
+                            opening_at: getValues(
+                              `open_days.${index}.opening_at`
+                            ),
+                            closing_at: getValues(
+                              `open_days.${index}.closing_at`
+                            ),
+                          } as UpdateProductOpenDayAvailability)
+                        }
+                        disabled={isAvailabilityDatUpdateDisabled(
+                          getValues("open_days") as Array<any>,
+                          day.id,
+                          isProcessingRequest
+                        )}
+                      >
+                        {isProcessingRequest ? (
+                          <CircularProgress size={18} color="inherit" />
+                        ) : (
+                          "Update"
+                        )}
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -477,6 +584,9 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.vendor.addProductAvailability(payload),
   updateProductAvailability: (payload: UpdateProductAvailabilityPayload) =>
     dispatch.vendor.updateProductAvailability(payload),
+  updateProductOpenDayAvailability: (
+    payload: UpdateProductOpenDayAvailability
+  ) => dispatch.vendor.updateProductOpenDayAvailability(payload),
 });
 
 export default connect(

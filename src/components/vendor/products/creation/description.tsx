@@ -112,7 +112,7 @@ const ProductInfo: FC<ProductInfoProps> = ({
               render={({ field: { value, onChange } }) => (
                 <textarea
                   placeholder="Provide any other details about this event. (optional)"
-                  className="border border-primary p-3 w-full mb-4 md:8 h-[150px] md:h-[300px] font-light outline-none"
+                  className="border border-primary p-3 w-full mb-4 md:8 h-[230px] md:h-[300px] font-light outline-none"
                   onChange={onChange}
                   value={value}
                 ></textarea>

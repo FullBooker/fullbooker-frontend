@@ -12,6 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import { convertToHumanReadableTime, humanReadableDate } from "@/utilities";
+import NoRecords from "@/components/vendor/products/shared/no-records";
 
 type MyTicketsPageProps = {
   isProcessingRequest: boolean;
@@ -50,11 +51,7 @@ const MyTicketsPage: FC<MyTicketsPageProps> = ({
             ))}
           </div>
         ) : tickets.length === 0 ? (
-          <div>
-            <div className=" text-red-500 h-screen grid place-items-center text-center">
-              <p>No tickets found.</p>
-            </div>
-          </div>
+          <NoRecords message="Oops! You have no tickets at the moment" />
         ) : (
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

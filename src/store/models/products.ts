@@ -5,9 +5,10 @@ import { buildQueryString, getRequest } from "@/utilities";
 import { CartItem, CartSummary, Product, ProductMedia } from "@/domain/product";
 import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
 import { County } from "@/domain/location";
+import { ProductsAPIResponse } from "@/domain/dto/output";
 
 type ProductsState = {
-  products: Array<Product>;
+  products: ProductsAPIResponse;
   product: Product | null;
   popularProducts: Array<Product>;
   nearByProducts: Array<Product>;
@@ -17,11 +18,15 @@ type ProductsState = {
   cart: Array<CartItem>;
   cartSummary: CartSummary | null;
   comprehensiveProductFilters: ComprehensiveProductFilters | null;
+  searchHistory: Array<string>;
 };
 
 export const products = createModel<RootModel>()({
   state: {
-    products: [],
+    products: {
+      count: 0,
+      results: [],
+    },
     product: null,
     popularProducts: [],
     nearByProducts: [],
@@ -31,7 +36,7 @@ export const products = createModel<RootModel>()({
     cart: [],
     cartSummary: null,
     comprehensiveProductFilters: {
-      keyword: "",
+      search: "",
       locations: [],
       categoies: [],
       start_date: "",
@@ -39,6 +44,7 @@ export const products = createModel<RootModel>()({
       max_price: "0",
       min_price: "0",
     },
+    searchHistory: ["1234"],
   } as ProductsState,
   reducers: {
     setProductDetails(state: ProductsState, product: Product) {
@@ -47,7 +53,7 @@ export const products = createModel<RootModel>()({
         product,
       };
     },
-    setProducts(state: ProductsState, products: Array<Product>) {
+    setProducts(state: ProductsState, products: ProductsAPIResponse) {
       return {
         ...state,
         products,
@@ -177,7 +183,7 @@ export const products = createModel<RootModel>()({
     },
     toggleCategoryFilter(state: ProductsState, category: string) {
       const existingCategories =
-        state.comprehensiveProductFilters?.categoies || [];
+        state.comprehensiveProductFilters?.categories || [];
       const updatedCategories = existingCategories.includes(category)
         ? existingCategories.filter((cat) => cat !== category)
         : [...existingCategories, category];
@@ -209,7 +215,7 @@ export const products = createModel<RootModel>()({
       return {
         ...state,
         comprehensiveProductFilters: {
-          keyword: "",
+          search: "",
           locations: [],
           categoies: [],
           start_date: "",
@@ -225,6 +231,25 @@ export const products = createModel<RootModel>()({
         productFilters: null,
       };
     },
+    addSearchKeyword(state: ProductsState, search: string) {
+      const updatedHistory = !state?.searchHistory?.length
+        ? [search]
+        : [
+            search,
+            ...state?.searchHistory?.filter((k) => k !== search),
+          ].slice(0, 10);
+      return {
+        ...state,
+        searchHistory: updatedHistory,
+      };
+    },
+
+    removeSearchKeyword(state: ProductsState, search: string) {
+      return {
+        ...state,
+        searchHistory: state?.searchHistory?.filter((k) => k !== search),
+      };
+    },
   },
   effects: (dispatch: any) => ({
     async getProducts(payload: ProductsFilters, rootState) {
@@ -236,7 +261,7 @@ export const products = createModel<RootModel>()({
         );
 
         if (response && response?.data) {
-          dispatch.products.setProducts(response?.data?.results);
+          dispatch.products.setProducts(response?.data);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

@@ -1,3 +1,5 @@
+import { ProductPricing } from "./product";
+
 export interface Ticket {
   id: string;
   created_at: string;
@@ -15,6 +17,7 @@ export interface Ticket {
   booking: string;
   pricing: string;
   qr_code: string | null;
+  pricing_details: ProductPricing;
 }
 
 interface Location {
@@ -28,7 +31,7 @@ interface Location {
   address: string;
 }
 
-export interface TicketBookingOrder {
+export interface TicketBooking {
   id: string;
   created_at: string;
   updated_at: string;
@@ -40,4 +43,18 @@ export interface TicketBookingOrder {
   total_cost: string;
   total_tickets_count: number;
   locations: Location[];
+}
+
+
+interface TicketSummary {
+  ticket: {
+    count: number;
+    price_per_ticket: number;
+    total_price: number;
+  };
+}
+export interface TicketBookingOrder {
+  tickets: Array<Ticket>;
+  ticket_summary: TicketSummary;
+  total_price: number;
 }

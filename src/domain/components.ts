@@ -15,5 +15,6 @@ export enum ModalID {
   activateProductConfirmation = "ACTIVATE_PRODUCT_CONFIRMATION",
   successfullPayment = "SUCCESSFULL_PAYMENT",
   comprehensiveProductFilters = "COMPREHENSIVE_PRODUCT_FILTERS",
-  ticketBookingSummary = "TICKET_BOOKING_SUMMARY"
+  ticketBookingSummary = "TICKET_BOOKING_SUMMARY",
+  productSocialShare = "PRODUCT_SOCIAL_SHARE"
 }

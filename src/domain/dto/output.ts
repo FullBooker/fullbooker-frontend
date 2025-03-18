@@ -83,3 +83,10 @@ export interface VendorProductsAPIResponse {
   previous?: any;
   results: Array<Product>;
 }
+
+export interface ProductsAPIResponse {
+  count: number;
+  next?: string;
+  previous?: any;
+  results: Array<Product>;
+}

@@ -4,6 +4,8 @@ import { Product } from "@/domain/product";
 import React, { FC } from "react";
 import SingleProduct from "../product";
 import Link from "next/link";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
 
 type CategoryProductsOutletProps = {
   products: Array<Product>;
@@ -24,22 +26,22 @@ const CategoryProductsOutlet: FC<CategoryProductsOutletProps> = ({
   path,
   shouldTrim = true,
 }) => {
+  const deviceType = useDeviceType();
   return (
     <div className="px-2 md:px-3 lg:px-4 bg-white">
-       <div className="px-4 md:px-7">
-      {isProcessingRequest ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0">
-          {Array(10)
-            .fill(null)
-            .map((_, index) => (
-              <SingleProductSkeleton key={index} />
-            ))}
-        </div>
-      ) : (
-        <div>
-          {products && products?.length > 0 && (
-            <div className="mb-4">
-             
+      <div className="px-4 md:px-7">
+        {isProcessingRequest ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0 mb-6">
+            {Array(deviceType === DeviceType.mobile ? 1 : 5)
+              .fill(null)
+              .map((_, index) => (
+                <SingleProductSkeleton key={index} />
+              ))}
+          </div>
+        ) : (
+          <div>
+            {products && products?.length > 0 && (
+              <div className="mb-4">
                 <div className="flex justify-between items-center mb-4 md:mb-6">
                   <h2 className="text-base md:text-xl font-semibold">
                     {title}
@@ -48,7 +50,7 @@ const CategoryProductsOutlet: FC<CategoryProductsOutletProps> = ({
                     className="text-base text-primary decoration-transparent"
                     href={path}
                   >
-                    See all
+                    View All
                   </Link>
                 </div>
 
@@ -64,10 +66,10 @@ const CategoryProductsOutlet: FC<CategoryProductsOutletProps> = ({
                     )
                   )}
                 </div>
-            </div>
-          )}
-        </div>
-      )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

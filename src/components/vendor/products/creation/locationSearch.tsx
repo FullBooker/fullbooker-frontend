@@ -17,15 +17,18 @@ import {
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { extractCoordinates } from "@/utilities/helpers";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "../../../../domain/constants";
 
 const API_KEY = process.env.NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY as string;
 
 type LocationSearchProps = {
   loading: boolean;
   newProduct: NewProductPayload;
-  addProductLocation: (payload: AddProductLocationPayload) => void;
-  updateProductLocation: (payload: UpdateProductLocationPayload) => void;
-  setSelectedLocation: (payload: any) => void;
+  addProductLocation: (payload: AddProductLocationPayload) => Promise<void>;
+  updateProductLocation: (
+    payload: UpdateProductLocationPayload
+  ) => Promise<void>;
   validationErrors: any;
 };
 
@@ -33,7 +36,6 @@ const LocationSearch: FC<LocationSearchProps> = ({
   newProduct,
   addProductLocation,
   updateProductLocation,
-  setSelectedLocation,
   validationErrors,
 }) => {
   const [selectedPlace, setSelectedPlace] =
@@ -42,12 +44,21 @@ const LocationSearch: FC<LocationSearchProps> = ({
   const [markerPosition, setMarkerPosition] = useState<{
     lat: number;
     lng: number;
-  } | null>(null);
+  }>(
+    newProduct?.locations?.length > 0
+      ? {
+          lat: extractCoordinates(newProduct?.locations[0]?.coordinates)
+            ?.latitude as number,
+          lng: extractCoordinates(newProduct?.locations[0]?.coordinates)
+            ?.longitude as number,
+        }
+      : { lat: 1.286389, lng: 36.817223 }
+  );
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const deviceType = useDeviceType();
 
   const saveProductLocation = (
     payload: AddProductLocationPayload | AddProductLocationPayload
@@ -63,43 +74,19 @@ const LocationSearch: FC<LocationSearchProps> = ({
   };
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLoc = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setUserLocation(userLoc);
-          setMarkerPosition(userLoc);
-        },
-        () => {
-          setUserLocation({ lat: 1.286389, lng: 36.817223 });
-          setMarkerPosition({ lat: 1.286389, lng: 36.817223 });
-        }
-      );
-    } else {
-      setUserLocation({ lat: 1.286389, lng: 36.817223 });
-      setMarkerPosition({ lat: 1.286389, lng: 36.817223 });
+    if (navigator.geolocation && newProduct?.locations?.length === 0) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const userLoc = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setUserLocation(userLoc);
+        setMarkerPosition(userLoc);
+      });
     }
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    setSelectedLocation(selectedPlace);
     if (selectedPlace && selectedPlace?.geometry?.location) {
       saveProductLocation({
         product: newProduct?.id,
@@ -129,10 +116,6 @@ const LocationSearch: FC<LocationSearchProps> = ({
           lat: newPos.lat,
           long: newPos.lng,
           address: formattedAddress,
-        });
-        setSelectedLocation({
-          lat: newPos.lat,
-          long: newPos.lng,
         });
       } else {
         console.error("No address found for this location");
@@ -179,24 +162,11 @@ const LocationSearch: FC<LocationSearchProps> = ({
         <Map
           mapId={"bf51a910020fa25a"}
           defaultZoom={10}
-          defaultCenter={
-            newProduct?.locations?.length > 0
-              ? {
-                  lat: extractCoordinates(
-                    newProduct?.locations[newProduct?.locations?.length - 1]
-                      ?.coordinates
-                  )?.latitude as number,
-                  lng: extractCoordinates(
-                    newProduct?.locations[newProduct?.locations?.length - 1]
-                      ?.coordinates
-                  )?.longitude as number,
-                }
-              : userLocation ?? { lat: 1.286389, lng: 36.817223 }
-          }
+          defaultCenter={markerPosition}
           gestureHandling={"greedy"}
           disableDefaultUI={true}
           style={{
-            height: isMobile ? "150px" : "80%",
+            height: deviceType === DeviceType.mobile ? "150px" : "80%",
             width: "100%",
           }}
           onClick={handleMapClick}
@@ -211,11 +181,11 @@ const LocationSearch: FC<LocationSearchProps> = ({
           )}
         </Map>
       </APIProvider>
-      {validationErrors && (
-        <p className="text-red-500 text-sm mt-3">
-          {validationErrors?.location?.message}
-        </p>
-      )}
+      {validationErrors &&
+        validationErrors?.location?.lat &&
+        validationErrors?.location?.lng &&(
+          <p className="text-red-500 text-sm mt-3">Please add a location</p>
+        )}
     </div>
   );
 };
@@ -306,9 +276,9 @@ const mapStateToProps = (state: RootState) => {
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
-  addProductLocation: (payload: AddProductLocationPayload) =>
+  addProductLocation: async (payload: AddProductLocationPayload) =>
     dispatch.vendor.addProductLocation(payload),
-  updateProductLocation: (payload: UpdateProductLocationPayload) =>
+  updateProductLocation: async (payload: UpdateProductLocationPayload) =>
     dispatch.vendor.updateProductLocation(payload),
 });
 
