@@ -5,10 +5,11 @@ export function authHeader() {
   const isLoggedIn = store.getState()?.authentication?.isLoggedIn;
   const authToken = getToken();
   const anonymousAuthToken = getAnonymousAuthToken();
-  if (authToken || anonymousAuthToken) {
-    let token = isLoggedIn ? authToken : anonymousAuthToken;
-    return "Bearer " + token;
+  console.log("ANONYMOUS: ", anonymousAuthToken);
+  console.log("IS LOGGED IN: ", isLoggedIn);
+  if (isLoggedIn && authToken) {
+    return "Bearer " + authToken;
   } else {
-    return "";
+    return "Bearer " + anonymousAuthToken;
   }
 }

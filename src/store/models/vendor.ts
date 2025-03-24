@@ -16,6 +16,7 @@ import {
   ProductPricingPayload,
   UpdateProductAvailabilityPayload,
   UpdateProductLocationPayload,
+  UpdateProductOpenDayAvailability,
   UpdateProductPayload,
   UpdateProductPricingPayload,
   VendorProductsFilters,
@@ -284,6 +285,29 @@ export const vendor = createModel<RootModel>()({
           );
           const previousStep = rootState.vendor.activeStep;
           dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.include || error?.message);
+      }
+    },
+    async updateProductOpenDayAvailability(
+      payload: UpdateProductOpenDayAvailability,
+      rootState
+    ) {
+      try {
+        const response: any = await patchRequest(
+          `/availability-day/${payload?.day}/`,
+          {
+            ...payload,
+            product: undefined,
+            day: undefined,
+          }
+        );
+        if (response && response?.data) {
+          dispatch.vendor.getVendorProductById(payload?.product);
+          dispatch.alert.setSuccessAlert(
+            "Product availability updated successfully!"
+          );
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.include || error?.message);

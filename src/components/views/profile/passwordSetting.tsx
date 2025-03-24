@@ -12,6 +12,7 @@ import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
+import Button from "@/components/shared/button";
 
 type PasswordSettingProps = {
   loading: boolean;
@@ -64,7 +65,7 @@ const PasswordSetting: FC<PasswordSettingProps> = ({
     <div>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-lg md:text-xl lg:text-2xl font-medium mb-4 md:mb-8">
-          Password Setting
+          Password
         </h1>
         <div className="flex flex-col gap-4 mb-5">
           <div className="w-full flex flex-col space-y-2">
@@ -156,16 +157,21 @@ const PasswordSetting: FC<PasswordSettingProps> = ({
           </div>
         </div>
         <div className="flex justify-end items-center">
-          <button
+          <Button
+            width="w-full md:w-[20%]"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white font-base"
+            padding="py-3"
+            margin="mb-2"
             type="submit"
-            className="px-[16px] py-[11px] lg:px-[20px] lg:py-[12px] xl:px-[22px] xl:py-[13px] bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-xs lg:text-sm xl:text-base text-whiteColor rounded-full transition-opacity duration-300 hover:opacity-40"
           >
             {loading ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
               " Edit Password"
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

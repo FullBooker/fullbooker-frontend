@@ -14,7 +14,6 @@ import {
   UpdateProductAvailabilityPayload,
 } from "@/domain/dto/input";
 import LocationSearch from "../locationSearch";
-import ReverseGeocoding from "../locationPointer";
 import { extractCoordinates } from "@/utilities";
 import StepHeader from "../stepHeader";
 
@@ -51,23 +50,27 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
       ),
     location: yup
       .object()
-      .nullable()
-      .required("Location is required")
-      .test(
-        "valid-location",
-        "Please select a valid location",
-        (value) => !!value && Object.keys(value).length > 0
-      ),
+      .shape({
+        lat: yup
+          .number()
+          .required("Latitude is required")
+          .typeError("Latitude must be a number"),
+        lng: yup
+          .number()
+          .required("Longitude is required")
+          .typeError("Longitude must be a number"),
+      })
+      .required("Location is required"),
   });
 
   const {
     control,
     handleSubmit,
     watch,
+    getValues,
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
     defaultValues: {
       start: newProduct?.availability?.start || "",
       end: newProduct.availability?.end || "",
@@ -75,8 +78,13 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
       end_time: newProduct.availability?.end_time || "",
       location:
         newProduct?.locations && newProduct?.locations?.length > 0
-          ? (newProduct?.locations[0] as any)
-          : null,
+          ? {
+              lat: extractCoordinates(newProduct?.locations[0]?.coordinates)
+                ?.latitude as number,
+              lng: extractCoordinates(newProduct?.locations[0]?.coordinates)
+                ?.longitude as number,
+            }
+          : undefined,
     },
     mode: "onBlur",
   });
@@ -102,12 +110,16 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
     }
   };
 
-  const [selectedLocation, setSelectedLocation] =
-    useState<google.maps.places.PlaceResult | null>(null);
-
   useEffect(() => {
-    setValue("location", selectedLocation as any);
-  }, [selectedLocation]);
+    if (newProduct?.locations && newProduct?.locations?.length > 0) {
+      setValue("location", {
+        lat: extractCoordinates(newProduct?.locations[0]?.coordinates)
+          ?.latitude as number,
+        lng: extractCoordinates(newProduct?.locations[0]?.coordinates)
+          ?.longitude as number,
+      });
+    }
+  }, [newProduct?.locations]);
 
   return (
     <div className="px-0 md:px-5">
@@ -115,7 +127,6 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">
           <LocationSearch
-            setSelectedLocation={setSelectedLocation}
             validationErrors={errors}
           />
           <div className="border rounded-sm border-primary px-3 md:px-4 py-4 col-span-2">
@@ -224,31 +235,13 @@ const EventAvailability: FC<EventAvailabilityProps> = ({
               <div className="flex justify-between">
                 <span className="font-base">Location:</span>
                 <span className="font-light">
-                  {(selectedLocation &&
-                    selectedLocation?.formatted_address) || (
+                  {
                     <>
-                      {newProduct?.locations?.length > 0 ? (
-                        <ReverseGeocoding
-                          lat={
-                            extractCoordinates(
-                              newProduct?.locations[
-                                newProduct?.locations?.length - 1
-                              ]?.coordinates
-                            )?.latitude as number
-                          }
-                          lng={
-                            extractCoordinates(
-                              newProduct?.locations[
-                                newProduct?.locations?.length - 1
-                              ]?.coordinates
-                            )?.longitude as number
-                          }
-                        />
-                      ) : (
-                        "N/A"
-                      )}
+                      {newProduct?.locations?.length > 0
+                        ? newProduct?.locations[0]?.address
+                        : "N/A"}
                     </>
-                  )}
+                  }
                 </span>
               </div>
               <div className="flex justify-between">

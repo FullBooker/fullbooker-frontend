@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { RootState } from "@/store";
 import ProductsOutlet from "@/components/products/productsOutlet";
 import { ProductsFilters } from "@/domain/dto/input";
+import { HomePageProductSection } from "@/constants";
 
 type CategoriesPageProps = {
   params: {
@@ -18,7 +19,25 @@ const CategoriesPage: FC<CategoriesPageProps> = ({ params }) => {
     page_size: 25,
     category: params?.category?.split("_")[1] as string,
   });
-  return <ProductsOutlet filters={filters} setFilters={setFilters} />;
+  console.log(params)
+  return (
+    <ProductsOutlet
+      filters={filters}
+      setFilters={setFilters}
+      isPopularNowProductsSection={
+        params?.category === HomePageProductSection.popularNowProducts
+      }
+      isNearbyProductsSection={
+        params?.category === HomePageProductSection.nearByProducts
+      }
+      isUpcomingProductsSection={
+        params?.category === HomePageProductSection.upcomingProducts
+      }
+      isRecommendedForYouSection={
+        params?.category === HomePageProductSection.recommendedProducts
+      }
+    />
+  );
 };
 
 const mapStateToProps = (state: RootState) => {

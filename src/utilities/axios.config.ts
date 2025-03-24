@@ -3,6 +3,7 @@ import { authHeader } from "./auth.header";
 import { store } from "../store";
 
 import { TechnicalError } from "./errors";
+import { removeAnonymousAuthToken, removeToken } from "./auth.cookie";
 
 const publicApiEndpoints = [
   "/accounts/otp/request",
@@ -30,10 +31,9 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
-      // store.dispatch.authentication.signOut({});
-      // store.dispatch.alert.setFailureAlert(
-      //   "You session has expired! Sign in again"
-      // );
+      if (store.getState()?.authentication?.isLoggedIn) {
+        store.dispatch.authentication.logOut();
+      }
       return;
     } else if (error.response.status === 500) {
       return Promise.reject(new TechnicalError(error.response?.data));
@@ -98,10 +98,14 @@ export async function postRequest(
   return response;
 }
 
-export async function patchRequest(URL: string, payload: any) {
+export async function patchRequest(
+  URL: string,
+  payload: any,
+  hasFile?: boolean
+) {
   const response = await axiosClient.patch(URL, payload, {
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": hasFile ? "multipart/form-data" : "application/json",
       Accept: "application/json",
       ...(authHeader() && !isPublic(URL)
         ? { Authorization: authHeader() }

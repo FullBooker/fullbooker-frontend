@@ -6,8 +6,7 @@ import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ModalID } from "@/domain/components";
 import { ProductCategory, ProductTag } from "@/domain/dto/output";
-import ProductCategories from "@/components/products/homePage/categories";
-import Button from "@/components/shared/button";
+import ProductTags from "@/components/products/homePage/tags";
 import DashBoardLayout from "./layout";
 import SearchFilters from "@/components/products/homePage/productFilters";
 import PopularProductsSection from "@/components/products/homePage/popularProductsSection";
@@ -15,19 +14,33 @@ import ProductsNearYouSection from "@/components/products/homePage/productsNearY
 import ProductsRecommendeForYouSection from "@/components/products/homePage/productsRecommendeForYou";
 import UpcomingProductsSection from "@/components/products/homePage/upcomingProducts";
 import MoreProductsSection from "@/components/products/homePage/more";
+import { Product } from "@/domain/product";
+import EmptyStoreDisclaimer from "@/components/products/emptyStoreDisclaimer";
 
 type HomePageProps = {
   getProductCategories: () => void;
   productCategories: Array<ProductCategory>;
   getCurrencies: () => void;
-  productTags: Array<ProductTag>
+  productTags: Array<ProductTag>;
   getProductTags: () => void;
+  products: Array<Product>;
+  popularProducts: Array<Product>;
+  nearByProducts: Array<Product>;
+  recommendedProducts: Array<Product>;
+  upcomingProducts: Array<Product>;
+  isProcessingRquest: boolean;
 };
 
 const HomePage: FC<HomePageProps> & { layout: any } = ({
   getProductCategories,
   getCurrencies,
   getProductTags,
+  products,
+  nearByProducts,
+  recommendedProducts,
+  upcomingProducts,
+  popularProducts,
+  isProcessingRquest,
 }) => {
   useEffect(() => {
     getProductCategories();
@@ -37,42 +50,30 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
 
   return (
     <div className="h-fit bg-white">
-      {/* Search Filters */}
-      <SearchFilters />
+      {products?.length === 0 &&
+      nearByProducts?.length === 0 &&
+      recommendedProducts?.length === 0 &&
+      upcomingProducts?.length === 0 &&
+      popularProducts?.length === 0 &&
+      !isProcessingRquest ? (
+        <EmptyStoreDisclaimer />
+      ) : (
+        <div>
+          <SearchFilters />
 
-      {/* Activity Categories */}
-      <ProductCategories />
+          <ProductTags />
 
-      {/* Popular Products Section */}
-      <PopularProductsSection />
+          <PopularProductsSection />
 
-      {/* Products near you Section */}
-      <ProductsNearYouSection />
+          <ProductsNearYouSection />
 
-      {/* Upcoming products section */}
-      <UpcomingProductsSection />
+          <UpcomingProductsSection />
 
-      {/* Products recommeded for you section */}
-      <ProductsRecommendeForYouSection />
+          <ProductsRecommendeForYouSection />
 
-       {/* More Products section */}
-       <MoreProductsSection />
-
-      <div className="py-8 px-2 md:px-3 lg:px-4 bg-white text-center flex justify-center">
-        <div className="flex justify-center px-4 sm:px-7">
-          <Button
-            width="w-full"
-            bg="bg-primary"
-            borderRadius="rounded"
-            margin="mb-2"
-            text="text-black"
-            padding="py-2 px-4 md:px-8"
-            isSecondary
-          >
-            Load more
-          </Button>
+          <MoreProductsSection />
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -80,17 +81,32 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
 HomePage.layout = DashBoardLayout;
 
 const mapStateToProps = (state: RootState) => {
-  const productsRequestProcessing = state.loading.models.products;
+  const isProcessingRquest =
+    state.loading.effects.products.getProducts ||
+    state.loading.effects.products.getPopularProducts ||
+    state.loading.effects.products.getNearByProducts ||
+    state.loading.effects.products.getNearByProducts ||
+    state.loading.effects.products.getRecommendedProducts;
   const { isLoggedIn } = state.authentication;
-  const { products } = state.products;
+  const {
+    products,
+    popularProducts,
+    nearByProducts,
+    recommendedProducts,
+    upcomingProducts,
+  } = state.products;
   const { productCategories, currencies, productTags } = state.settings;
   return {
     isLoggedIn,
     products,
+    popularProducts,
+    nearByProducts,
+    recommendedProducts,
+    upcomingProducts,
     productCategories,
-    productsRequestProcessing,
+    isProcessingRquest,
     currencies,
-    productTags
+    productTags,
   };
 };
 

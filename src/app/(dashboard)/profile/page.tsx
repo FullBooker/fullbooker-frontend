@@ -1,18 +1,14 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { ImageUp } from "lucide-react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
-import { FC, use, useEffect, useState } from "react";
-import DeactiveModalAccount from "@/components/layout/modal/DeactiveModal";
+import { FC, useEffect, useState } from "react";
 
-import { RootState } from "@/store";
+import { Dispatch, RootState } from "@/store";
 
 import { connect } from "react-redux";
 import { AuthData } from "@/domain/dto/output";
 import { UserProfile } from "@/domain/profile";
-import { authentication } from "../../../store/models/authentication";
 import {
   UpdatePasswordPayload,
   UpdateUserProfilePayload,
@@ -21,6 +17,9 @@ import ProfileSetting from "@/components/views/profile/profileSetting";
 import PasswordSetting from "@/components/views/profile/passwordSetting";
 import { withAuth } from "@/components/views/dash/authGuard";
 import MobileMiniAppBar from "@/components/layout/mobileMiniAppBar";
+import { useTheme } from "next-themes";
+import { UpdateProfileImagePayload } from "@/domain/dto/profile.input";
+import { MediaType } from "@/domain/constants";
 
 type ProfilePageProps = {
   profileLoading: boolean;
@@ -28,6 +27,7 @@ type ProfilePageProps = {
   getUserProfile: () => void;
   profile: UserProfile;
   authData: AuthData;
+  updateProfileImage: (payload: UpdateProfileImagePayload) => void;
 };
 
 const ProfilePage: FC<ProfilePageProps> = ({
@@ -36,6 +36,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
   getUserProfile,
   profile,
   authData,
+  updateProfileImage,
 }) => {
   const { theme = "light" } = useTheme();
   const [themeMode, setThemeMode] = useState("light");
@@ -43,33 +44,43 @@ const ProfilePage: FC<ProfilePageProps> = ({
   useEffect(() => {
     setThemeMode(theme);
   }, [theme]);
-
   useEffect(() => {
-    // getUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getUserProfile();
   }, []);
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      updateProfileImage({
+        image: file,
+      } as UpdateProfileImagePayload);
+    }
+  };
 
   return (
     <div>
-      <MobileMiniAppBar title="My Profile"/>
+      <MobileMiniAppBar title="My Profile" />
       <div className="flex flex-col gap-12 h-fit py-3 md:py-10 px-4 max-w-7xl mx-auto">
         {/* BG Profile */}
         <div className="w-full flex flex-col">
           <div className="flex flex-col justify-center">
             <div className="sm:flex ms-6 sm:-mb-[58px] sm:ms-6 md:-mb-16 md:ms-12 lg:-mb-24 lg:ms-16 items-center sm:items-end gap-4 md:gap-6 lg:gap-8">
               <Image
-                src={`/assets/default-profile-picture-placeholder.jpg`}
+                 src={`${
+                  profile?.image ||
+                  "/assets/default-profile-picture-placeholder.jpg"
+                } `}
                 alt="Profile Picture"
-                width={348}
-                height={348}
-                className="block w-[75px] h-[75px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] lg:w-[200px] lg:h-[200px] rounded-full"
+                width={300}
+                height={300}
+                className="w-[75px] h-[75px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] lg:w-[200px] lg:h-[200px] rounded-full object-cover"
                 unoptimized={true}
               />
               <div className="w-full flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
                 <div className="flex flex-col gap-0 lg:gap-1">
                   <span className="text-black sm:text-primary text-sm sm:text-base md:text-lg lg:text-2xl">
-                    {authData?.user?.first_name
-                      ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+                    {profile?.first_name
+                      ? `${profile?.first_name} ${profile?.last_name}`
                       : ""}
                   </span>
                   <div
@@ -80,28 +91,35 @@ const ProfilePage: FC<ProfilePageProps> = ({
                     }`}
                   >
                     <span className="text-xs lg:text-sm">
-                      {authData?.user?.first_name
-                        ? `${authData?.user?.first_name?.toLocaleLowerCase()}${authData?.user?.last_name?.toLocaleLowerCase()}`
+                      {profile?.first_name
+                        ? `${profile?.first_name?.toLocaleLowerCase()}${profile?.last_name?.toLocaleLowerCase()}`
                         : ""}
                     </span>
                     <span className="text-base lg:text-xl">&bull;</span>
                     <span className="text-xs lg:text-sm">
-                      {authData?.user?.email ? authData?.user?.email : ""}
+                      {profile?.email ? profile?.email : ""}
                     </span>
                   </div>
                 </div>
-                <button
-                  className={`flex w-fit h-fit py-[10px] px-[14px] lg:py-3 lg:px-4 items-center gap-2 border bg-background text-primary sm:bg-transparent ${
+                <label
+                  className={`cursor-pointer flex w-fit h-fit py-[10px] px-[14px] lg:py-3 lg:px-4 items-center gap-2 border bg-background text-primary sm:bg-transparent ${
                     themeMode === "light"
                       ? "border-strokeColor2 text-textColor2"
                       : "border-whiteColor text-whiteColor"
                   } rounded-full text-sm`}
                 >
                   <span className="text-xs lg:text-sm">
-                    Upload Profile Picture
+                    {profile?.image ? "Update" : "Upload"} Profile Picture
                   </span>
                   <ImageUp className="w-3 h-3 md:w-[14px] md:h-[14px] lg:w-4 lg:h-4" />
-                </button>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
+                </label>
               </div>
             </div>
           </div>
@@ -115,7 +133,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
         >
           <ProfileSetting />
           <PasswordSetting />
-          <div>
+          {/* <div>
             <h1 className="text-lg md:text-xl lg:text-2xl font-medium">
               Deactivate Account
             </h1>
@@ -129,7 +147,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
             <div className="flex justify-start items-center mt-4 md:mt-3 lg:mt-4">
               <DeactiveModalAccount theme={themeMode} />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
@@ -144,12 +162,14 @@ const mapStateToProps = (state: RootState) => {
   return { profileLoading, authLoading, authData, profile };
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   getUserProfile: () => dispatch.profile.getUserProfile(),
   updateUserProfile: (payload: UpdateUserProfilePayload) =>
     dispatch.profile.updateUserProfile(payload),
   updatePassword: (payload: UpdatePasswordPayload) =>
     dispatch.authentication.updatePassword(payload),
+  updateProfileImage: (payload: UpdateProfileImagePayload) =>
+    dispatch.profile.updateProfileImage(payload),
 });
 
 export default connect(

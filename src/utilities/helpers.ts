@@ -11,9 +11,9 @@ export const buildQueryString = (params: any) => {
       if (value !== null && value !== undefined) {
         return `${encodeURIComponent(key)}=${encodeURIComponent(value as any)}`;
       }
-      return null; // return null for undefined or null values
+      return null;
     })
-    .filter((queryPart) => queryPart !== null) // filter out null values
+    .filter((queryPart) => queryPart !== null)
     .join("&");
   return query;
 };
@@ -105,6 +105,7 @@ export const purgeAnonymousAuthToken = () => {
 
 import { format, parseISO } from "date-fns";
 import { ProductPricing } from "@/domain/product";
+import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
 
 interface OpenDay {
   id: string;
@@ -200,12 +201,16 @@ export const humanReadableDate = (isoTimestamp: string): string => {
   return date?.toISOString()?.split("T")[0];
 };
 
-export const getPricingRange = (pricing: Array<ProductPricing> = []): string => {
+export const getPricingRange = (
+  pricing: Array<ProductPricing> = []
+): string => {
   if (pricing.length === 1) {
     const cost = parseFloat(pricing[0]?.cost);
     return isNaN(cost) ? "N/A" : addCommaSeparators(Math.round(cost));
   } else if (pricing.length > 0) {
-    const prices = pricing.map((p: ProductPricing) => Math.round(parseFloat(p.cost) || 0));
+    const prices = pricing.map((p: ProductPricing) =>
+      Math.round(parseFloat(p.cost) || 0)
+    );
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     return `${addCommaSeparators(minPrice)} - ${addCommaSeparators(maxPrice)}`;
@@ -213,3 +218,23 @@ export const getPricingRange = (pricing: Array<ProductPricing> = []): string => 
     return "N/A";
   }
 };
+
+export function formatProductFilters(
+  filters: ComprehensiveProductFilters
+): Record<string, string> {
+  const queryParams: Record<string, string> = {};
+
+  if (filters.search) queryParams["search"] = filters.search;
+  if (filters.categories && filters.categories.length)
+    queryParams["category"] = filters.categories.join(",");
+  if (filters.locations && filters.locations.length)
+    queryParams["location"] = filters.locations
+      .map((loc) => loc.name)
+      .join(",");
+  if (filters.max_price) queryParams["max_price"] = filters.max_price;
+  if (filters.min_price) queryParams["min_price"] = filters.min_price;
+  if (filters.start_date) queryParams["start_date"] = filters.start_date;
+  if (filters.end_date) queryParams["end_date"] = filters.end_date;
+
+  return queryParams;
+}

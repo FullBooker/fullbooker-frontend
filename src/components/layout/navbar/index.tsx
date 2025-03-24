@@ -1,44 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { SearchInput } from "./components/SearchInput";
-import {
-  ArrowRightLeft,
-  Banknote,
-  BellDot,
-  CheckCheck,
-  ChevronDown,
-  ChevronUp,
-  HandCoins,
-  History,
-  LogOut,
-  Moon,
-  Plus,
-  SunMedium,
-  Tally3,
-  UserRound,
-  UserX,
-  Wallet,
-  X,
-  LogIn,
-  UserPlus,
-  EyeOff,
-  EyeIcon,
-  GiftIcon,
-  UserCircle,
-  Ticket,
-} from "lucide-react";
+import { LogOut, Tally3, UserRound, Ticket } from "lucide-react";
 import Image from "next/image";
 import Profile from "./profile/Profile";
 import { useTheme } from "next-themes";
 import ProfileItem from "./profile/ProfileItem";
-import Notification from "./notification/Notification";
-import NotificationItem from "./notification/NotificationItem";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
-import { AuthData, ProductCategory, Subcategory } from "@/domain/dto/output";
+import { AuthData, ProductCategory } from "@/domain/dto/output";
 import { FC } from "react";
 import ButtonAuth from "../../auth/ButtonAuth";
 import {
@@ -47,17 +19,9 @@ import {
   CircularProgress,
   IconButton,
   Toolbar,
-  Typography,
 } from "@mui/material";
-import {
-  addCommaSeparators,
-  generateSlug,
-  getInitials,
-  hideMiddleCharacters,
-} from "@/utilities";
+import { generateSlug, hideMiddleCharacters } from "@/utilities";
 import { UserProfile } from "@/domain/profile";
-import CustomAvatar from "./components/customAvatar";
-import BottomNavBar from "../bottomNavbar";
 import { getToken, AUTH_TOKEN_KEY } from "@/utilities/auth.cookie";
 import Cookies from "js-cookie";
 import { ModalID } from "@/domain/components";
@@ -94,9 +58,6 @@ const Navbar: FC<NavbarProps> = ({
   sigOut,
   authData,
   profile,
-  getUserProfile,
-  showBalance,
-  toggleBalanceVisibility,
   setActiveModal,
   switchToHost,
   productCategories,
@@ -108,12 +69,9 @@ const Navbar: FC<NavbarProps> = ({
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
-  const [openNotification, setOpenNotification] = useState(false);
   const [themeMode, setThemeMode] = useState("light");
-  const today = new Date();
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [authToken, setAuthToken] = useState<string | null>(getToken());
 
   const handleCloseLink = () => {
@@ -219,16 +177,11 @@ const Navbar: FC<NavbarProps> = ({
                   text="text-sm"
                   isSecondary={true}
                   onClick={() => {
-                    if (authToken) {
+                    if (isLoggedIn) {
                       switchToHost({
                         user: authData?.user?.id,
                       } as SwitchToHostPayload);
                     } else {
-                      const newSearchParams = new URLSearchParams(
-                        searchParams.toString()
-                      );
-                      newSearchParams.set("user_flow", "vendor");
-                      router.push(`${pathname}?${newSearchParams.toString()}`);
                       setActiveModal(ModalID.login);
                     }
                   }}
@@ -269,11 +222,11 @@ const Navbar: FC<NavbarProps> = ({
                         src={`${
                           profile?.image ||
                           "/assets/default-profile-picture-placeholder.jpg"
-                        }`}
+                        } `}
                         alt={"Profile Image"}
                         width={isMobile ? 35 : 35}
                         height={isMobile ? 35 : 35}
-                        className="rounded-lg"
+                        className="rounded-full w-full object-cover"
                       />
                     </div>
                   }
@@ -294,10 +247,10 @@ const Navbar: FC<NavbarProps> = ({
                       {authToken && (
                         <>
                           <div className="flex flex-col gap-[1px] sm:gap-1 items-center">
-                            {authData?.user?.phone_number && (
+                            {profile?.phone_number && (
                               <span className="text-[13px] sm:text-base lg:text-lg text-black">
                                 {`${hideMiddleCharacters(
-                                  authData?.user?.phone_number
+                                  profile?.phone_number
                                 )}`}
                               </span>
                             )}
@@ -308,8 +261,8 @@ const Navbar: FC<NavbarProps> = ({
                                   : "text-white"
                               }`}
                             >
-                              {authData?.user?.first_name
-                                ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+                              {profile?.first_name
+                                ? `${profile?.first_name} ${profile?.last_name}`
                                 : ""}
                             </span>
                           </div>

@@ -23,6 +23,7 @@ export interface ProductLocation {
   id: string;
   active: boolean;
   coordinates: string;
+  address: string;
   created_at: string;
   updated_at: string;
   host: string;
@@ -35,6 +36,7 @@ export interface ProductHost {
   updated_at: string;
   active: boolean;
   user: User;
+  image: ProductMedia | null;
 }
 
 interface OpenDay {
@@ -84,7 +86,7 @@ export interface Product {
   subcategory: string;
   availability: Availability;
   pricing: Array<ProductPricing>;
-  image: ProductMedia;
+  image: ProductMedia | null;
   locations: Array<ProductLocation>;
 }
 

@@ -22,6 +22,7 @@ import {
   TICKET_PRICING_CATEGORIES,
 } from "@/constants";
 import { useRouter } from "next/navigation";
+import { UserProfile } from "@/domain/profile";
 
 type TicketBookingSummaryProps = {
   productsRequestProcessing: boolean;
@@ -40,6 +41,7 @@ type TicketBookingSummaryProps = {
   bookTicket: (payload: BookTicketPayload) => void;
   isProcessingRequest: boolean;
   isActivity: boolean;
+  profile: UserProfile;
 };
 
 const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
@@ -54,15 +56,16 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
   setFailureAlert,
   clearCart,
   isActivity,
+  profile,
 }) => {
   const router = useRouter();
   const defaultValues = {
-    name: authData?.user
-      ? `${authData?.user?.first_name} ${authData?.user?.last_name}`
+    name: profile?.first_name
+      ? `${profile?.first_name} ${profile?.last_name}`
       : "",
-    id_number: authData?.user ? authData?.user?.id_number : "",
-    phone_number: authData?.user ? authData?.user?.phone_number : "",
-    email: authData?.user ? authData?.user?.email : "",
+    id_number: "",
+    phone_number: profile?.phone_number ? profile?.phone_number : "",
+    email: profile?.email ? profile?.email : "",
   };
 
   interface FormData {
@@ -443,6 +446,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
 const mapStateToProps = (state: RootState) => {
   const isProcessingRequest = state.loading.effects.tickets.bookTicket;
   const { isLoggedIn, authData } = state.authentication;
+  const { profile } = state.profile;
   const { cart, cartSummary } = state.products;
   const { message, type } = state.alert;
   const { currencies } = state.settings;
@@ -455,6 +459,7 @@ const mapStateToProps = (state: RootState) => {
     cart,
     currencies,
     cartSummary,
+    profile,
   };
 };
 

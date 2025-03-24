@@ -24,76 +24,62 @@ const Footer = () => {
               Ticket booking made easier and simpler
             </p>
             <div className="flex gap-4 mt-4">
-              <Link href="#" className="text-primary hover:text-mainColor">
-                <Facebook className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-primary hover:text-mainColor">
-                <Twitter className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-primary hover:text-mainColor">
-                <Instagram className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-primary hover:text-mainColor">
-                <Linkedin className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-primary hover:text-mainColor">
-                <Youtube className="w-5 h-5" />
-              </Link>
+              <div className="flex gap-4 mt-4"></div>
             </div>
           </div>
 
           {/* Product Column */}
           <div>
-            <h3 className="font-semibold mb-3 md:mb-4">Product</h3>
+            <h3 className="font-light mb-3 md:mb-4 text-primary">Product</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                Features
+                Email Marketing
               </Link>
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                Pricing
+                Campaigns
               </Link>
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                Case studies
+                Branding
               </Link>
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                Reviews
-              </Link>
-              <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
-              >
-                Updates
+                Offline
               </Link>
             </div>
           </div>
 
           {/* Company Column */}
           <div>
-            <h3 className="font-semibold mb-3 md:mb-4">Company</h3>
+            <h3 className="font-semibold mb-3 md:mb-4">About</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                About
+                Our Story
               </Link>
               <Link
                 href="#"
                 className="text-sm text-gray-600 hover:text-mainColor"
               >
-                Contact us
+                Benefits
+              </Link>
+              <Link
+                href="#"
+                className="text-sm text-gray-600 hover:text-mainColor"
+              >
+                Team
               </Link>
               <Link
                 href="#"
@@ -101,54 +87,37 @@ const Footer = () => {
               >
                 Careers
               </Link>
-              <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
-              >
-                Culture
-              </Link>
-              <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
-              >
-                Blog
-              </Link>
             </div>
           </div>
 
           {/* Support Column */}
           <div>
-            <h3 className="font-semibold mb-3 md:mb-4">Support</h3>
+            <h3 className="font-light mb-3 md:mb-4 text-primary">Follow Us</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
+                href="https://www.facebook.com/share/17bq7mDhL9/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-mainColor flex items-center"
               >
-                Getting started
+                <Facebook className="w-5 h-5 me-2" />  <span className="text-black text-sm">Facebook</span>
               </Link>
               <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
+                href="https://x.com/fullbooker_?t=vJnHyxhz5eH8Yx0uKlo6aQ&s=08"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-mainColor flex items-center"
               >
-                Help center
+                <Twitter className="w-5 h-5 me-2" /> <span className="text-black text-sm">Twitter</span>
               </Link>
               <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
+                href="https://www.linkedin.com/company/fullbooker/about/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-mainColor flex items-center"
               >
-                Server status
-              </Link>
-              <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
-              >
-                Report a bug
-              </Link>
-              <Link
-                href="#"
-                className="text-sm text-gray-600 hover:text-mainColor"
-              >
-                Chat support
+                <Linkedin className="w-5 h-5 me-1 me-2" />{" "}
+                <span className="text-black text-sm ">Linkedin</span>
               </Link>
             </div>
           </div>
@@ -158,7 +127,7 @@ const Footer = () => {
         <div className="mt-12 pt-3 md:pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
             <div className="flex itsems-center">
-              <p className="text-xs md:tex-sm text-black">
+              <p className="text-xs md:tex-sm text-black me-28">
                 Copyright © {new Date().getFullYear()} Fullbooker
               </p>
               <p className="text-xs md:tex-sm text-black">

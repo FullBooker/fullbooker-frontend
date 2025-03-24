@@ -93,29 +93,6 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
       ? extractCoordinates(product?.locations[0]?.coordinates)
       : null;
 
-  const getDefaultPricingOption = (
-    pricingOptions: Array<ProductPricing>
-  ): {
-    currency: Currency;
-    pricingOption: ProductPricing;
-  } => {
-    if (pricingOptions?.length > 0) {
-      const defaultPricingOption = pricingOptions[0];
-      return {
-        currency: currencies?.find(
-          (currency: Currency) =>
-            currency?.id === defaultPricingOption?.currency
-        ) as Currency,
-        pricingOption: defaultPricingOption,
-      };
-    } else {
-      return {
-        currency: {} as Currency,
-        pricingOption: {} as ProductPricing,
-      };
-    }
-  };
-
   const getPricingRangeString = (pricing: Array<ProductPricing>): string => {
     if (pricing?.length === 1) {
       return addCommaSeparators(Math.round(parseFloat(pricing[0]?.cost)));
@@ -215,11 +192,8 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                 <div className="flex items-center text-[#808080] space-x-2">
                   <MapPin className="h-5 w-5" />
                   <p className="text-sm">
-                    {processedCoordinates ? (
-                      <LocationIdentifier
-                        lat={processedCoordinates?.latitude}
-                        lng={processedCoordinates?.longitude}
-                      />
+                    {product?.locations?.length > 0 ? (
+                      <span>{product?.locations[0]?.address}</span>
                     ) : (
                       "N/A"
                     )}
@@ -271,14 +245,17 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
               <div className="hidden lg:flex justify-end items-start">
                 <div className="flex items-center">
                   <Image
-                    src="/assets/default-profile-picture-placeholder.jpg"
+                    src={`${
+                      product?.host?.user?.image ||
+                      "/assets/default-profile-picture-placeholder.jpg"
+                    }`}
                     alt={"Host Profile Image"}
                     width={isMobile ? 50 : 50}
                     height={isMobile ? 50 : 50}
-                    className="rounded-lg me-2"
+                    className="rounded-full me-2"
                   />
                   <div className="text-base">
-                    <p className="-mb-2">Hosted by</p>
+                    <p className="-mb-1">Hosted by</p>
                     <p>
                       {product?.host?.user?.first_name
                         ? `${product?.host?.user?.first_name} ${product?.host?.user?.last_name}`
@@ -374,14 +351,6 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                     productsRequestProcessing={productsRequestProcessing}
                   />
                 </div>
-
-                {/* Ticket Details */}
-                {/* <div ref={buyTicketRef}>
-                <TicketDetails
-                  product={product}
-                  productsRequestProcessing={productsRequestProcessing}
-                />
-              </div> */}
 
                 {/* Map Section */}
                 <div
