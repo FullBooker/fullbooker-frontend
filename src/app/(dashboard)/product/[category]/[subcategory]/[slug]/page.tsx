@@ -21,12 +21,7 @@ import {
 } from "lucide-react";
 import ProductLocation from "@/components/products/singleProduct/productLocation";
 import ProductGallery from "@/components/products/singleProduct/gallery";
-import {
-  addCommaSeparators,
-  extractCoordinates,
-  formatProductAvailability,
-} from "@/utilities";
-import LocationIdentifier from "@/components/shared/locationidentifier";
+import { addCommaSeparators, formatProductAvailability } from "@/utilities";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import TicketBooking from "@/components/products/singleProduct/ticketBooking";
 import { useRouter } from "next/navigation";
@@ -40,6 +35,7 @@ type SingleProductPageProps = {
   getCurrencies: () => void;
   getProductCategories: () => void;
   currencies: Array<Currency>;
+  clearState: () => void;
   params: {
     slug: string;
   };
@@ -54,6 +50,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
   currencies,
   params,
   productMedia,
+  clearState,
 }) => {
   const isMobile = useIsMobile();
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -83,16 +80,6 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
     }
   };
 
-  interface ProcessedCoordinates {
-    latitude: number;
-    longitude: number;
-  }
-
-  const processedCoordinates: ProcessedCoordinates | null =
-    product?.locations?.length > 0
-      ? extractCoordinates(product?.locations[0]?.coordinates)
-      : null;
-
   const getPricingRangeString = (pricing: Array<ProductPricing>): string => {
     if (pricing?.length === 1) {
       return addCommaSeparators(Math.round(parseFloat(pricing[0]?.cost)));
@@ -109,6 +96,12 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
       return "N/A";
     }
   };
+
+  useEffect(() => {
+    return () => {
+      clearState();
+    };
+  }, []);
 
   return (
     <div className="h-fit md:max-w-6xl mx-auto">
@@ -394,6 +387,11 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch.products.getProductById(productId),
   getProductCategories: () => dispatch.settings.getProductCategories(),
   getCurrencies: () => dispatch.settings.getCurrencies(),
+  clearState: () => {
+    dispatch.products.setProductDetails(null);
+    dispatch.products.clearCart();
+    dispatch.products.setProductMedia([]);
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleProductPage);

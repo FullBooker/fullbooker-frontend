@@ -63,7 +63,7 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
     name: profile?.first_name
       ? `${profile?.first_name} ${profile?.last_name}`
       : "",
-    id_number: "",
+    id_number: cart?.length > 0 ? cart[0]?.id_number : "",
     phone_number: profile?.phone_number ? profile?.phone_number : "",
     email: profile?.email ? profile?.email : "",
   };
@@ -106,21 +106,13 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
 
     if (!cartSummary?.prefill_all_items_with_primary_user_details) {
       let hasMissingFields: boolean = false;
-      cart
-        ?.filter((i: CartItem, index: number) => {
-          return index !== 0;
-        })
-        .map((item: CartItem) => {
-          if (
-            item.email === "" ||
-            item.name === "" ||
-            item.phone_number === ""
-          ) {
-            hasMissingFields = true;
-            setFailureAlert("You need to fill out all missing fields");
-            return;
-          }
-        });
+      cart?.forEach((item: CartItem) => {
+        if (item.email === "" || item.name === "" || item.phone_number === "") {
+          hasMissingFields = true;
+          setFailureAlert("You need to fill out all missing fields");
+          return;
+        }
+      });
       if (hasMissingFields) return;
     }
 
@@ -155,27 +147,35 @@ const TicketBookingSummary: FC<TicketBookingSummaryProps> = ({
   };
 
   useEffect(() => {
+    const handleSuccessfulBooking = async (event: any) => {
+      await clearTicketSummary();
+      setActiveModal(ModalID.none);
+      router.push(`/product/booking/${event?.detail?.booking_id}`);
+    };
+
     document.addEventListener(
       CustomeEvents.successfullTicketBooking,
-      async (event: any) => {
-        clearTicketSummary().then(() => {
-          setActiveModal(ModalID.none);
-          router.push(`/product/booking/${event?.detail?.booking_id}`);
-        });
-      }
+      handleSuccessfulBooking
     );
+
+    return () => {
+      document.removeEventListener(
+        CustomeEvents.successfullTicketBooking,
+        clearCart
+      );
+    };
   }, []);
 
   useEffect(() => {
-    if (cart?.length > 0) {
-      const { user } = authData || {};
+    if (cart?.length > 0 && authData?.user) {
+      const { user } = authData;
       const firstItemInCart: CartItem = cart[0];
       addUserDetailsToCart({
         ...firstItemInCart,
-        name: user ? `${user.first_name} ${user.last_name}` : "",
-        id_number: user ? user.id_number : "",
-        phone_number: user ? user.phone_number : "",
-        email: user ? user.email : "",
+        name: `${user.first_name} ${user.last_name}`,
+        id_number: user.id_number,
+        phone_number: user.phone_number,
+        email: user.email,
       } as CartItem);
     }
   }, [authData]);

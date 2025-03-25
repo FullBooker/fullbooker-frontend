@@ -18,8 +18,7 @@ const CategoriesPage: FC<CategoriesPageProps> = ({ params }) => {
     page: 1,
     page_size: 25,
     category: params?.category?.split("_")[1] as string,
-  });
-  console.log(params)
+  });  
   return (
     <ProductsOutlet
       filters={filters}
