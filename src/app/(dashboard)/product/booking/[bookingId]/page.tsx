@@ -63,7 +63,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
   const [baseCurrency, setBaseCurrency] = useState("");
 
   const groupTickets = (tickets: Array<Ticket>): Array<GroupedTicket> => {
-    const grouped = tickets.reduce(
+    const grouped = tickets?.reduce(
       (acc: Record<string, GroupedTicket>, ticket) => {
         const { type, ticket_tier, cost, currency } = ticket.pricing_details;
         const key =
@@ -98,7 +98,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
       {}
     );
 
-    return Object.values(grouped);
+    return grouped ? Object.values(grouped) : [];
   };
 
   useEffect(() => {
@@ -227,8 +227,8 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                       <div className="flex-1 px-4 py-2 flex justify-between items-center">
                         <div>
                           <h4 className="text-sm">
-                            {ticket?.count} {ticket?.title} Ticket(s) for the Eras
-                            tour, tylor swift concert
+                            {ticket?.count} {ticket?.title} Ticket(s) for the
+                            Eras tour, tylor swift concert
                           </h4>
 
                           <div className="mt-2 flex justify-between items-center">
@@ -354,13 +354,13 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             {/* M-pesa */}
 
             {paymentMethod === "mpesa" && (
-                <div className="mb-4 space-y-2">
-                  <label className="block text-sm">Mpesa Number</label>
-                  <input
-                    type="text"
-                    className="outline-none border border-gray-300 rounded w-full p-2 "
-                  />
-                </div>
+              <div className="mb-4 space-y-2">
+                <label className="block text-sm">Mpesa Number</label>
+                <input
+                  type="text"
+                  className="outline-none border border-gray-300 rounded w-full p-2 "
+                />
+              </div>
             )}
             {/* Pay Button */}
             <Button

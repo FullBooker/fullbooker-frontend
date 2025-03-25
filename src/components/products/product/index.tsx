@@ -207,7 +207,10 @@ const SingleProduct: FC<SingleProductProps> = ({
         </div>
       </Link>
       {modalId === ModalID.productSocialShare && activeProduct && (
-        <SocialShareDialog title={product?.name} url={fullUrl} />
+        <SocialShareDialog
+          title={product?.name}
+          url={fullUrl}
+        />
       )}
     </div>
   );

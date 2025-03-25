@@ -226,7 +226,7 @@ const Navbar: FC<NavbarProps> = ({
                         alt={"Profile Image"}
                         width={isMobile ? 35 : 35}
                         height={isMobile ? 35 : 35}
-                        className="rounded-full w-full object-cover"
+                        className="rounded-full object-cover"
                       />
                     </div>
                   }
