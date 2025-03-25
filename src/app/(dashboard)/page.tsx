@@ -50,11 +50,11 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
 
   return (
     <div className="h-fit bg-white">
-      {products?.length === 0 &&
-      nearByProducts?.length === 0 &&
-      recommendedProducts?.length === 0 &&
-      upcomingProducts?.length === 0 &&
-      popularProducts?.length === 0 &&
+      {(!products || products?.length === 0 )&&
+      (!nearByProducts || nearByProducts?.length === 0) &&
+      (!recommendedProducts || recommendedProducts?.length === 0) &&
+      (!upcomingProducts || upcomingProducts?.length === 0) &&
+      (!popularProducts ||popularProducts?.length) === 0 &&
       !isProcessingRquest ? (
         <EmptyStoreDisclaimer />
       ) : (
