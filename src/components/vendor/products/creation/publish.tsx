@@ -467,7 +467,7 @@ const ProductPublishing: FC<ProductPublishingProps> = ({
       </div>
       <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10 mt-8 md:mt-4 w-full">
         <div className="w-full flex">
-          {newProduct?.active ? (
+          {newProduct?.active && (
             <Button
               width="w-full md:w-[20%]"
               bg="bg-primary"
@@ -489,44 +489,25 @@ const ProductPublishing: FC<ProductPublishingProps> = ({
                 </span>
               )}
             </Button>
-          ) : (
-            <Button
-              width="w-full md:w-[20%]"
-              bg="bg-primary"
-              borderRadius="rounded"
-              text="text-black"
-              padding="py-2"
-              margin="mb-2"
-              type="button"
-              isSecondary
-              onClick={() =>
-                setActiveModal(ModalID.activateProductConfirmation)
-              }
-            >
-              {deviceType === DeviceType.mobile ? (
-                "Activate"
-              ) : (
-                <span>
-                  Activate this{" "}
-                  {productType === ProductType.event ? "Event" : "Activity"}
-                </span>
-              )}
-            </Button>
           )}
         </div>
-        <Button
-          width="w-full md:w-[20%]"
-          bg="bg-primary"
-          borderRadius="rounded"
-          text="text-white"
-          padding="py-2"
-          margin="mb-2"
-          type="button"
-          onClick={publishProduct}
-          disabled={isProcessingRequest}
-        >
-          Publish
-        </Button>
+        {!newProduct?.active && (
+          <Button
+            width="w-full md:w-[20%]"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white"
+            padding="py-2"
+            margin="mb-2"
+            type="button"
+            onClick={() => {
+              setActiveModal(ModalID.activateProductConfirmation);
+            }}
+            disabled={isProcessingRequest}
+          >
+            Publish{" "}
+          </Button>
+        )}
       </div>
     </div>
   );

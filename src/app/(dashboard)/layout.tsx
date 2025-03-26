@@ -21,11 +21,11 @@ import PasswordResetSuccessfullModal from "@/components/views/auth/passwordReset
 import { NotificationType } from "@/domain/notification";
 import SessionExpiredModal from "@/components/views/auth/sessionExpired";
 import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index";
-// import { useGoogleOneTap } from "@/lib/hooks/useGoogleAuth";
 import BottomNavBar from "@/components/layout/bottomNavbar";
-import useIsMobile from "@/lib/hooks/useIsMobile";
 import ComprehensiveProductFilters from "@/components/products/homePage/comprehensiveProductFilters";
 import { CustomeEvents } from "@/constants";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -40,38 +40,17 @@ type DashboardLayoutProps = {
 const DashboardLayout: FC<DashboardLayoutProps> = ({
   children,
   modalId,
-  message,
-  type,
-  sessionHasExpired,
   isLoggedIn,
-  signOut,
 }) => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = usePathname();
   const navigation = useRouter();
   const { theme = "light" } = useTheme();
-  const [data, setData] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState("light");
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [isPlayingGameOnMobile, setIsPlayingGameOnMobile] =
+  const [shouldRedirectToHostView, setShouldRedirectToHostView] =
     useState<boolean>(false);
-
-  const [isTablet, setIsTablet] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsTablet(width >= 768 && width <= 1024);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -94,7 +73,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [router, data, children]);
+  }, [router, children]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -120,31 +99,50 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   }, [theme]);
 
   useEffect(() => {
+    const handleSwitchedToHosting = async (event: any) => {
+      navigation.push("/vendor");
+    };
+
+    const handleSuccessfulAuth = async (event: any) => {
+      const redirect = searchParams?.get("redirect");
+      if (redirect) {
+        navigation.push(`/${redirect}`);
+      }
+    };
+
     document.addEventListener(
       CustomeEvents.switchedToHostingSuccessfullEvent,
-      async (event: any) => {
-        navigation.push("/vendor/products");
-      }
+      handleSwitchedToHosting
     );
 
     document.addEventListener(
       CustomeEvents.successfullUserAuthentication,
-      async (event: any) => {
-        const redirect = searchParams?.get("redirect");
-          if (redirect) {
-            navigation.push(`/${redirect}`);
-          }
-      }
+      handleSuccessfulAuth
     );
+
+    return () => {
+      document.removeEventListener(
+        CustomeEvents.switchedToHostingSuccessfullEvent,
+        handleSwitchedToHosting
+      );
+
+      document.removeEventListener(
+        CustomeEvents.successfullUserAuthentication,
+        handleSuccessfulAuth
+      );
+    };
   }, []);
 
-  // useGoogleOneTap();
+  useEffect(() => {
+    if (shouldRedirectToHostView && isLoggedIn) {
+      navigation.push("/vendor");
+    }
+  }, [isLoggedIn]);
 
-  const isMobile = useIsMobile();
+  const deviceType = useDeviceType();
 
   return (
     <div className="flex h-fit w-full overflow-x-hidden">
-      {/* Sidebar */}
       <div
         className="h-fit lg:hidden xl:hidden md:flex xs:hidden"
         ref={sidebarRef}
@@ -153,15 +151,15 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={open}
           onClose={() => setOpen(false)}
-          isMobile={isMobile}
+          isMobile={deviceType === DeviceType.mobile}
         />
       </div>
 
       <div
         className={`h-full w-full overflow-x-hidden ${
-          open && isMobile && themeMode === "dark"
+          open && deviceType === DeviceType.mobile && themeMode === "dark"
             ? "bg-black opacity-30 z-40"
-            : open && isMobile && themeMode === "light"
+            : open && deviceType === DeviceType.mobile && themeMode === "light"
             ? "blur-sm bg-white opacity-30 z-40"
             : ""
         }`}
@@ -169,12 +167,12 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
         <main
           className={`h-fit mx-auto w-full overflow-x-hidden mt-0 md:mt-12 content-container`}
         >
-          {/* Navbar */}
-          {!data && !isPlayingGameOnMobile && !isMobile ? (
+          {deviceType !== DeviceType.mobile ? (
             <Navbar
               openNav={open}
               onOpenSideNav={() => setOpen(true)}
-              isMobile={isMobile}
+              isMobile={false}
+              setShouldRedirectToHostView={setShouldRedirectToHostView}
             />
           ) : (
             <></>
@@ -193,8 +191,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           ) : (
             <></>
           )}
-          {/* Footer */}
-          {!data && !isPlayingGameOnMobile ? <Footer /> : <></>}
+          <Footer />
         </main>
       </div>
       {modalId === ModalID.login && (
@@ -202,7 +199,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<LoginModalContent />}
-          fullScreen={isMobile ? true : false}
+          fullScreen={deviceType === DeviceType.mobile ? true : false}
         />
       )}
       {modalId === ModalID.register && (
@@ -210,7 +207,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
           theme={themeMode}
           open={true}
           content={<RegisterModalContent />}
-          fullScreen={isMobile ? true : false}
+          fullScreen={deviceType === DeviceType.mobile ? true : false}
         />
       )}
       {modalId === ModalID.forgotPassword && (

@@ -202,7 +202,7 @@ const SingleProduct: FC<SingleProductProps> = ({
             padding="py-2"
             margin="m-0"
           >
-            Buy tickets
+            Buy Tickets
           </Button>
         </div>
       </Link>

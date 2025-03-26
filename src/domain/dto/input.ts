@@ -199,6 +199,10 @@ export interface ActivateProductPayload {
   active: boolean;
 }
 
-export type GoogleSocialSigninPayload = {
+export interface GoogleSocialSigninPayload  {
   access_token: string;
 };
+
+export interface WithdrawalRequestPayload {
+  amount: string;
+}

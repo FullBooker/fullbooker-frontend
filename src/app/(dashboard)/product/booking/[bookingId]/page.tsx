@@ -20,6 +20,7 @@ import { addCommaSeparators } from "@/utilities";
 import { ModalID } from "@/domain/components";
 import { Ticket, TicketBookingOrder } from "@/domain/ticket";
 import MobileMiniAppBar from "@/components/layout/mobileMiniAppBar";
+import { withAuth } from "../../../../../components/views/dash/authGuard";
 import {
   SESSION_PRICING_CATEGORIES,
   TICKET_PRICING_CATEGORIES,
@@ -59,7 +60,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
 }) => {
   const isMobile = useIsMobile();
 
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("mpesa");
   const [baseCurrency, setBaseCurrency] = useState("");
 
   const groupTickets = (tickets: Array<Ticket>): Array<GroupedTicket> => {
@@ -181,7 +182,6 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto py-6 md:py-10 px-4 md:px-7">
-          {/* Order Summary */}
           <div className="w-full lg:w-1/2 border border-gray-400 rounded py-4 md:py-6 px-6">
             <h2 className="text-xl font-medium">Order Summary</h2>
             <p className="font-base mb-3">
@@ -271,15 +271,13 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             </div>
           </div>
 
-          {/* Payment Section */}
           <div className="w-full lg:w-1/2 border border-gray-400 py-4 md:py-6 px-6 rounded">
             <h2 className="text-xl font-medium">Payment</h2>
             <p className="font-base mb-3">
               Complete your purcharse by providing payment details
             </p>
 
-            {/* Payment Options */}
-            <div className="flex gap-4 mb-4">
+            {/* <div className="flex gap-4 mb-4">
               {["card", "mpesa"].map((method) => (
                 <label
                   key={method}
@@ -296,9 +294,8 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                   {method.charAt(0).toUpperCase() + method.slice(1)}
                 </label>
               ))}
-            </div>
+            </div> */}
 
-            {/* Card Details */}
             {paymentMethod === "card" && (
               <>
                 <div className="mb-4 space-y-2">
@@ -350,9 +347,6 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                 </div>
               </>
             )}
-
-            {/* M-pesa */}
-
             {paymentMethod === "mpesa" && (
               <div className="mb-4 space-y-2">
                 <label className="block text-sm">Mpesa Number</label>
@@ -410,4 +404,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch.tickets.getTicketBookingOrderById(bookingId),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckoutPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withAuth(CheckoutPage));

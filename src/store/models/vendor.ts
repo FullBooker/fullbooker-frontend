@@ -20,6 +20,7 @@ import {
   UpdateProductPayload,
   UpdateProductPricingPayload,
   VendorProductsFilters,
+  WithdrawalRequestPayload,
 } from "@/domain/dto/input";
 import { MediaType, ProductType, ViewType } from "@/domain/constants";
 import {
@@ -415,6 +416,24 @@ export const vendor = createModel<RootModel>()({
           dispatch.vendor.setNewProductDetails(null);
           dispatch.vendor.setProductPageViewType(ViewType.productsListView);
           dispatch.alert.setSuccessAlert("Product activated successfully!");
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
+    async triggerWithdrawalRequest(
+      payload: WithdrawalRequestPayload,
+      rootState
+    ) {
+      try {
+        const response: any = await patchRequest("/withdraw/", payload);
+        if (response && response?.data) {
+          dispatch.components.setActiveModal(ModalID.none);
+          dispatch.alert.setSuccessAlert(
+            "Withdrawal request submitted successfully!"
+          );
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(

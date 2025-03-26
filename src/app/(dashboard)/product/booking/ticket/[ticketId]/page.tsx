@@ -12,6 +12,8 @@ import QRCode from "react-qr-code";
 import { Ticket } from "@/domain/ticket";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import Link from "next/link";
+import { withAuth } from "@/components/views/dash/authGuard";
 
 type CheckoutPageProps = {
   ticket: Ticket;
@@ -100,7 +102,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
   return (
     <div>
       {fetchingTicketRequestProcessing ? (
-        <div className="gap-6 max-w-7xl mx-auto py-6 md:py-10 px-4 md:px-7 animate-pulse">
+        <div className="gap-6 max-w-5xl mx-auto py-6 md:py-10 px-4 md:px-7 animate-pulse">
           {/* Header */}
           <div className="mb-4">
             <div className="h-6 w-3/4 mx-auto bg-gray-300 rounded"></div>
@@ -109,7 +111,7 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
           {/* Ticket Container */}
           <div className="overflow-x-auto whitespace-nowrap">
             <div className="flex items-center justify-center bg-gray-100 min-w-[800px] md:min-w-[600px] p-6 rounded-md shadow-lg">
-              <div className="flex w-[1200px] h-[250px] md:h-[280px] bg-white border rounded-md shadow-lg">
+              <div className="flex w-[900px] h-[250px] md:h-[280px] bg-white border rounded-md shadow-lg">
                 <div className="h-full w-10 bg-gray-400"></div>
 
                 {/* Left Section */}
@@ -153,7 +155,6 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             </div>
           </div>
 
-          {/* Button */}
           <div className="flex justify-center mt-4">
             <div className="h-10 w-40 bg-gray-300 rounded"></div>
           </div>
@@ -171,12 +172,11 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
               ref={ticketRef}
               className="flex items-center justify-center min-w-[800px] md:min-w-[600px]"
             >
-              <div className="flex w-[1200px] h-[250px] md:h-[280px] borderrounded-md shadow-lg">
+              <div className="flex w-[900px] h-[250px] md:h-[280px] borderrounded-md shadow-lg">
                 <p className="[writing-mode:sideways-lr] text-center text-white bg-primary py-4">
                   FULLBOOKER
                 </p>
 
-                {/* Left Section */}
                 <div className="w-[full] md:w-1/3 bg-white border-r-8 border-dashed border-gray-700 p-4 flex flex-col justify-between px-4">
                   <div className="w-full">
                     <h2 className="text-sm font-bold">Rock Concert</h2>
@@ -190,7 +190,6 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                     </p>
                   </div>
                   <div className="flex w-full">
-                    {/* QR Code Placeholder */}
                     <QRCode
                       size={isMobile ? 100 : 160}
                       value={
@@ -198,17 +197,13 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                       }
                     />
                   </div>
-                  {/* <p className="text-xs text-gray-600 text-center rotate-180 transform origin-left">
-              Fullbooker
-            </p> */}
                 </div>
 
-                {/* Right Section */}
                 <div
                   className="w-full md:w-2/3 p-4 bg-white relative text-white"
                   style={{
                     backgroundImage:
-                      'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://dev-fullbooker-static.s3.amazonaws.com/media/images/burna-boy-fest/977532a9fc6d4350b68bbb90f148d248.jpeg")',
+                      'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://dev-fullbooker-static.s3.eu-central-1.amazonaws.com/images/default_ticket_background.png")',
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}
@@ -247,17 +242,10 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
                     <p> {formatEventDate(ticket?.start, ticket?.end)?.time}</p>
                   </div>
 
-                  {/* Emergency Contact */}
                   <div className="absolute bottom-4 right-4 text-right text-sm">
                     <p className="font-semibold">Emergency Contact</p>
                     <p>+254721611555</p>
-                    <p>St Johns Ambulance</p>
                   </div>
-
-                  {/* Vertical Text */}
-                  {/* <p className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 text-gray-600 text-xs">
-              REGULAR
-            </p> */}
                 </div>
 
                 <p className="[writing-mode:vertical-rl] text-center text-white bg-primary py-4">
@@ -267,16 +255,17 @@ const CheckoutPage: FC<CheckoutPageProps> & { layout: any } = ({
             </div>
           </div>
           <div className="flex justify-center">
-            <Button
-              padding="px-4 py-2"
-              margin="mt-4"
-              borderRadius="rounded"
-              text="text-white text-sm"
-              bg="bg-primary"
-              onClick={() => downloadTicketAsPDF()}
-            >
-              Download ticket
-            </Button>
+            <Link href={ticket?.url}>
+              <Button
+                padding="px-4 py-2"
+                margin="mt-4"
+                borderRadius="rounded"
+                text="text-white text-sm"
+                bg="bg-primary"
+              >
+                Download ticket
+              </Button>
+            </Link>
           </div>
         </div>
       )}
@@ -300,4 +289,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   getTicketById: (ticketId: string) => dispatch.tickets.getTicketById(ticketId),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckoutPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withAuth(CheckoutPage));

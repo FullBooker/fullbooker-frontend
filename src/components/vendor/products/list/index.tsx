@@ -5,9 +5,8 @@ import {
   ProductCategory,
   VendorProductsAPIResponse,
 } from "@/domain/dto/output";
-import { CircularProgress } from "@mui/material";
 import Image from "next/image";
-import { addCommaSeparators, getPricingRange } from "@/utilities";
+import { getPricingRange } from "@/utilities";
 import Button from "@/components/shared/button";
 import useDeviceType from "@/lib/hooks/useDeviceType";
 import { VendorProductsFilters } from "@/domain/dto/input";
@@ -56,7 +55,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
           margin="m-0"
           bg="bg-primary"
           borderRadius="rounded"
-          text="text-white"
+          text="text-white text-sm"
           padding="py-1 px-3"
         >
           Add New Product
@@ -76,7 +75,6 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
         <div className="flex flex-col items-center mt-8">
           {[...Array(5)].map((_, index: number) => (
             <div key={index} className="mb-6 animate-pulse w-full">
-              <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
               <div className="overflow-auto whitespace-nowrap w-full">
                 <table className="w-full border border-gray-200 rounded-lg">
                   <thead className="border">
@@ -130,7 +128,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                     margin="m-0"
                     bg="bg-primary"
                     borderRadius="rounded"
-                    text="text-white"
+                    text="text-white text-sm"
                     padding="py-1 px-3"
                   >
                     Add New Product
@@ -193,10 +191,10 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
                                     className={`p-3 font-semibold ${
                                       product?.active
                                         ? "text-green-600"
-                                        : "text-red-600"
+                                        : "text-orange-600"
                                     } border-r text-center font-base`}
                                   >
-                                    {product?.active ? "Active" : "Inactive"}
+                                    {product?.active ? "Active" : "Under Review"}
                                   </td>
                                   <td className="p-3 text-center flex justify-center space-x-2">
                                     <Link
