@@ -3,37 +3,37 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import Sidebar from "@/components/vendor/sidebar";
 import { useTheme } from "next-themes";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SecondaryNavbar from "@/components/vendor/navbar";
 import Appbar from "@/components/vendor/appbar";
+import Withdrawal from "@/components/vendor/wallet/withdrawal";
+import UniversalModal from "@/components/layout/modal/UniversalModal";
+import { connect } from "react-redux";
+import { WithdrawalRequestPayload } from "@/domain/dto/input";
+import { Dispatch, RootState } from "@/store";
+import { ModalID } from "@/domain/components";
 
 type VendorLayoutProps = {
   children: React.ReactNode;
+  modalId: ModalID;
 };
 
-const VendorLayout: FC<VendorLayoutProps> = ({ children }) => {
+const VendorLayout: FC<VendorLayoutProps> = ({ children, modalId }) => {
   const [open, setOpen] = useState(true);
-  const searchParams = useSearchParams();
-  const router = usePathname();
-  const navigation = useRouter();
   const { theme = "light" } = useTheme();
-  const [data, setData] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState("light");
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [isPlayingGameOnMobile, setIsPlayingGameOnMobile] =
-    useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       setIsMobile(width < 768);
       setIsTablet(width >= 768 && width <= 1024);
-      setOpen(width > 1024); // Keep open for desktops
+      setOpen(width > 1024);
     };
 
-    handleResize(); // Initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -73,7 +73,7 @@ const VendorLayout: FC<VendorLayoutProps> = ({ children }) => {
           isMobile={isMobile || isTablet}
         />
       </div>
-      <div className="h-full w-full overflow-x-hidden bg-white px-4">
+      <div className="h-full w-full overflow-x-hidden bg-gray-50">
         {(isMobile || isTablet) && <Appbar open={open} setOpen={setOpen} />}
         <main className="h-fit mx-auto w-full overflow-x-hidden">
           <div className="h-full">
@@ -82,8 +82,24 @@ const VendorLayout: FC<VendorLayoutProps> = ({ children }) => {
           </div>
         </main>
       </div>
+      {modalId === ModalID.vendorWalletWithdrawal && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<Withdrawal />}
+        />
+      )}
     </div>
   );
 };
 
-export default VendorLayout;
+const mapStateToProps = (state: RootState) => {
+  const { modalId } = state.components;
+  return {
+    modalId,
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(VendorLayout);

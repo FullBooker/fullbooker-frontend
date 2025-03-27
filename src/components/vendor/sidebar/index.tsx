@@ -37,11 +37,11 @@ import Drawer from "@mui/material/Drawer";
 const drawerWidth = 300;
 
 const SIDENAV_ITEMS: SideNavItem[] = [
-  // {
-  //   title: "Overview",
-  //   path: "/vendor",
-  //   icon: <LayoutGrid width={22} height={22} />,
-  // },
+  {
+    title: "Overview",
+    path: "/vendor",
+    icon: <LayoutGrid width={22} height={22} />,
+  },
   {
     title: "Products",
     path: "/vendor/products",

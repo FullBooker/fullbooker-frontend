@@ -434,6 +434,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
                     {/* Update Button */}
                     <div className="w-[20%] flex justify-end">
                       <Button
+                        height="h-[30px]"
                         width="w-full"
                         bg="bg-primary"
                         borderRadius="rounded"

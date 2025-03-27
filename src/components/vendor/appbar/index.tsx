@@ -7,7 +7,16 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import { LogOut, Tally3, UserRound, X } from "lucide-react";
+import {
+  Grid,
+  Home,
+  LogOut,
+  ShoppingBag,
+  Tally3,
+  Ticket,
+  UserRound,
+  X,
+} from "lucide-react";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { ModalID } from "@/domain/components";
@@ -125,7 +134,10 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
                 button={
                   <div className="md:flex justify-center content-center items-center cursor-pointer ml-2">
                     <Image
-                      src="/assets/default-profile-picture-placeholder.jpg"
+                      src={`${
+                        profile?.image ||
+                        "/assets/default-profile-picture-placeholder.jpg"
+                      }`}
                       alt={"Host Profile Image"}
                       width={isMobile ? 35 : 35}
                       height={isMobile ? 35 : 35}
@@ -179,11 +191,54 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
                     <div className="w-full flex flex-col gap-2 sm:gap-3">
                       <ProfileItem
                         theme={themeMode}
+                        icon={<Home className="w-4 h-4 sm:w-5 sm:h-5" />}
+                        text="Home"
+                        href="/"
+                        onItemClick={handleCloseLink}
+                      />
+
+                      <ProfileItem
+                        theme={themeMode}
+                        icon={<Grid className="w-4 h-4 sm:w-5 sm:h-5" />}
+                        text="Dashboard"
+                        href={
+                          authToken
+                            ? "/vendor"
+                            : `/login?redirect=${pathname?.slice(1)}`
+                        }
+                        onItemClick={handleCloseLink}
+                      />
+                      <ProfileItem
+                        theme={themeMode}
+                        icon={<ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />}
+                        text="My Products"
+                        href={
+                          authToken
+                            ? "/vendor/products"
+                            : `/login?redirect=${pathname?.slice(1)}`
+                        }
+                        onItemClick={handleCloseLink}
+                      />
+                      <ProfileItem
+                        theme={themeMode}
                         icon={<UserRound className="w-4 h-4 sm:w-5 sm:h-5" />}
-                        text="View My Profile"
+                        text="My Profile"
                         href={
                           authToken
                             ? "/profile"
+                            : `/login?redirect=${pathname?.slice(1)}`
+                        }
+                        onItemClick={handleCloseLink}
+                      />
+                      <ProfileItem
+                        theme={themeMode}
+                        icon={
+                          <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+                        }
+                        text="My Tickets"
+                        href={
+                          authToken
+                            ? "/tickets"
                             : `/login?redirect=${pathname?.slice(1)}`
                         }
                         onItemClick={handleCloseLink}

@@ -21,7 +21,7 @@ import Accordion from "@mui/material/Accordion";
 import { CircularProgress, Typography } from "@mui/material";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Edit, Pen, Plus } from "lucide-react";
 import { PricingType } from "@/domain/constants";
 
 type EventPricingProps = {
@@ -124,9 +124,16 @@ const EventPricing: FC<EventPricingProps> = ({
   return (
     <Accordion>
       <AccordionSummary
-        expandIcon={<ChevronDown className="w-10 h-10" />}
+        expandIcon={newProduct?.pricing?.find(
+          (pricing: ProductPricing) => pricing.ticket_tier === pricingType.key
+        ) ? <span className="flex items-center text-primary"><Pen className="w-6 h-6 me-2" />Edit </span>: <span className="flex items-center text-green-500"><Plus className="w-6 h-6 me-2" /> Add</span>}
         aria-controls="panel1-content"
         id="panel1-header"
+        sx={{
+          '& .MuiAccordionSummary-expandIconWrapper': {
+            transform: 'none !important' // Prevent default rotation
+          }
+        }}
       >
         <Typography component="span">{pricingType.title}</Typography>
       </AccordionSummary>

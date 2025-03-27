@@ -61,7 +61,7 @@ const Footer = () => {
 
           {/* Company Column */}
           <div>
-            <h3 className="font-semibold mb-3 md:mb-4">About</h3>
+            <h3 className="font-light mb-3 md:mb-4 text-primary">About</h3>
             <div className="grid grid-cols-3 md:grid-cols-1 gap-3">
               <Link
                 href="#"
@@ -126,12 +126,9 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-12 pt-3 md:pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
-            <div className="flex itsems-center">
-              <p className="text-xs md:tex-sm text-black me-28">
-                Copyright © {new Date().getFullYear()} Fullbooker
-              </p>
+            <div className="">
               <p className="text-xs md:tex-sm text-black">
-                All Rights Reserved |
+                Copyright © {new Date().getFullYear()} Fullbooker | All Rights Reserved 
               </p>
             </div>
             <div className="flex gap-1 md:gap-3 mb-10 md:mb-0">

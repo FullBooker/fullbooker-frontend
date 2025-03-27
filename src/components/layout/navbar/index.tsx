@@ -48,6 +48,7 @@ type NavbarProps = {
   switchToHost: (payload: SwitchToHostPayload) => void;
   productCategories: Array<ProductCategory>;
   modalId: ModalID;
+  setShouldRedirectToHostView: (shouldRedirectToHostView: boolean) => void;
 };
 
 const Navbar: FC<NavbarProps> = ({
@@ -66,6 +67,7 @@ const Navbar: FC<NavbarProps> = ({
   switchToHostRequestProcessing,
   signOutRequestProcessing,
   modalId,
+  setShouldRedirectToHostView,
 }) => {
   const { theme = "light", setTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
@@ -182,6 +184,7 @@ const Navbar: FC<NavbarProps> = ({
                         user: authData?.user?.id,
                       } as SwitchToHostPayload);
                     } else {
+                      setShouldRedirectToHostView(true);
                       setActiveModal(ModalID.login);
                     }
                   }}
@@ -227,6 +230,7 @@ const Navbar: FC<NavbarProps> = ({
                         width={isMobile ? 35 : 35}
                         height={isMobile ? 35 : 35}
                         className="rounded-full object-cover"
+                        unoptimized={true}
                       />
                     </div>
                   }
@@ -274,7 +278,7 @@ const Navbar: FC<NavbarProps> = ({
                           icon={
                             <UserRound className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
                           }
-                          text="View My Profile"
+                          text="My Profile"
                           href={
                             authToken
                               ? "/profile"
