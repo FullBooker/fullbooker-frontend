@@ -32,7 +32,7 @@ const OthersPricing: FC<OthersPricingProps> = ({
     <div>
       <StepHeader title="How will you charge for your Activity?" />
       <div className="gap-4">
-        <div className="px-1 md:px-6 bg-white space-y-6">
+        <div className="px-1 md:px-6  space-y-6">
           <div className="flex items-center pb-4">
             <p className="text-lg font-medium me-3">
               Select a currency for this event
@@ -71,9 +71,7 @@ const OthersPricing: FC<OthersPricingProps> = ({
           )}
         </div>
       </div>
-      <div className="px-2 md:px-10 mt-4 md:mt-10">
         <NavigationButtons isFormSubmit/>
-      </div>
     </div>
   );
 };

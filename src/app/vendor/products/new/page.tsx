@@ -13,10 +13,6 @@ import ProductInfo from "@/components/vendor/products/creation/description";
 import ProductPricing from "@/components/vendor/products/creation/pricing";
 import ProductPricingSummary from "@/components/vendor/products/creation/pricingSummary";
 import ProductPublishing from "@/components/vendor/products/creation/publish";
-import { styled } from "@mui/material/styles";
-import LinearProgress, {
-  linearProgressClasses,
-} from "@mui/material/LinearProgress";
 import { ProductType } from "@/domain/constants";
 import { ModalID } from "@/domain/components";
 import UniversalModal from "@/components/layout/modal/UniversalModal";
@@ -27,22 +23,6 @@ import ActivateProductConfirmation from "@/components/vendor/products/shared/act
 import { NewProductPayload } from "@/domain/dto/input";
 import { useSearchParams } from "next/navigation";
 import { productProfileSteps } from "@/constants";
-
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 6,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-    backgroundColor: theme.palette.grey[200],
-    ...theme.applyStyles("dark", {
-      backgroundColor: theme.palette.grey[800],
-    }),
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    backgroundColor: "#F55E00",
-    ...theme.applyStyles("dark", {
-      backgroundColor: "#308fe8",
-    }),
-  },
-}));
 
 export type NewProductPageProps = {
   productType: ProductType;
@@ -64,10 +44,6 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
   getVendorProductById,
 }) => {
   const searchParams = useSearchParams();
-  const calculateProgress = () => {
-    const totalSteps = productType === ProductType.event ? 8 : 7;
-    return Math.round((activeStep / totalSteps) * 100);
-  };
 
   const getActiveStepContent = () => {
     switch (activeStep) {
@@ -133,14 +109,7 @@ const NewProductPage: FC<NewProductPageProps> & { layout: any } = ({
 
   return (
     <div className="flex flex-col h-fit justify-center">
-      {getActiveStepContent()}
-      <div className="px-2 md:px-10 mt-4 md:mt-10 mb-8 md:mb-20">
-        <BorderLinearProgress
-          variant="determinate"
-          value={calculateProgress()}
-        />
-      </div>
-
+      <div className="h-screen px-4 mb-[150px]">{getActiveStepContent()}</div>
       {modalId === ModalID.continueWithProductCreation && (
         <UniversalModal open={true} content={<ContinueWithProductCreation />} />
       )}

@@ -30,7 +30,7 @@ const TablePaginationComponent: FC<TablePaginationComponentProps> = ({
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    handleChange("pageSize", parseInt(event.target.value, 10));
+    handleChange("page_size", parseInt(event.target.value, 10));
   };
 
   const { theme = "light", setTheme } = useTheme();

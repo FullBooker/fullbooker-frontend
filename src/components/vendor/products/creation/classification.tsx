@@ -1,16 +1,18 @@
 "use client";
 
-import React, { FC, useEffect } from "react";
-import { RootState } from "@/store";
+import { type FC, useEffect, useState } from "react";
+import type { RootState } from "@/store";
 import { connect } from "react-redux";
-import { ProductCategory, Subcategory } from "@/domain/dto/output";
-import { NewProductPayload } from "@/domain/dto/input";
+import type { ProductCategory, Subcategory } from "@/domain/dto/output";
+import type { NewProductPayload } from "@/domain/dto/input";
 import NavigationButtons from "./navigationButtons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { ProductType } from "@/domain/constants";
 import StepHeader from "./stepHeader";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import Button from "@/components/shared/button";
 
 type ProductClassificationProps = {
   productCategories: Array<ProductCategory>;
@@ -33,10 +35,11 @@ const ProductClassification: FC<ProductClassificationProps> = ({
   activeStep,
   setActiveStep,
 }) => {
-  const defaultValues = {
-    category: newProduct?.category || "",
-    subcategory: newProduct?.subcategory || "",
-  };
+  const [selectedCategory, setSelectedCategory] =
+    useState<ProductCategory | null>(null);
+  const [flattenedSubcategories, setFlattenedSubcategories] = useState<
+    Array<{ id: string; name: string; level: number }>
+  >([]);
 
   interface FormData {
     category: string;
@@ -81,21 +84,30 @@ const ProductClassification: FC<ProductClassificationProps> = ({
   useEffect(() => {
     if (newProduct?.category) {
       setValue("category", newProduct?.category);
+      const category = productCategories.find(
+        (cat) => cat.id === newProduct.category
+      );
+      if (category) {
+        setSelectedCategory(category);
+        setFlattenedSubcategories(
+          flattenSubcategories(category.subcategories || [])
+        );
+      }
     }
 
     if (newProduct?.subcategory) {
       setValue("subcategory", newProduct?.subcategory);
     }
-  }, [newProduct?.category, newProduct?.subcategory]);
+  }, [newProduct?.category, newProduct?.subcategory, productCategories]);
 
   const flattenSubcategories = (
     subs: Subcategory[],
     level = 0
-  ): Array<{ id: string; name: string }> => {
-    let result: Array<{ id: string; name: string }> = [];
+  ): Array<{ id: string; name: string; level: number }> => {
+    let result: Array<{ id: string; name: string; level: number }> = [];
 
     subs.forEach((sub) => {
-      result.push({ id: sub.id, name: `${"— ".repeat(level)}${sub.name}` });
+      result.push({ id: sub.id, name: sub.name, level });
 
       if (sub.children && sub.children.length > 0) {
         result = result.concat(flattenSubcategories(sub.children, level + 1));
@@ -105,10 +117,63 @@ const ProductClassification: FC<ProductClassificationProps> = ({
     return result;
   };
 
+  const handleCategorySelect = (category: ProductCategory) => {
+    setSelectedCategory(category);
+    setNewProductDetails({
+      ...newProduct,
+      category: category?.id,
+      subcategory: "",
+    } as NewProductPayload);
+    setValue("category", category?.id);
+    setValue("subcategory", "");
+    setProductType(
+      category?.name?.includes("Event") ? ProductType.event : ProductType.others
+    );
+
+    setFlattenedSubcategories(
+      flattenSubcategories(category.subcategories || [])
+    );
+  };
+
+  const handleBackToCategories = () => {
+    setSelectedCategory(null);
+    setFlattenedSubcategories([]);
+    setValue("subcategory", "");
+
+    setNewProductDetails({
+      ...newProduct,
+      category: "",
+      subcategory: "",
+    } as NewProductPayload);
+  };
+
+  const handleSubcategorySelect = (subcategoryId: string) => {
+    setValue("subcategory", subcategoryId);
+    setNewProductDetails({
+      ...newProduct,
+      subcategory: subcategoryId,
+    } as NewProductPayload);
+  };
+
+  const getGroupedSubcategories = () => {
+    const grouped: {
+      [key: number]: Array<{ id: string; name: string; level: number }>;
+    } = {};
+
+    flattenedSubcategories.forEach((sub) => {
+      if (!grouped[sub.level]) {
+        grouped[sub.level] = [];
+      }
+      grouped[sub.level].push(sub);
+    });
+
+    return grouped;
+  };
+
   return (
     <div>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <StepHeader title=" Choose the one that best describes your product" />
+        <StepHeader title="Choose the one that best describes your product" />
         <div className="px-0 md:px-20 lg:px-20 xl:px-20">
           {loading ? (
             <div>
@@ -116,83 +181,133 @@ const ProductClassification: FC<ProductClassificationProps> = ({
                 .fill(null)
                 .map((_, index) => (
                   <div key={index} className="flex w-full mb-3 md:mb-8">
-                    <div className="animate-pulse bg-gray-200 h-12 w-[40%] rounded"></div>
-                    <div className="animate-pulse bg-gray-200 h-12 w-[60%] ml-2 rounded"></div>
+                    <div className="animate-pulse bg-gray-200 h-20 w-full rounded"></div>
                   </div>
                 ))}
             </div>
           ) : (
             <>
-              {productCategories.map(
-                (category: ProductCategory, index: number) => (
-                  <div
-                    key={index}
-                    className="flex w-full mb-3 md:mb-8"
-                    onClick={() => {
-                      setNewProductDetails({
-                        ...newProduct,
-                        category: category?.id,
-                      } as NewProductPayload);
-                      setValue("category", category?.id);
-                      setProductType(
-                        category?.name?.includes("Event")
-                          ? ProductType.event
-                          : ProductType.others
-                      );
-                    }}
-                  >
+              {!selectedCategory ? (
+                productCategories.map(
+                  (category: ProductCategory, index: number) => (
                     <div
-                      className={`flex justify-between items-center border ${
-                        newProduct?.category === category?.id
-                          ? "border-orange-500"
-                          : "border-black"
-                      } p-4 cursor-pointer w-[40%]`}
+                      key={index}
+                      className={`flex justify-between items-center w-full mb-3 md:mb-8 border rounded-sm bg-gray-100  p-4 cursor-pointer`}
+                      onClick={() => handleCategorySelect(category)}
                     >
-                      <span className="text-black">{category?.name}</span>
+                      <div>
+                        <div className=" items-center w-full">
+                          <span className="text-black">{category?.name}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 text-sm mt-1">
+                            {category?.description ||
+                              "Choose this for " +
+                                category?.name.toLowerCase() +
+                                " related products"}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <ChevronRight className="h-5 w-5 text-gray-500" />
+                      </div>
                     </div>
-                    <div
-                      className={`flex justify-between items-center border ${
-                        newProduct?.category === category?.id
-                          ? "border-orange-500"
-                          : "border-black"
-                      } p-4 cursor-pointer w-[60%]`}
-                    >
-                      <Controller
-                        name="subcategory"
-                        control={control}
-                        rules={{ required: true }}
-                        render={({ field: { value, onChange } }) => {
-                          const flattenedSubcategories = flattenSubcategories(
-                            category?.subcategories || []
-                          );
-
-                          return (
-                            <select
-                              className="w-full border-none outline-none"
-                              value={value}
-                              onChange={onChange}
-                            >
-                              {!watch("subcategory") ? (
-                                <option value="">Select a subcategory</option>
-                              ) : (
-                                <option value=""></option>
-                              )}
-                              {flattenedSubcategories.map((sub, idx) => (
-                                <option key={idx} value={sub.id}>
-                                  {sub.name}
-                                </option>
-                              ))}
-                            </select>
-                          );
-                        }}
-                      />
-                    </div>
-                  </div>
+                  )
                 )
+              ) : (
+                <div>
+                  <button
+                    className="flex items-center mb-4 cursor-pointer text-gray-600"
+                    onClick={() => handleBackToCategories()}
+                  >
+                    <ChevronLeft className="h-5 w-5 mr-1" />
+                    <span>Back to categories</span>
+                  </button>
+
+                  <div className="relative mb-6 border border-primary bg-white rounded-sm p-4">
+                    <span className="absolute top-1 right-1 bg-primary text-white text-xs font-light px-2 py-1 rounded-full">
+                      Selected
+                    </span>
+
+                    <div className="flex justify-between items-center w-full">
+                      <span className="text-black font-medium">
+                        {selectedCategory.name}
+                      </span>
+                    </div>
+
+                    <span className="text-gray-500 text-sm mt-1">
+                      {selectedCategory?.description ||
+                        "Choose this for " +
+                          selectedCategory?.name.toLowerCase() +
+                          " related products"}
+                    </span>
+                  </div>
+
+                  <div className="mb-2 text-gray-700">
+                    Select a subcategory:
+                  </div>
+                  {flattenedSubcategories.length === 0 ? (
+                    <div className="text-gray-500 text-sm italic bg-gray-100 p-4 rounded">
+                      <p>
+                        {" "}
+                        No subcategories available for this category.{" "}
+                        <span
+                          className="text-primary cursor-pointer"
+                          onClick={() => handleBackToCategories()}
+                        >
+                          Change category instead
+                        </span>
+                      </p>
+                    </div>
+                  ) : (
+                    <Controller
+                      name="subcategory"
+                      control={control}
+                      render={({ field }) => {
+                        const groupedSubcategories = getGroupedSubcategories();
+
+                        return (
+                          <div className="space-y-4">
+                            {Object.keys(groupedSubcategories).map((level) => (
+                              <div key={level} className="flex flex-wrap gap-2">
+                                {groupedSubcategories[
+                                  Number.parseInt(level)
+                                ].map((sub, idx) => (
+                                  <div
+                                    key={idx}
+                                    className={`
+                                    inline-flex items-center px-3 py-1 rounded-full
+                                    transition-all duration-200 cursor-pointer text-sm
+                                    ${
+                                      field.value === sub.id
+                                        ? "bg-primary text-white font-medium shadow-sm"
+                                        : "bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200"
+                                    }
+                                  `}
+                                    onClick={() =>
+                                      handleSubcategorySelect(sub.id)
+                                    }
+                                  >
+                                    <span className="font-light">
+                                      {sub.name}
+                                    </span>
+                                    {field.value === sub.id && (
+                                      <Check className="h-3.5 w-3.5 ml-1.5 stroke-[3]" />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      }}
+                    />
+                  )}
+                </div>
               )}
             </>
           )}
-          <div className="flex items-center">
+          <div className="flex items-center mt-4">
             {errors?.category?.message && (
               <p className="text-red-500 me-1">{errors?.category?.message}</p>
             )}
@@ -201,9 +316,7 @@ const ProductClassification: FC<ProductClassificationProps> = ({
             )}
           </div>
         </div>
-        <div className="px-2 md:px-10 mt-4 md:mt-10">
-          <NavigationButtons isFormSubmit />
-        </div>
+        <NavigationButtons isFormSubmit />
       </form>
     </div>
   );

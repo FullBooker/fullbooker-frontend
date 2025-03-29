@@ -1,4 +1,5 @@
 import { Product } from "../product";
+import { HostAccount, Transaction } from "../vendor";
 
 export type AuthData = {
   user: User;
@@ -89,4 +90,38 @@ export interface ProductsAPIResponse {
   next?: string;
   previous?: any;
   results: Array<Product>;
+}
+export interface VendorAccountsAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<HostAccount>;
+}
+
+export interface VendorPaymentMethodsAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<any>;
+}
+
+export interface VendorSalesAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<any>;
+}
+
+export interface VendorTransactionsAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<Transaction>;
+}
+
+export interface VendorAccountsTransactionsAPIResponse {
+  count?: number;
+  next?: string;
+  previous?: any;
+  results: Array<Transaction>;
 }

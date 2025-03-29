@@ -13,7 +13,7 @@ type ProductLocationProps = {
 const ProductLocation: FC<ProductLocationProps> = ({ productType }) => {
   return (
     <div>
-      {productType === ProductType.event ? (
+      {[ProductType.oneTime, ProductType.multiDay].includes(productType) ? (
         <EventAvailability />
       ) : (
         <OtherProductsAvailability />

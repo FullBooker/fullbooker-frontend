@@ -1,11 +1,15 @@
 import Button from "@/components/shared/button";
 import { ProductType } from "@/domain/constants";
-import { ActivateProductPayload, NewProductPayload } from "@/domain/dto/input";
+import { NewProductPayload } from "@/domain/dto/input";
 import { Dispatch, RootState } from "@/store";
 import { CircularProgress } from "@mui/material";
 import Link from "next/link";
 import React, { FC } from "react";
 import { connect } from "react-redux";
+import { styled } from "@mui/material/styles";
+import LinearProgress, {
+  linearProgressClasses,
+} from "@mui/material/LinearProgress";
 
 type NavigationButtonsProps = {
   isProcessingRequest: boolean;
@@ -33,6 +37,27 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
     setActiveStep(activeStep - 1);
   };
 
+  const calculateProgress = () => {
+    const totalSteps = productType === ProductType.event ? 8 : 7;
+    return Math.round((activeStep / totalSteps) * 100);
+  };
+
+  const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+    height: 6,
+    [`&.${linearProgressClasses.colorPrimary}`]: {
+      backgroundColor: theme.palette.grey[200],
+      ...theme.applyStyles("dark", {
+        backgroundColor: theme.palette.grey[800],
+      }),
+    },
+    [`& .${linearProgressClasses.bar}`]: {
+      backgroundColor: "#F55E00",
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#308fe8",
+      }),
+    },
+  }));
+
   const backButtonProps = {
     margin: "m-0",
     borderRadius: "rounded",
@@ -57,94 +82,102 @@ const NavigationButtons: FC<NavigationButtonsProps> = ({
   };
 
   return (
-    <div className="flex justify-between gap-10 md:gap-0 mb-4 md:mb-10 mt-8 md:mt-4">
-      {activeStep === 0 || activeStep === 1 ? (
-        <Link href={"/vendor/products"} className="w-full">
-          <Button {...backButtonProps}>Back</Button>
-        </Link>
-      ) : (
-        <Button {...backButtonProps} onClick={() => handleBack()}>
-          Back
-        </Button>
-      )}
-      {productType === ProductType.others &&
-      activeStep === 5 &&
-      newProduct?.pricing?.length > 0 ? (
-        <Button
-          {...continueButtonProps}
-          disabled={isProcessingRequest}
-          onClick={() => setActiveStep(activeStep + 2)}
-        >
-          {renderButtonContent("Continue")}
-        </Button>
-      ) : productType === ProductType.event &&
-        activeStep === 6 &&
+    <div className="fixed bottom-0 left-0 md:left-[300px] right-0 bg-white border-t border-gray-200 px-4 md:px-10">
+      <div className="flex justify-between gap-10 md:gap-0 mb-6 md:mb-4 mt-6 md:mt-6 w-full">
+        {activeStep === 0 || activeStep === 1 ? (
+          <Link href={"/vendor/products"} className="w-full">
+            <Button {...backButtonProps}>Back</Button>
+          </Link>
+        ) : (
+          <Button {...backButtonProps} onClick={() => handleBack()}>
+            Back
+          </Button>
+        )}
+        {productType === ProductType.others &&
+        activeStep === 5 &&
         newProduct?.pricing?.length > 0 ? (
-        <Link href={"/vendor/products"}>
           <Button
             {...continueButtonProps}
             disabled={isProcessingRequest}
-            type="button"
-            onClick={() => setActiveStep(activeStep + 1)}
+            onClick={() => setActiveStep(activeStep + 2)}
           >
             {renderButtonContent("Continue")}
           </Button>
-        </Link>
-      ) : isFormSubmit ? (
-        <Button
-          {...continueButtonProps}
-          type="submit"
-          disabled={
-            isProcessingRequest ||
-            (productType === ProductType.event
-              ? activeStep === 6
-              : activeStep === 5)
-          }
-        >
-          {renderButtonContent("Continue")}
-        </Button>
-      ) : activeStep === 4 ? (
-        <Button
-          {...continueButtonProps}
-          onClick={() => {
-            if (!newProduct.image) {
-              setFailureAlert("You need to upload atleast one image");
-            } else {
-              handleNext();
+        ) : productType === ProductType.event &&
+          activeStep === 6 &&
+          newProduct?.pricing?.length > 0 ? (
+          <Link href={"/vendor/products"}>
+            <Button
+              {...continueButtonProps}
+              disabled={isProcessingRequest}
+              type="button"
+              onClick={() => setActiveStep(activeStep + 1)}
+            >
+              {renderButtonContent("Continue")}
+            </Button>
+          </Link>
+        ) : isFormSubmit ? (
+          <Button
+            {...continueButtonProps}
+            type="submit"
+            disabled={
+              isProcessingRequest ||
+              (productType === ProductType.event
+                ? activeStep === 6
+                : activeStep === 5)
             }
-          }}
-          disabled={isProcessingRequest}
-        >
-          {renderButtonContent("Continue")}
-        </Button>
-      ) : activeStep === 5 ? (
-        <Button
-          {...continueButtonProps}
-          onClick={() => {
-            if (newProduct?.pricing?.length === 0) {
-              setFailureAlert("You need to add atleast one pricing option");
-            } else {
-              handleNext();
+          >
+            {renderButtonContent("Continue")}
+          </Button>
+        ) : activeStep === 4 ? (
+          <Button
+            {...continueButtonProps}
+            onClick={() => {
+              if (!newProduct.image) {
+                setFailureAlert("You need to upload atleast one image");
+              } else {
+                handleNext();
+              }
+            }}
+            disabled={isProcessingRequest}
+          >
+            {renderButtonContent("Continue")}
+          </Button>
+        ) : activeStep === 5 ? (
+          <Button
+            {...continueButtonProps}
+            onClick={() => {
+              if (newProduct?.pricing?.length === 0) {
+                setFailureAlert("You need to add atleast one pricing option");
+              } else {
+                handleNext();
+              }
+            }}
+            disabled={isProcessingRequest}
+          >
+            {renderButtonContent("Continue")}
+          </Button>
+        ) : (
+          <Button
+            {...continueButtonProps}
+            onClick={handleNext}
+            disabled={
+              isProcessingRequest ||
+              (productType === ProductType.event
+                ? activeStep === 6
+                : activeStep === 5)
             }
-          }}
-          disabled={isProcessingRequest}
-        >
-          {renderButtonContent("Continue")}
-        </Button>
-      ) : (
-        <Button
-          {...continueButtonProps}
-          onClick={handleNext}
-          disabled={
-            isProcessingRequest ||
-            (productType === ProductType.event
-              ? activeStep === 6
-              : activeStep === 5)
-          }
-        >
-          {renderButtonContent("Continue")}
-        </Button>
-      )}
+          >
+            {renderButtonContent("Continue")}
+          </Button>
+        )}
+      </div>
+      <div className="mt-4 md:mt-10 mb-4 md:mb-8">
+        <BorderLinearProgress
+          variant="determinate"
+          value={calculateProgress()}
+        />
+      </div>
     </div>
   );
 };

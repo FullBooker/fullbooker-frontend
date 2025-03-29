@@ -21,7 +21,7 @@ import Accordion from "@mui/material/Accordion";
 import { CircularProgress, Typography } from "@mui/material";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { ChevronDown, Edit, Pen, Plus } from "lucide-react";
+import { Pen, Plus } from "lucide-react";
 import { PricingType } from "@/domain/constants";
 
 type EventPricingProps = {
@@ -131,7 +131,7 @@ const EventPricing: FC<EventPricingProps> = ({
         id="panel1-header"
         sx={{
           '& .MuiAccordionSummary-expandIconWrapper': {
-            transform: 'none !important' // Prevent default rotation
+            transform: 'none !important'
           }
         }}
       >
