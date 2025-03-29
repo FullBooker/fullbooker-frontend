@@ -165,7 +165,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
 
           <button
             type="button"
-            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
+            className="w-full rounded-sm py-4 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
             onClick={() => login()}
           >
             {googleLoginRequestProcessing ? (
@@ -183,23 +183,10 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
               </div>
             )}
           </button>
-
-          <button
-            type="button"
-            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-          >
-            <Image
-              src="/assets/facebook-icon.png"
-              alt="Facebook"
-              width={28}
-              height={28}
-            />
-            Sign in with Facebook
-          </button>
         </div>
       </form>
 
-      <div className="mt-10 text-center relative bottom-0">
+      <div className="mt-10 text-center relative bottom-0 mb-8">
         <p className="text-sm text-black font-thin mb-4">
           <span>Don't have an account?</span>
         </p>

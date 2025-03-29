@@ -1,11 +1,15 @@
 "use client";
 
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ModalID } from "@/domain/components";
-import { ProductCategory, ProductsAPIResponse, ProductTag } from "@/domain/dto/output";
+import {
+  ProductCategory,
+  ProductsAPIResponse,
+  ProductTag,
+} from "@/domain/dto/output";
 import ProductTags from "@/components/products/homePage/tags";
 import DashBoardLayout from "./layout";
 import SearchFilters from "@/components/products/homePage/productFilters";
@@ -42,38 +46,50 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
   popularProducts,
   isProcessingRquest,
 }) => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {}, []);
   useEffect(() => {
     getProductCategories();
     getCurrencies();
     getProductTags();
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <div className="h-fit bg-white">
-      {(!products || products?.results?.length === 0 )&&
-      (!nearByProducts || nearByProducts?.length === 0) &&
-      (!recommendedProducts || recommendedProducts?.length === 0) &&
-      (!upcomingProducts || upcomingProducts?.length === 0) &&
-      (!popularProducts ||popularProducts?.length) === 0 &&
-      !isProcessingRquest ? (
-        <EmptyStoreDisclaimer />
-      ) : (
-        <div>
-          <SearchFilters />
-
-          <ProductTags />
-
-          <PopularProductsSection />
-
-          <ProductsNearYouSection />
-
-          <UpcomingProductsSection />
-
-          <ProductsRecommendeForYouSection />
-
-          <MoreProductsSection />
-        </div>
-      )}
+      <div
+        className={`fixed z-50 bg-white w-full transition-shadow duration-300 ${
+          isScrolled ? "shadow-md" : ""
+        }`}
+      >
+        <SearchFilters />
+        <ProductTags />
+      </div>
+      <div className="pt-[130px] md:pt-[200px] lg:pt-[200px]">
+        {(!products || products?.results?.length === 0) &&
+        (!nearByProducts || nearByProducts?.length === 0) &&
+        (!recommendedProducts || recommendedProducts?.length === 0) &&
+        (!upcomingProducts || upcomingProducts?.length === 0) &&
+        (!popularProducts || popularProducts?.length) === 0 &&
+        !isProcessingRquest ? (
+          <EmptyStoreDisclaimer />
+        ) : (
+          <div>
+            <PopularProductsSection />
+            <ProductsNearYouSection />
+            <UpcomingProductsSection />
+            <ProductsRecommendeForYouSection />
+            <MoreProductsSection />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
