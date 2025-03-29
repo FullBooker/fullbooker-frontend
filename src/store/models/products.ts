@@ -37,6 +37,7 @@ export const products = createModel<RootModel>()({
     cartSummary: null,
     comprehensiveProductFilters: {
       search: "",
+      tag: undefined,
       locations: [],
       categoies: [],
       start_date: "",
@@ -196,6 +197,15 @@ export const products = createModel<RootModel>()({
         },
       };
     },
+    toggleTagFilter(state: ProductsState, tag: string): ProductsState {
+      return {
+        ...state,
+        comprehensiveProductFilters: {
+          ...state.comprehensiveProductFilters,
+          tag: state?.comprehensiveProductFilters?.tag === tag ? null : tag,
+        },
+      };
+    },    
     toggleLocationFilter(state: ProductsState, location: County) {
       const existingLocations =
         state.comprehensiveProductFilters?.locations || [];

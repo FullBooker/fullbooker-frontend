@@ -2,6 +2,7 @@ import { County } from "../location";
 
 export interface ComprehensiveProductFilters {
   search?: string;
+  tag?: string | null;
   categories?: Array<string>;
   locations?: Array<County>;
   max_price?: string;
