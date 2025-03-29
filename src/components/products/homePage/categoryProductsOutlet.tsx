@@ -28,7 +28,7 @@ const CategoryProductsOutlet: FC<CategoryProductsOutletProps> = ({
 }) => {
   const deviceType = useDeviceType();
   return (
-    <div className="px-2 md:px-3 lg:px-4 bg-white">
+    <div className="px-0 md:px-3 lg:px-4 bg-white">
       <div className="px-4 md:px-7">
         {isProcessingRequest ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 py-0 mb-6">

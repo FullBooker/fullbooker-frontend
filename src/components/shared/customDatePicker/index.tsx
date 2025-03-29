@@ -32,7 +32,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         customInput ? (
           customInput
         ) : (
-          <input className="shadow-md px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input className="shadow px-4 py-3 border focus:outline-none w-full" />
         )
       }
       className={`${

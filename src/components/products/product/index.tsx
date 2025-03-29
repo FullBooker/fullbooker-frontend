@@ -210,6 +210,7 @@ const SingleProduct: FC<SingleProductProps> = ({
         <SocialShareDialog
           title={product?.name}
           url={fullUrl}
+          setActiveProduct={setActiveProduct}
         />
       )}
     </div>

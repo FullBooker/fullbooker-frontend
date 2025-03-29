@@ -23,6 +23,7 @@ type UniversalModalProps = {
   fullScreen?: boolean;
   showDividers?: boolean;
   footer?: any;
+  onBeforeModalClose?: () => void;
 };
 
 const UniversalModal: FC<UniversalModalProps> = ({
@@ -35,6 +36,7 @@ const UniversalModal: FC<UniversalModalProps> = ({
   fullScreen = false,
   showDividers = false,
   footer,
+  onBeforeModalClose,
 }) => {
   const handleclose = () => {
     setActiveModal(ModalID.none);
@@ -43,7 +45,12 @@ const UniversalModal: FC<UniversalModalProps> = ({
   return (
     <Dialog
       open={open}
-      onClose={() => handleclose}
+      onClose={() => {
+        if (onBeforeModalClose) {
+          onBeforeModalClose();
+        }
+        handleclose();
+      }}
       scroll={"paper"}
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
@@ -93,7 +100,12 @@ const UniversalModal: FC<UniversalModalProps> = ({
           </div>
           <div
             className="flex justify-start cursor-pointer"
-            onClick={() => handleclose()}
+            onClick={() => {
+              if (onBeforeModalClose) {
+                onBeforeModalClose();
+              }
+              handleclose();
+            }}
           >
             <X className="h-4 w-4" />
           </div>

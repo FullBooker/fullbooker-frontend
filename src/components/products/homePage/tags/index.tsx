@@ -1,6 +1,6 @@
 import React, { FC, useRef, useState, useEffect } from "react";
 import { ProductTag } from "@/domain/dto/output";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
 import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
@@ -9,6 +9,7 @@ import { DeviceType } from "../../../../domain/constants";
 import Image from "next/image";
 import { formatProductFilters } from "@/utilities";
 import { ModalID } from "@/domain/components";
+import { ProductTagsFilters } from "@/domain/dto/input/settings.input";
 
 type ProductTagsProps = {
   isProcessingRequest: boolean;
@@ -16,6 +17,7 @@ type ProductTagsProps = {
   comprehensiveProductFilters: ComprehensiveProductFilters;
   productTags: Array<ProductTag>;
   fetchFilteredProducts: (filters: ComprehensiveProductFilters) => void;
+  getProductTags: (filters: ProductTagsFilters) => void;
 };
 
 const ProductsTags: FC<ProductTagsProps> = ({
@@ -24,28 +26,23 @@ const ProductsTags: FC<ProductTagsProps> = ({
   productTags,
   isProcessingRequest,
   fetchFilteredProducts,
+  getProductTags,
 }) => {
   const deviceType = useDeviceType();
   const categoriesContainerRef = useRef<HTMLDivElement>(null);
-  const [isScrollable, setIsScrollable] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (categoriesContainerRef.current) {
-        setIsScrollable(
-          categoriesContainerRef.current.scrollWidth >
-            categoriesContainerRef.current.clientWidth
-        );
-      }
-    };
+  const handleScrollLeft = () => {
+    if (categoriesContainerRef.current) {
+      categoriesContainerRef.current.scrollBy({
+        left: -100,
+        behavior: "smooth",
+      });
+    }
+  };
 
-    checkOverflow();
-    window.addEventListener("resize", checkOverflow);
-
-    return () => window.removeEventListener("resize", checkOverflow);
-  }, [productTags]);
-
-  const handleScroll = () => {
+  const handleScrollRight = () => {
     if (categoriesContainerRef.current) {
       categoriesContainerRef.current.scrollBy({
         left: 100,
@@ -53,6 +50,40 @@ const ProductsTags: FC<ProductTagsProps> = ({
       });
     }
   };
+  const checkOverflow = () => {
+    if (!categoriesContainerRef.current) return;
+
+    const { scrollWidth, clientWidth, scrollLeft } =
+      categoriesContainerRef.current;
+
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
+  };
+
+  useEffect(() => {
+    setTimeout(checkOverflow, 0);
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [productTags]);
+
+  useEffect(() => {
+    const container = categoriesContainerRef.current;
+    if (container) {
+      categoriesContainerRef.current.addEventListener("scroll", checkOverflow);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", checkOverflow);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    getProductTags({
+      page: 1,
+      page_size: 100,
+    } as ProductTagsFilters);
+  }, []);
 
   return (
     <div>
@@ -78,15 +109,27 @@ const ProductsTags: FC<ProductTagsProps> = ({
         <div>
           {productTags && productTags?.length > 0 ? (
             <div className={`bg-white px-2 md:px-3 lg:px-4 `}>
-              <div className="flex justify-center items-center gap-8 px-4 py-2 md:py-0 md:px-7">
+              <div className="flex justify-center items-center gap-2 px-2 py-2 md:py-0 md:px-7">
+                {canScrollLeft && (
+                  <button
+                    className="bg-white hover:text-primary flex-shrink-0"
+                    onClick={handleScrollLeft}
+                  >
+                    <ChevronLeft className="w-8 h-8" />
+                  </button>
+                )}
                 <div
                   ref={categoriesContainerRef}
-                  className="flex justify-evenly items-center gap-6 overflow-x-auto no-scrollbar"
+                  className="flex md:justify-evenly items-center gap-10 md:gap-6 overflow-x-auto no-scrollbar"
                 >
                   {productTags.map((tag: ProductTag, index: number) => (
                     <span
                       key={index}
-                      className={`flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer ${comprehensiveProductFilters?.tag === tag?.id ? "border-b-2 border-primary" : ""}`}
+                      className={`flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer pb-2  ${
+                        comprehensiveProductFilters?.tag === tag?.id
+                          ? "border-b-2 border-primary"
+                          : ""
+                      }`}
                       onClick={() => {
                         toggleTagFilter(tag?.id);
                         if (
@@ -108,8 +151,8 @@ const ProductsTags: FC<ProductTagsProps> = ({
                           }`}
                         >
                           <Image
-                            width={deviceType === DeviceType.mobile ? 24 :30}
-                            height={deviceType === DeviceType.mobile ? 24 :30}
+                            width={deviceType === DeviceType.mobile ? 24 : 30}
+                            height={deviceType === DeviceType.mobile ? 24 : 30}
                             src={tag?.icon as string}
                             alt="Tag Icon"
                             unoptimized={true}
@@ -129,10 +172,10 @@ const ProductsTags: FC<ProductTagsProps> = ({
                     </span>
                   ))}
                 </div>
-                {isScrollable && (
+                {canScrollRight && (
                   <button
                     className="bg-white hover:text-primary flex-shrink-0"
-                    onClick={handleScroll}
+                    onClick={handleScrollRight}
                   >
                     <ChevronRight className="w-8 h-8" />
                   </button>
@@ -158,6 +201,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
+  getProductTags: (filters: ProductTagsFilters) =>
+    dispatch.settings.getProductTags(filters),
   toggleTagFilter: (tagId: string) => dispatch.products.toggleTagFilter(tagId),
   fetchFilteredProducts: (filters: ComprehensiveProductFilters) => {
     const formattedFilters = formatProductFilters(filters);

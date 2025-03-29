@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Copy, Link as LinkIcon } from "lucide-react";
 import UniversalModal from "@/components/layout/modal/UniversalModal";
 import { FaXTwitter, FaFacebookF, FaWhatsapp } from "react-icons/fa6";
@@ -9,9 +9,14 @@ import Button from "@/components/shared/button";
 interface SocialShareDialogProps {
   title: string;
   url: string;
+  setActiveProduct: (activeProduct: string | null) => void;
 }
 
-export function SocialShareDialog({ url, title }: SocialShareDialogProps) {
+export function SocialShareDialog({
+  url,
+  title,
+  setActiveProduct,
+}: SocialShareDialogProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
@@ -117,6 +122,7 @@ export function SocialShareDialog({ url, title }: SocialShareDialogProps) {
           </div>
         </div>
       }
+      onBeforeModalClose={() => setActiveProduct(null)}
     />
   );
 }
