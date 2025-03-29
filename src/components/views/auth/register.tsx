@@ -299,7 +299,7 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 
           <button
             type="button"
-            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
+            className="w-full rounded-sm py-4 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
             onClick={() => register()}
           >
             {googleRegisterRequestProcessing ? (
@@ -313,27 +313,15 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
                   height={20}
                   className="me-1"
                 />
-                <span>Sign in with Google</span>
+                <span>Sign up with Google</span>
               </div>
             )}
           </button>
 
-          <button
-            type="button"
-            className="w-full rounded-sm py-2 flex items-center justify-center gap-2 bg-gray-100 font-thin text-sm hover:bg-gray-50 shadow-md"
-          >
-            <Image
-              src="/assets/facebook-icon.png"
-              alt="Facebook"
-              width={28}
-              height={28}
-            />
-            Sign in with Facebook
-          </button>
         </div>
       </form>
 
-      <p className="text-center mt-6 text-sm text-black font-thin">
+      <p className="text-center mt-6 text-sm text-black font-thin mb-8">
         Already have an account?{" "}
         <button
           onClick={() => setActiveModal(ModalID.login)}

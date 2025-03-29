@@ -16,6 +16,8 @@ import { ComprehensiveProductFilters } from "@/domain/dto/product.input";
 import { addCommaSeparators, formatProductFilters } from "@/utilities";
 import Box from "@mui/material/Box";
 import { ModalID } from "@/domain/components";
+import CustomDatePicker from "@/components/shared/customDatePicker";
+import moment from "moment";
 
 type SearchFiltersProps = {
   setComprehensiveeProductFilters: (
@@ -62,97 +64,106 @@ const ComprehensiveSearchFilters: FC<SearchFiltersProps> = ({
       title={"Filters"}
       content={
         <div className="md:px-2">
-          <div className="mb-3">
-            <FilterAccordion title="Pricing">
-              <Box sx={{ width: "100%" }}>
-                <Slider
-                  getAriaLabel={() => "Price range"}
-                  value={value}
-                  onChange={handleChange}
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={100000}
-                  sx={{
-                    color: "#FC8135",
-                    height: "5px",
-                    "& .MuiSlider-thumb": {
-                      backgroundColor: "#FFF",
-                    },
-                    "& .MuiSlider-track": {
-                      backgroundColor: "#FC8135",
-                    },
-                    "& .MuiSlider-rail": {
-                      backgroundColor: "#E3E3E3",
-                    },
-                  }}
-                />
-                <div className="flex justify-between items-center">
-                  <div className="text-center space-y-2">
-                    <p className="text-center">Minimum</p>
-                    <p className="text-sm border border-gray-400 rounded-lg p-2">
-                      KES{" "}
-                      {addCommaSeparators(
-                        parseInt(
-                          comprehensiveProductFilters?.min_price as string
-                        )
-                      ) || 0}
-                    </p>
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="text-center">Maximum</p>
-                    <p className="text-sm border border-gray-400 rounded-lg p-2">
-                      KES{" "}
-                      {addCommaSeparators(
-                        parseInt(
-                          comprehensiveProductFilters?.max_price as string
-                        )
-                      ) || 0}
-                    </p>
-                  </div>
+          <div className="mb-4 shadow px-4 py-3">
+            <Box sx={{ width: "100%" }}>
+              <p className="text-black font-semibold">Pricing</p>
+              <Slider
+                getAriaLabel={() => "Price range"}
+                value={value}
+                onChange={handleChange}
+                valueLabelDisplay="auto"
+                min={0}
+                max={100000}
+                sx={{
+                  color: "#FC8135",
+                  height: "5px",
+                  "& .MuiSlider-thumb": {
+                    backgroundColor: "#FFF",
+                  },
+                  "& .MuiSlider-track": {
+                    backgroundColor: "#FC8135",
+                  },
+                  "& .MuiSlider-rail": {
+                    backgroundColor: "#E3E3E3",
+                  },
+                }}
+              />
+
+              <div className="flex justify-between items-center">
+                <div className="text-center space-y-2">
+                  <p className="text-center">Minimum</p>
+                  <p className="text-sm border border-gray-400 rounded-lg p-2">
+                    KES{" "}
+                    {addCommaSeparators(
+                      parseInt(comprehensiveProductFilters?.min_price as string)
+                    ) || 0}
+                  </p>
                 </div>
-              </Box>
-            </FilterAccordion>
-          </div>
-          <div className="mb-3">
-            <FilterAccordion title="Dates">
-              <div className="mb-4">
-                <div className="mb-4">
-                  <p className="font-medium">Date range</p>
-                </div>
-                <div className="flex gap-6">
-                  <div className="w-1/2">
-                    <p>From</p>
-                    <input
-                      type="date"
-                      placeholder="From"
-                      className=" p-2 border border-gray-300 rounded w-full"
-                      value={comprehensiveProductFilters?.start_date}
-                      onChange={(e) =>
-                        setComprehensiveeProductFilters({
-                          ...comprehensiveProductFilters,
-                          start_date: e.target.value,
-                        } as ComprehensiveProductFilters)
-                      }
-                    />
-                  </div>
-                  <div className="w-1/2">
-                    <p>To</p>
-                    <input
-                      type="date"
-                      placeholder="To"
-                      className=" p-2 border border-gray-300 rounded w-full"
-                      value={comprehensiveProductFilters?.end_date}
-                      onChange={(e) =>
-                        setComprehensiveeProductFilters({
-                          ...comprehensiveProductFilters,
-                          end_date: e.target.value,
-                        } as ComprehensiveProductFilters)
-                      }
-                    />
-                  </div>
+                <div className="text-center space-y-2">
+                  <p className="text-center">Maximum</p>
+                  <p className="text-sm border border-gray-400 rounded-lg p-2">
+                    KES{" "}
+                    {addCommaSeparators(
+                      parseInt(comprehensiveProductFilters?.max_price as string)
+                    ) || 0}
+                  </p>
                 </div>
               </div>
-            </FilterAccordion>
+            </Box>
+          </div>
+          <div className="mb-4 shadow px-4 py-3">
+            <p className="text-black font-semibold mb-3">Date</p>
+            <div className="mb-6">
+              <div className="flex gap-6">
+                <div className="w-1/2">
+                <p>From</p>
+                  <CustomDatePicker
+                    onChange={(date) => {
+                      if (date) {
+                        setComprehensiveeProductFilters({
+                          ...comprehensiveProductFilters,
+                          start_date: moment(date).format("YYYY-MM-DD"),
+                        } as ComprehensiveProductFilters);
+                      }
+                    }}
+                    placement={"bottom-start"}
+                    minDate={new Date()}
+                    customInput={undefined}
+                    defaultDate={
+                      comprehensiveProductFilters?.start_date
+                        ? new Date(
+                            comprehensiveProductFilters?.start_date as string
+                          )
+                        : new Date()
+                    }
+                  />
+                </div>
+                <div className="w-1/2">
+                <p>To</p>
+                  <CustomDatePicker
+                    onChange={(date) => {
+                      if (date) {
+                        setComprehensiveeProductFilters({
+                          ...comprehensiveProductFilters,
+                          end_date: moment(date).format("YYYY-MM-DD"),
+                        } as ComprehensiveProductFilters);
+                      }
+                    }}
+                    placement={"bottom-start"}
+                    minDate={new Date()}
+                    availableDates={[]}
+                    customInput={undefined}
+                    defaultDate={
+                      comprehensiveProductFilters?.end_date
+                        ? new Date(
+                            comprehensiveProductFilters?.end_date as string
+                          )
+                        : new Date()
+                    }
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <div className="mb-3">
             <FilterAccordion title="Location">

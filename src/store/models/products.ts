@@ -37,7 +37,7 @@ export const products = createModel<RootModel>()({
     cartSummary: null,
     comprehensiveProductFilters: {
       search: "",
-      tag: undefined,
+      tag: null,
       locations: [],
       categoies: [],
       start_date: "",

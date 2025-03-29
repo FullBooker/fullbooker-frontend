@@ -77,8 +77,8 @@ const ProductsTags: FC<ProductTagsProps> = ({
       ) : (
         <div>
           {productTags && productTags?.length > 0 ? (
-            <div className="py-1 md:py-2 bg-white px-2 md:px-3 lg:px-4">
-              <div className="flex justify-center items-center gap-8 py-4 px-4 md:px-7">
+            <div className={`bg-white px-2 md:px-3 lg:px-4 `}>
+              <div className="flex justify-center items-center gap-8 px-4 py-2 md:py-0 md:px-7">
                 <div
                   ref={categoriesContainerRef}
                   className="flex justify-evenly items-center gap-6 overflow-x-auto no-scrollbar"
@@ -86,7 +86,7 @@ const ProductsTags: FC<ProductTagsProps> = ({
                   {productTags.map((tag: ProductTag, index: number) => (
                     <span
                       key={index}
-                      className="flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer"
+                      className={`flex flex-col items-center gap-1 md:min-w-[80px] flex-shrink-0 cursor-pointer ${comprehensiveProductFilters?.tag === tag?.id ? "border-b-2 border-primary" : ""}`}
                       onClick={() => {
                         toggleTagFilter(tag?.id);
                         if (
@@ -108,8 +108,8 @@ const ProductsTags: FC<ProductTagsProps> = ({
                           }`}
                         >
                           <Image
-                            width={30}
-                            height={30}
+                            width={deviceType === DeviceType.mobile ? 24 :30}
+                            height={deviceType === DeviceType.mobile ? 24 :30}
                             src={tag?.icon as string}
                             alt="Tag Icon"
                             unoptimized={true}
@@ -117,7 +117,7 @@ const ProductsTags: FC<ProductTagsProps> = ({
                         </span>
                       </div>
                       <span
-                        className={`text-sm md:text-xs text-center ${
+                        className={`text-xs md:text-xs text-center ${
                           comprehensiveProductFilters?.tag &&
                           comprehensiveProductFilters?.tag === tag?.id
                             ? "text-primary"

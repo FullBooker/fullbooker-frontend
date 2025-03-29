@@ -213,6 +213,7 @@ const TicketBooking: FC<TicketBookingProps> = ({
                 }
                 placement={"bottom-start"}
                 availableDates={generateAvailableDates(product?.availability)}
+                defaultDate={null}
               />
             </div>
           </div>
