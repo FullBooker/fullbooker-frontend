@@ -31,6 +31,8 @@ jobs:
                 IMAGE_TAG: 'latest'
                 CONFIG: '.github/workflows/lightsail_config.json'
               run: |
+                sed -i -e "s|{{SERVICE_NAME}}|fullbooker-dev-fe-sm|g" .github/workflows/lightsail_config.json
+                sed -i -e "s/{{CONTAINER_NAME}}/fullbooker-fe-sm/" .github/workflows/lightsail_config.json
                 sed -i -e "s#{{NEXT_PUBLIC_API_BASE_URL}}#${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }}#" $CONFIG
                 sed -i -e "s#{{NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY}}#${{ secrets.DEV_NEXT_PUBLIC_API_GOOGLE_MAPS_API_KEY }}#" $CONFIG
                 sed -i -e "s#{{NEXT_PUBLIC_GOOGLE_CLIENT_ID}}#${{ secrets.DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID }}#" $CONFIG

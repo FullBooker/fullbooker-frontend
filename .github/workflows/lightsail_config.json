@@ -1,7 +1,7 @@
 {
-  "serviceName": "fullbooker-dev-fe-sm",
+  "serviceName": "{{SERVICE_NAME}}",
   "containers": {
-    "fullbooker-fe-sm": {
+    "{{CONTAINER_NAME}}": {
       "image": "{{IMAGE}}",
       "ports": {
         "3000": "HTTP"
@@ -16,7 +16,7 @@
     }
   },
   "publicEndpoint": {
-    "containerName": "fullbooker-fe-sm",
+    "containerName": "{{CONTAINER_NAME}}",
     "containerPort": 3000,
     "healthCheck": {
       "healthyThreshold": 2,
