@@ -107,6 +107,24 @@ export const vendor = createModel<RootModel>()({
     },
   },
   effects: (dispatch: any) => ({
+    async getVendorProfile(payload: NewProductPayload, rootState) {
+      try {
+        const response: any = await postRequest("/host/accounts/", payload);
+        if (response && response?.data) {
+          const product: Product = response?.data;
+          const url = new URL(window.location.href);
+          url.searchParams.set("product_id", product?.id);
+          window.history.pushState({}, "", url);
+          const previousStep = rootState.vendor.activeStep;
+          dispatch.vendor.setNewProductDetails(product);
+          dispatch.vendor.setActiveStep(previousStep + 1);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.data?.identifier[0] || error?.message
+        );
+      }
+    },
     async registerProduct(payload: NewProductPayload, rootState) {
       try {
         const response: any = await postRequest("/products/", payload);

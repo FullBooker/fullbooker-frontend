@@ -179,7 +179,7 @@ const Navbar: FC<NavbarProps> = ({
                   text="text-sm"
                   isSecondary={true}
                   onClick={() => {
-                    if (isLoggedIn) {
+                    if (authToken) {
                       switchToHost({
                         user: authData?.user?.id,
                       } as SwitchToHostPayload);
@@ -203,7 +203,10 @@ const Navbar: FC<NavbarProps> = ({
                     padding="py-2 px-3 md:py-2 md:px-10"
                     borderRadius="rounded"
                     text="text-xs md:text-sm text-white"
-                    onClick={() => setActiveModal(ModalID.login)}
+                    onClick={() => {
+                      setShouldRedirectToHostView(false);
+                      setActiveModal(ModalID.login);
+                    }}
                     extraClasses="hidden md:flex"
                   >
                     {(googleLoginRequestProcessing ||

@@ -50,18 +50,21 @@ const ProductsTags: FC<ProductTagsProps> = ({
       });
     }
   };
+
   const checkOverflow = () => {
-    if (!categoriesContainerRef.current) return;
+    if (!categoriesContainerRef.current) {
+      return;
+    }
 
-    const { scrollWidth, clientWidth, scrollLeft } =
-      categoriesContainerRef.current;
+    const container = categoriesContainerRef.current;
+    const { scrollWidth, clientWidth, scrollLeft } = container;
 
-    setCanScrollLeft(scrollLeft > 0);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
   };
 
   useEffect(() => {
-    setTimeout(checkOverflow, 0);
+    setTimeout(checkOverflow, 100);
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
   }, [productTags]);
@@ -113,7 +116,10 @@ const ProductsTags: FC<ProductTagsProps> = ({
                 {canScrollLeft && (
                   <button
                     className="bg-white hover:text-primary flex-shrink-0"
-                    onClick={handleScrollLeft}
+                    onClick={() => {
+                      handleScrollLeft();
+                      checkOverflow();
+                    }}
                   >
                     <ChevronLeft className="w-8 h-8" />
                   </button>
@@ -175,7 +181,10 @@ const ProductsTags: FC<ProductTagsProps> = ({
                 {canScrollRight && (
                   <button
                     className="bg-white hover:text-primary flex-shrink-0"
-                    onClick={handleScrollRight}
+                    onClick={() => {
+                      handleScrollRight();
+                      checkOverflow();
+                    }}
                   >
                     <ChevronRight className="w-8 h-8" />
                   </button>
