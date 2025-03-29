@@ -7,6 +7,7 @@ type CustomDatePickerProps = {
   availableDates?: any;
   placement: any;
   minDate?: Date;
+  defaultDate: Date | null;
 };
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -15,8 +16,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   customInput,
   placement,
   minDate = new Date(),
+  defaultDate,
 }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(defaultDate);
   return (
     <DatePicker
       selected={selectedDate}
@@ -26,8 +28,19 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
       }}
       popperPlacement={placement}
       minDate={minDate}
-      includeDates={availableDates}
-      customInput={customInput ? customInput : undefined}
+      customInput={
+        customInput ? (
+          customInput
+        ) : (
+          <input className="shadow-md px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        )
+      }
+      className={`${
+        !customInput
+          ? "shadow px-4 py-3 border rounded-md focus:outline-none"
+          : ""
+      }  `}
+      {...(availableDates && availableDates?.length > 0 ? { includeDates: availableDates } : {})}
     />
   );
 };
