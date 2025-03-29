@@ -19,6 +19,7 @@ import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CircularProgress } from "@mui/material";
+import Button from "@/components/shared/button";
 
 type ProfileSettingProps = {
   loading: boolean;
@@ -37,22 +38,14 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
     first_name: string | null;
     last_name: string | null;
     email?: string;
-    national_id?: string;
-    country?: string;
-    city?: string;
-    address?: string;
-    phone?: string;
+    phone_number?: string;
   }
 
   const schema = yup.object().shape({
     first_name: yup.string().required("First name is required"),
     last_name: yup.string().required("Last name is required"),
     email: yup.string().email("Provide a valid email address"),
-    phone: yup.string(),
-    national_id: yup.string(),
-    country: yup.string(),
-    city: yup.string(),
-    address: yup.string(),
+    phone_number: yup.string().required("Phone number is required"),
   });
 
   const {
@@ -66,11 +59,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
       first_name: profile?.first_name || "",
       last_name: profile?.last_name || "",
       email: profile?.email || undefined,
-      national_id: profile?.national_id || undefined,
-      country: profile?.country || undefined,
-      city: profile?.city || undefined,
-      address: profile?.address || undefined,
-      phone: profile?.phone || undefined,
+      phone_number: profile?.phone_number || undefined,
     },
     mode: "onBlur",
     resolver: yupResolver(schema),
@@ -81,19 +70,11 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
       first_name,
       last_name,
       email,
-      national_id,
-      country,
-      city,
-      address,
     } = data;
     updateUserProfile({
-      FirstName: first_name,
-      LastName: last_name,
+      first_name: first_name,
+      last_name: last_name,
       email: email,
-      NationalID: national_id,
-      country: country,
-      city: city,
-      address: address,
     } as any);
   };
 
@@ -101,7 +82,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
     <div>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-lg md:text-xl lg:text-2xl font-medium mb-4 md:mb-8">
-          Profile Name
+          Profile
         </h1>
         <div className="w-full md:grid grid-cols-2 gap-4 mb-4">
           <div className={`flex flex-col space-y-2 mb-4 md:mb-0`}>
@@ -170,7 +151,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
               Phone Number
             </label>
             <Controller
-              name="phone"
+              name="phone_number"
               control={control}
               render={({ field: { value, onChange, onBlur } }) => (
                 <input
@@ -180,14 +161,13 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
                   className={cn(
                     "flex w-full text-xs py-4 px-4 rounded-sm bg-transparent border border-inputBorderColor file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-placeholderColor focus-visible:outline-none focus-visible:border focus-visible:ring-[1px] focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   )}
-                  disabled
                   onChange={onChange}
-                  value={value || (profile?.phone as any)}
+                  value={value || (profile?.phone_number as any)}
                 />
               )}
             />
             {errors?.last_name?.message && (
-              <p className="text-red-500">{errors?.phone?.message}</p>
+              <p className="text-red-500">{errors?.phone_number?.message}</p>
             )}
           </div>
           <div className={`flex flex-col space-y-2 mb-4 md:mb-0`}>
@@ -216,7 +196,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
               <p className="text-red-500">{errors?.email?.message}</p>
             )}
           </div>
-          <div className="flex flex-col space-y-2 mb-4 md:mb-0">
+          {/* <div className="flex flex-col space-y-2 mb-4 md:mb-0">
             <label
               htmlFor="national_identification"
               className="text-xs lg:text-sm xl:text-base"
@@ -270,9 +250,9 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
             {errors?.city?.message && (
               <p className="text-red-500">{errors?.city?.message}</p>
             )}
-          </div>
+          </div> */}
         </div>
-        <div className="w-full flex flex-col space-y-2 mb-5">
+        {/* <div className="w-full flex flex-col space-y-2 mb-5">
           <label htmlFor="address" className="text-xs lg:text-sm xl:text-base">
             Your Address
           </label>
@@ -297,19 +277,24 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
           {errors?.address?.message && (
             <p className="text-red-500">{errors?.address?.message}</p>
           )}
-        </div>
+        </div> */}
 
         <div className="flex justify-end items-center">
-          <button
+          <Button
+            width="w-full md:w-[20%]"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white font-base"
+            padding="py-3"
+            margin="mb-2"
             type="submit"
-            className="px-[16px] py-[11px] lg:px-[20px] lg:py-[12px] xl:px-[22px] xl:py-[13px] bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-xs lg:text-sm xl:text-base text-whiteColor rounded-full transition-opacity duration-300 hover:opacity-40"
           >
             {loading ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
               "Save Changes"
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

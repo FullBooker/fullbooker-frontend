@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const basicAuth = req.headers.get("authorization");
-  const bypassDomain = "beta.mowinbet.com";
+  const bypassDomain = "dev.fullbooker.co.ke";
   const requestHost = req.headers.get("host");
 
   // if (requestHost && requestHost.includes(bypassDomain)) {
@@ -13,8 +13,8 @@ export function middleware(req: NextRequest) {
     // const authValue = basicAuth.split(" ")[1];
     // const [user, pwd] = Buffer.from(authValue, "base64").toString().split(":");
 
-    // const validUser = process.env.NEXT_BASIC_AUTH_USER || "admin";
-    // const validPassword = process.env.NEXT_BASIC_AUTH_PASSWORD || "@dmin123";
+    // const validUser = process.env.NEXT_PUBLIC_BASIC_AUTH_USER || "admin";
+    // const validPassword = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || "@dmin123";
 
     // if (user === validUser && pwd === validPassword) {
       return NextResponse.next();

@@ -1,18 +1,25 @@
 import { UserProfile } from "@/domain/profile";
 import type { RootModel } from ".";
-import { getRequest, putRequest } from "../../utilities";
+import {
+  getRequest,
+  patchRequest,
+  postRequest,
+  putRequest,
+} from "../../utilities";
 
 import { createModel } from "@rematch/core";
+import {
+  UpdateProfileImagePayload,
+} from "@/domain/dto/profile.input";
 
 type ProfileState = {
   profile: UserProfile | null;
-  showBalance: boolean;
 };
 
 export const profile = createModel<RootModel>()({
   state: {
     profile: null,
-    showBalance: true
+    showBalance: true,
   } as ProfileState,
   reducers: {
     setProfile(state: ProfileState, profile: UserProfile) {
@@ -29,25 +36,39 @@ export const profile = createModel<RootModel>()({
     },
   },
   effects: (dispatch: any) => ({
-    async getUserProfile(payload, rootState) {
+    async getUserProfile() {
       try {
-        const response: any = await getRequest("/api/v1/user/auth/profile");
+        const response: any = await getRequest("/accounts/profile");
 
-        if (response && response?.data?.success) {
-          dispatch.profile.setProfile(response?.data?.data);
+        if (response && response?.data) {
+          dispatch.profile.setProfile(response?.data);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async updateUserProfile(payload, rootState) {
+    async updateUserProfile(payload) {
       try {
-        const response: any = await putRequest(
-          "/api/v1/user/auth/profile",
-          payload
+        const response: any = await patchRequest("/accounts/profile/update/", payload);
+
+        if (response) {
+          dispatch.profile.getUserProfile();
+          dispatch.alert.setSuccessAlert(response?.data?.message);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async updateProfileImage(payload: UpdateProfileImagePayload) {
+      try {
+        const response: any = await patchRequest(
+          "/accounts/profile/update/",
+          payload,
+          true
         );
 
-        if (response && response?.data?.success) {
+        if (response) {
+          dispatch.profile.getUserProfile();
           dispatch.alert.setSuccessAlert(response?.data?.message);
         }
       } catch (error: any) {

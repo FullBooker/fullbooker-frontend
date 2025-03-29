@@ -2,21 +2,30 @@ import { Models } from "@rematch/core";
 import { alert } from "./alert";
 import { authentication } from "./authentication";
 import { components } from "./components";
-import { settings } from "./settings";
-import { profile } from './profile';
+import { profile } from "./profile";
+import { vendor } from "./vendor";
+import { settings } from './settings';
+import { products } from './products';
+import { tickets } from './ticket';
 
 export interface RootModel extends Models<RootModel> {
   alert: typeof alert;
   authentication: typeof authentication;
   components: typeof components;
-  settings: typeof settings;
   profile: typeof profile;
+  vendor: typeof vendor;
+  settings: typeof settings;
+  products: typeof products;
+  tickets: typeof tickets;
 }
 
 export const models: RootModel = {
   alert,
   authentication,
   components,
-  settings,
   profile,
+  vendor,
+  settings,
+  products,
+  tickets
 };

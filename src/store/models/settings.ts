@@ -1,81 +1,101 @@
-import { createModel } from "@rematch/core";
-
-import type { RootModel } from ".";
 import {
-  getRequest,
-} from "../../utilities";
+  Currency,
+  DayOfWeek,
+  ProductCategory,
+  ProductTag,
+  VendorDetails,
+} from "@/domain/dto/output";
+import type { RootModel } from ".";
+import { createModel } from "@rematch/core";
+import { NewProductPayload } from "@/domain/dto/input";
+import { getRequest } from "@/utilities";
 
 type SettingsState = {
-  paymentMethods: Array<string>;
-  transactionTypes: Array<string>;
-  transactionStatuses: Array<string>;
+  productCategories: Array<ProductCategory>;
+  daysOfWeek: Array<DayOfWeek>;
+  currencies: Array<Currency>;
+  productTags: Array<ProductTag>;
 };
 
 export const settings = createModel<RootModel>()({
   state: {
-    paymentMethods: [],
-    transactionTypes: [],
-    transactionStatuses: []
+    productCategories: [],
+    daysOfWeek: [],
+    currencies: [],
+    productTags: [],
   } as SettingsState,
   reducers: {
-    setPaymentMethods(state: SettingsState, paymentMethods: Array<string>) {
-      return {
-        ...state,
-        paymentMethods,
-      };
-    },
-    setTransactionTypes(
+    setProductCategories(
       state: SettingsState,
-      transactionTypes: Array<string>
+      productCategories: Array<ProductCategory>
     ) {
       return {
         ...state,
-        transactionTypes,
+        productCategories,
       };
     },
-    setTransactionStatuses(state: SettingsState, transactionStatuses: Array<string>) {
+    setProductTags(
+      state: SettingsState,
+      productTags: Array<ProductTag>
+    ) {
       return {
         ...state,
-        transactionStatuses,
+        productTags,
+      };
+    },
+    setDaysOfWeek(state: SettingsState, daysOfWeek: Array<DayOfWeek>) {
+      return {
+        ...state,
+        daysOfWeek,
+      };
+    },
+    setCurrencies(state: SettingsState, currencies: Array<Currency>) {
+      return {
+        ...state,
+        currencies,
       };
     },
   },
-  effects: (dispatch) => ({
-    async getPaymentMethods() {
+  effects: (dispatch: any) => ({
+    async getProductCategories() {
       try {
-        const response: any = await getRequest("/api/v1/transaction/history/payments/payment-methods");
-        if (response) {
-          dispatch.settings.setPaymentMethods(
-            response?.data?.data ? response?.data?.data : []
-          );
+        const response: any = await getRequest("/categories/");
+
+        if (response && response?.data) {
+          dispatch.settings.setProductCategories(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getTransactionTypes() {
+    async getProductTags(payload, rootState) {
       try {
-        const response: any = await getRequest(
-          "/api/v1/transaction/history/payments/transaction-types"
-        );
-        if (response) {
-          dispatch.settings.setTransactionTypes(
-            response?.data?.data ? response?.data?.data : []
-          );
+        const response: any = await getRequest("/tags/");
+
+        if (response && response?.data) {
+          dispatch.settings.setProductTags(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-     async getTransactionStatuses() {
+    async getDaysOfWeek(payload, rootState) {
       try {
-        const response: any = await getRequest(
-          "/api/v1/transaction/history/payments/transaction-status"
-        );
-        if (response) {
-          dispatch.settings.setTransactionStatuses(
-            response?.data?.data ? response?.data?.data : []
-          );
+        const response: any = await getRequest("/days-of-week/");
+
+        if (response && response?.data) {
+          dispatch.settings.setDaysOfWeek(response?.data?.results);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getCurrencies() {
+      try {
+        const response: any = await getRequest("/currencies/");
+
+        if (response && response?.data) {
+          dispatch.settings.setCurrencies(response?.data?.results);
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);

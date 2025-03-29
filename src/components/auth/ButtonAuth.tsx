@@ -20,7 +20,7 @@ const ButtonAuth: React.FC<ButtonAuthProps> = ({
   return (
     <button
       type={type}
-      className="py-3 lg:py-3 xl:py-4 rounded-full text-xs lg:text-sm xl:text-sm 2xl:text-base bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor w-100 transition-opacity duration-300 hover:opacity-40"
+      className="py-3 lg:py-3 xl:py-4 rounded-full text-xs lg:text-sm xl:text-sm 2xl:text-base bg-gradient-to-bl from-mainColor via-redMediumColor to-redDarkColor text-whiteColor w-100 transition-opacity duration-300 hover:opacity-40 text-black"
       onClick={handleClick}
       disabled={disabled}
     >

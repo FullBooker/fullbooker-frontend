@@ -44,6 +44,8 @@ const config = {
         },
         mainColor: "hsl(var(--main-color))",
         primary: "hsl(var(--primary))",
+        success: "hsl(var(--success))",
+        secondary: "hsl(var(--secondary))",
         whiteColor: "hsl(var(--white-color))",
         textColor: "hsl(var(--text-color))",
         textColor2: "hsl(var(--text-color-2))",
@@ -53,6 +55,7 @@ const config = {
         lightRedColor: 'hsl(var(--light-red-color))',
         greenColor: 'hsl(var(--green-color))',
         footerTextColor: "hsl(var(--footer-link))",
+        darkOrange: "#AE4808",
 
         cardColor: "hsl(var(--card-color))",
         inputBorderColor: "hsl(var(--input-border-color))",

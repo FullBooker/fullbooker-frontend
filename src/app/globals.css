@@ -19,11 +19,13 @@
   :root {
     --background: 0, 0%, 100%;
     --auth-background: 0, 0%, 100%;
-    --main-color: 24, 97%, 60%;
+    --main-color: 23, 97%, 60%;
     --white-color: 0, 0%, 100%;
     --text-color: 0, 0%, 69%;
     --text-color-2: 0, 0%, 54%;
-    --primary: 330, 6%, 7%, 1;
+    --primary: 23, 97%, 60%;
+    --success: 147, 60%, 50%;
+    --secondary: 21, 99%, 78%;
     --red-medium: 24, 97%, 50%;
     --red-dark: 24, 97%, 40%;
     --red-dark2: 357, 25%, 15%;
@@ -33,6 +35,8 @@
     --placeholder: 0, 0%, 54%;
     --sidebar-color: 0, 0%, 100%;
     --footer-link: 0, 0%, 66%;
+    --orange-dark: 138.6, 91%, 35.65%;
+
 
     --card-color: 0, 0%, 100%;
     --input-border-color: 0, 0%, 69%;
@@ -128,4 +132,71 @@
 
 .bottom-nav-link.Mui-selected {
   color: #ab3029 !important;
+}
+
+.autocomplete-container {
+  width: 100% !important;
+}
+.autocomplete-container input,
+.autocomplete-control {
+  box-sizing: border-box;
+}
+
+.autocomplete-control {
+  background: #fff;
+  width: 100% !important;
+}
+
+.autocomplete-container {
+  width: 100% !important;
+}
+
+.autocomplete-container input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+.autocomplete-container .custom-list {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.autocomplete-container .custom-list-item {
+  padding: 8px;
+}
+
+.autocomplete-container .custom-list-item:hover {
+  background: lightgrey;
+  cursor: pointer;
+}
+
+.custom-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #E3E3E3;
+  border-radius: 5px;
+}
+
+.custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #FFF;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.custom-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #FFF;
+  border-radius: 50%;
+  cursor: pointer;
 }
