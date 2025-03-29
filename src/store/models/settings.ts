@@ -3,12 +3,11 @@ import {
   DayOfWeek,
   ProductCategory,
   ProductTag,
-  VendorDetails,
 } from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
-import { NewProductPayload } from "@/domain/dto/input";
-import { getRequest } from "@/utilities";
+import { buildQueryString, getRequest } from "@/utilities";
+import { ProductTagsFilters } from "@/domain/dto/input/settings.input";
 
 type SettingsState = {
   productCategories: Array<ProductCategory>;
@@ -34,10 +33,7 @@ export const settings = createModel<RootModel>()({
         productCategories,
       };
     },
-    setProductTags(
-      state: SettingsState,
-      productTags: Array<ProductTag>
-    ) {
+    setProductTags(state: SettingsState, productTags: Array<ProductTag>) {
       return {
         ...state,
         productTags,
@@ -68,9 +64,11 @@ export const settings = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async getProductTags(payload, rootState) {
+    async getProductTags(payload: ProductTagsFilters, rootState) {
       try {
-        const response: any = await getRequest("/tags/");
+        const response: any = await getRequest(
+          `/tags/?${buildQueryString(payload)}`
+        );
 
         if (response && response?.data) {
           dispatch.settings.setProductTags(response?.data?.results);

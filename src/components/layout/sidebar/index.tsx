@@ -9,7 +9,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import LogoutButton from "./components/LogoutButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import Drawer from "@mui/material/Drawer";
 import { connect } from "react-redux";
@@ -28,7 +27,6 @@ const Sidebar = ({
   signOut,
   signingOutRequestProcessing,
   isLoggedIn,
-  getProductCategories,
   productCategories,
   productsCategoriesRequestProcessing,
 }: {
@@ -43,9 +41,6 @@ const Sidebar = ({
   productCategories: Array<ProductCategory>;
   productsCategoriesRequestProcessing: boolean;
 }) => {
-  useEffect(() => {
-    getProductCategories();
-  }, []);
   return (
     <Drawer
       variant={"temporary"}
@@ -181,7 +176,6 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = (dispatch: any) => ({
   signOut: () => dispatch.authentication.signOut(),
-  getProductCategories: () => dispatch.settings.getProductCategories(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);

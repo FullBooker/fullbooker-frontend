@@ -114,9 +114,9 @@ const ComprehensiveSearchFilters: FC<SearchFiltersProps> = ({
           <div className="mb-4 shadow px-4 py-3">
             <p className="text-black font-semibold mb-3">Date</p>
             <div className="mb-6">
-              <div className="flex gap-6">
-                <div className="w-1/2">
-                <p>From</p>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-full md:w-1/2">
+                  <p>From</p>
                   <CustomDatePicker
                     onChange={(date) => {
                       if (date) {
@@ -138,8 +138,9 @@ const ComprehensiveSearchFilters: FC<SearchFiltersProps> = ({
                     }
                   />
                 </div>
-                <div className="w-1/2">
-                <p>To</p>
+
+                <div className="w-full md:w-1/2">
+                  <p>To</p>
                   <CustomDatePicker
                     onChange={(date) => {
                       if (date) {

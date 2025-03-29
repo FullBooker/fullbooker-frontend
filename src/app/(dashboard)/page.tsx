@@ -22,37 +22,33 @@ import { Product } from "@/domain/product";
 import EmptyStoreDisclaimer from "@/components/products/emptyStoreDisclaimer";
 
 type HomePageProps = {
-  getProductCategories: () => void;
   productCategories: Array<ProductCategory>;
   getCurrencies: () => void;
   productTags: Array<ProductTag>;
-  getProductTags: () => void;
   products: ProductsAPIResponse;
   popularProducts: Array<Product>;
   nearByProducts: Array<Product>;
   recommendedProducts: Array<Product>;
   upcomingProducts: Array<Product>;
   isProcessingRquest: boolean;
+  getProductCategories: () => void;
 };
 
 const HomePage: FC<HomePageProps> & { layout: any } = ({
-  getProductCategories,
   getCurrencies,
-  getProductTags,
   products,
   nearByProducts,
   recommendedProducts,
   upcomingProducts,
   popularProducts,
   isProcessingRquest,
+  getProductCategories
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {}, []);
   useEffect(() => {
-    getProductCategories();
     getCurrencies();
-    getProductTags();
+    getProductCategories();
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -61,6 +57,7 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  
 
   return (
     <div className="h-fit bg-white">
@@ -72,7 +69,7 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
         <SearchFilters />
         <ProductTags />
       </div>
-      <div className="pt-[130px] md:pt-[200px] lg:pt-[200px]">
+      <div className="pt-[140px] md:pt-[200px] lg:pt-[200px]">
         {(!products || products?.results?.length === 0) &&
         (!nearByProducts || nearByProducts?.length === 0) &&
         (!recommendedProducts || recommendedProducts?.length === 0) &&
@@ -129,9 +126,8 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: any) => ({
   setActiveModal: (modalId: ModalID) =>
     dispatch.components.setActiveModal(modalId),
-  getProductCategories: () => dispatch.settings.getProductCategories(),
-  getProductTags: () => dispatch.settings.getProductTags(),
   getCurrencies: () => dispatch.settings.getCurrencies(),
+  getProductCategories: () => dispatch.settings.getProductCategories(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
