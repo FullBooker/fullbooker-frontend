@@ -51,6 +51,7 @@ const ProductClassification: FC<ProductClassificationProps> = ({
   const {
     control,
     handleSubmit,
+    watch,
     setValue,
     formState: { errors },
   } = useForm({
@@ -86,6 +87,23 @@ const ProductClassification: FC<ProductClassificationProps> = ({
       setValue("subcategory", newProduct?.subcategory);
     }
   }, [newProduct?.category, newProduct?.subcategory]);
+
+  const flattenSubcategories = (
+    subs: Subcategory[],
+    level = 0
+  ): Array<{ id: string; name: string }> => {
+    let result: Array<{ id: string; name: string }> = [];
+
+    subs.forEach((sub) => {
+      result.push({ id: sub.id, name: `${"— ".repeat(level)}${sub.name}` });
+
+      if (sub.children && sub.children.length > 0) {
+        result = result.concat(flattenSubcategories(sub.children, level + 1));
+      }
+    });
+
+    return result;
+  };
 
   return (
     <div>
@@ -143,22 +161,30 @@ const ProductClassification: FC<ProductClassificationProps> = ({
                         name="subcategory"
                         control={control}
                         rules={{ required: true }}
-                        render={({ field: { value, onChange } }) => (
-                          <select
-                            className="w-full border-none outline-none"
-                            value={value}
-                            onChange={onChange}
-                          >
-                            <option></option>
-                            {category?.subcategories?.map(
-                              (sub: Subcategory, idx: number) => (
+                        render={({ field: { value, onChange } }) => {
+                          const flattenedSubcategories = flattenSubcategories(
+                            category?.subcategories || []
+                          );
+
+                          return (
+                            <select
+                              className="w-full border-none outline-none"
+                              value={value}
+                              onChange={onChange}
+                            >
+                              {!watch("subcategory") ? (
+                                <option value="">Select a subcategory</option>
+                              ) : (
+                                <option value=""></option>
+                              )}
+                              {flattenedSubcategories.map((sub, idx) => (
                                 <option key={idx} value={sub.id}>
-                                  {sub?.name}
+                                  {sub.name}
                                 </option>
-                              )
-                            )}
-                          </select>
-                        )}
+                              ))}
+                            </select>
+                          );
+                        }}
                       />
                     </div>
                   </div>

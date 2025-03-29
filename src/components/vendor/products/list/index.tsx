@@ -109,12 +109,12 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
               <div className="grid place-items-center text-center">
                 <Image
                   src="/assets/no-records.jpg"
-                  alt="Fullbooker Logo"
+                  alt="No products"
                   width={getImageDimensions(deviceType).width}
                   height={getImageDimensions(deviceType).height}
                   className="mb-4"
                 />
-                <p className="text-xl font-semibold text-black">
+                <p className="text-xl font-semibold text-black mb-4">
                   Oops! You have no products in your catalogue
                 </p>
                 <Link
