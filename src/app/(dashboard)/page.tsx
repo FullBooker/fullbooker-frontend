@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { RootState } from "@/store";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ModalID } from "@/domain/components";
-import { ProductCategory, ProductTag } from "@/domain/dto/output";
+import { ProductCategory, ProductsAPIResponse, ProductTag } from "@/domain/dto/output";
 import ProductTags from "@/components/products/homePage/tags";
 import DashBoardLayout from "./layout";
 import SearchFilters from "@/components/products/homePage/productFilters";
@@ -23,7 +23,7 @@ type HomePageProps = {
   getCurrencies: () => void;
   productTags: Array<ProductTag>;
   getProductTags: () => void;
-  products: Array<Product>;
+  products: ProductsAPIResponse;
   popularProducts: Array<Product>;
   nearByProducts: Array<Product>;
   recommendedProducts: Array<Product>;
@@ -50,7 +50,7 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
 
   return (
     <div className="h-fit bg-white">
-      {(!products || products?.length === 0 )&&
+      {(!products || products?.results?.length === 0 )&&
       (!nearByProducts || nearByProducts?.length === 0) &&
       (!recommendedProducts || recommendedProducts?.length === 0) &&
       (!upcomingProducts || upcomingProducts?.length === 0) &&
