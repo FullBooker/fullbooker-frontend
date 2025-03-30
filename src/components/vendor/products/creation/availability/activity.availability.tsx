@@ -251,7 +251,7 @@ const OtherProductsAvailability: FC<OtherProductsAvailabilityProps> = ({
   }, [newProduct?.locations]);
 
   return (
-    <div className="px-0 md:px-5">
+    <div className="px-0 md:px-5 pb-[150px] md:pb-[200px]">
       <StepHeader title="Where and when does this activity happen?" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 gap-4">

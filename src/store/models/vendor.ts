@@ -1,7 +1,12 @@
 import {
   ProductCategory,
+  VendorAccountsAPIResponse,
+  VendorAccountsTransactionsAPIResponse,
   VendorDetails,
+  VendorPaymentMethodsAPIResponse,
   VendorProductsAPIResponse,
+  VendorSalesAPIResponse,
+  VendorTransactionsAPIResponse,
 } from "@/domain/dto/output";
 import type { RootModel } from ".";
 import { createModel } from "@rematch/core";
@@ -33,6 +38,12 @@ import {
 } from "@/utilities";
 import { Product, ProductMedia } from "@/domain/product";
 import { ModalID } from "@/domain/components";
+import {
+  NewPaymentMethodPayload,
+  VendorAccountTransactionsFilters,
+  VendorSalesFilters,
+  VendorTransactionsFilters,
+} from "@/domain/dto/input/vendor.input";
 
 type VendorState = {
   vendorDetails: VendorDetails;
@@ -42,6 +53,10 @@ type VendorState = {
   productPageViewType: ViewType;
   productType: ProductType;
   productMedia: Array<ProductMedia>;
+  vendorAccounts: VendorAccountsAPIResponse;
+  vendorPaymentMethods: VendorAccountsAPIResponse;
+  vendorSales: VendorSalesAPIResponse;
+  vendorAccountTransactions: VendorTransactionsAPIResponse;
 };
 
 export const vendor = createModel<RootModel>()({
@@ -55,8 +70,44 @@ export const vendor = createModel<RootModel>()({
     productPageViewType: ViewType.productsListView,
     productType: ProductType.default,
     productMedia: [],
+    vendorAccounts: {
+      results: [],
+    } as VendorAccountsAPIResponse,
+    vendorPaymentMethods: {
+      results: [],
+    } as VendorPaymentMethodsAPIResponse,
+    vendorSales: {
+      results: [],
+    } as VendorSalesAPIResponse,
+    vendorAccountTransactions: {
+      results: [],
+    } as VendorAccountsTransactionsAPIResponse,
   } as VendorState,
   reducers: {
+    setVendorAccounts(state: VendorState, vendorAccounts: any) {
+      return {
+        ...state,
+        vendorAccounts,
+      };
+    },
+    setVendorPaymentMethods(state: VendorState, vendorPaymentMethods: any) {
+      return {
+        ...state,
+        vendorPaymentMethods,
+      };
+    },
+    setVendorSales(state: VendorState, vendorSales: any) {
+      return {
+        ...state,
+        vendorSales,
+      };
+    },
+    setVendorAccountTransactions(state: VendorState, vendorAccountTransactions: any) {
+      return {
+        ...state,
+        vendorAccountTransactions,
+      };
+    },
     setVendorDetails(state: VendorState, vendorDetails: VendorDetails) {
       return {
         ...state,
@@ -107,22 +158,65 @@ export const vendor = createModel<RootModel>()({
     },
   },
   effects: (dispatch: any) => ({
-    async getVendorProfile(payload: NewProductPayload, rootState) {
+    async getVendorAccounts() {
       try {
-        const response: any = await postRequest("/host/accounts/", payload);
+        const response: any = await getRequest("/hosts-accounts/");
         if (response && response?.data) {
-          const product: Product = response?.data;
-          const url = new URL(window.location.href);
-          url.searchParams.set("product_id", product?.id);
-          window.history.pushState({}, "", url);
-          const previousStep = rootState.vendor.activeStep;
-          dispatch.vendor.setNewProductDetails(product);
-          dispatch.vendor.setActiveStep(previousStep + 1);
+          dispatch.vendor.setVendorAccounts(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async addPaymentMethod(payload: NewPaymentMethodPayload) {
+      try {
+        const response: any = await postRequest("/payment-methods/", {
+          payment_method: payload,
+        });
+        if (response && response?.data) {
+          dispatch.vendor.getVendorAccounts();
+          dispatch.vendor.getVendorPaymentMethods();
+          dispatch.components.setActiveModal(ModalID.none);
+          dispatch.alert.setSuccessAlert("Payment method added successfully!");
         }
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
           error?.data?.identifier[0] || error?.message
         );
+      }
+    },
+    async getVendorPaymentMethods() {
+      try {
+        const response: any = await getRequest("/payment-methods/");
+        if (response && response?.data) {
+          dispatch.vendor.setVendorPaymentMethods(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getVendorSales(payload: VendorSalesFilters) {
+      try {
+        const response: any = await getRequest(
+          `/bookings/?${buildQueryString(payload)}`
+        );
+        if (response && response?.data) {
+          dispatch.vendor.setVendorSales(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
+      }
+    },
+    async getAccountTransactions(payload: VendorAccountTransactionsFilters) {
+      try {
+        const response: any = await getRequest(
+          `/hosts-accountentries/?${buildQueryString(payload)}`
+        );
+        if (response && response?.data) {
+          dispatch.vendor.setVendorAccountTransactions(response?.data);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(error?.message);
       }
     },
     async registerProduct(payload: NewProductPayload, rootState) {

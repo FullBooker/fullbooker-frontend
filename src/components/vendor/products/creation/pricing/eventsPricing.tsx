@@ -68,9 +68,7 @@ const EventsPricing: FC<EventsPricingProps> = ({
           )}
         </div>
       </div>
-      <div className="px-2 md:px-10 mt-4 md:mt-10">
         <NavigationButtons />
-      </div>
     </div>
   );
 };

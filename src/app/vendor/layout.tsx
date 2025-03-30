@@ -8,9 +8,9 @@ import Appbar from "@/components/vendor/appbar";
 import Withdrawal from "@/components/vendor/wallet/withdrawal";
 import UniversalModal from "@/components/layout/modal/UniversalModal";
 import { connect } from "react-redux";
-import { WithdrawalRequestPayload } from "@/domain/dto/input";
 import { Dispatch, RootState } from "@/store";
 import { ModalID } from "@/domain/components";
+import NewPaymentMethodForm from "@/components/vendor/wallet/newPaymentMethod";
 
 type VendorLayoutProps = {
   children: React.ReactNode;
@@ -87,6 +87,20 @@ const VendorLayout: FC<VendorLayoutProps> = ({ children, modalId }) => {
           theme={themeMode}
           open={true}
           content={<Withdrawal />}
+        />
+      )}
+      {modalId === ModalID.vendorWalletWithdrawal && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<Withdrawal />}
+        />
+      )}
+      {modalId === ModalID.vendorNewPaymentMethodForm && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<NewPaymentMethodForm />}
         />
       )}
     </div>

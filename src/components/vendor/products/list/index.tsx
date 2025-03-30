@@ -65,7 +65,7 @@ const VendorProductsListView: FC<VendorProductsListViewProps> = ({
   );
 
   return (
-    <div className="px-1 py-2 md:px-6 md:py-3 bg-white">
+    <div className="px-4 py-2 md:px-6 md:py-3 bg-white">
       {deviceType === DeviceType.mobile ? (
         renderHeader()
       ) : (

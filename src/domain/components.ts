@@ -17,5 +17,6 @@ export enum ModalID {
   comprehensiveProductFilters = "COMPREHENSIVE_PRODUCT_FILTERS",
   ticketBookingSummary = "TICKET_BOOKING_SUMMARY",
   productSocialShare = "PRODUCT_SOCIAL_SHARE",
-  vendorWalletWithdrawal = "VENDOR_WALLET_WITHDRAWAL"
+  vendorWalletWithdrawal = "VENDOR_WALLET_WITHDRAWAL",
+  vendorNewPaymentMethodForm = "VENDOR_NEW_PAYMENT_METHOD_FORM",
 }

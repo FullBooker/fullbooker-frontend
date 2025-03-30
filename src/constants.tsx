@@ -176,3 +176,28 @@ export enum HomePageProductSection {
   nearByProducts = 'nearby',
   recommendedProducts = "recommended",
 }
+
+export enum TransactionStatus {
+  Pending = "pending",
+  Completed = "completed",
+  Cancelled = "cancelled",
+  Failed = "failed",
+}
+
+export enum PaymentMethod {
+  BANK = "bank",
+  MPESA = "mpesa",
+}
+
+export enum AccountType {
+  ASSET = "asset",
+  LIABILITY = "liability",
+  EQUITY = "equity",
+  REVENUE = "revenue",
+  EXPENSE = "expense",
+}
+
+export enum BalanceType {
+  DEBIT = "debit",
+  CREDIT = "credit",
+}

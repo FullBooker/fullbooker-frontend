@@ -148,7 +148,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
   }, []);
 
   return (
-    <div>
+    <div className="pb-[150px] md:pb-[200px]">
       <StepHeader title="Upload Photos and Videos" />
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="px-0 md:px-5 w-full">
@@ -289,9 +289,7 @@ const ProductMediaComponent: FC<ProductMediaProps> = ({
             </div>
           </div>
         </div>
-        <div className="px-2 md:px-10 mt-4 md:mt-10">
           <NavigationButtons isProcessingRequest={isProcessingRequest} />
-        </div>
       </form>
       <Dialog
         open={currentIndex !== null}

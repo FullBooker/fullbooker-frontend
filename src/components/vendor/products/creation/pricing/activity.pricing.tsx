@@ -3,7 +3,7 @@
 import React, { FC, useEffect } from "react";
 import { Dispatch, RootState } from "@/store";
 import { connect } from "react-redux";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +15,11 @@ import {
 } from "@/domain/dto/input";
 import { ProductPricing, SessionPricingCategory } from "@/domain/product";
 import Button from "@/components/shared/button";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import { Pen, Plus } from "lucide-react";
+import { PricingType } from "@/domain/constants";
 
 type ActivityPricingProps = {
   isProcessingRequest: boolean;
@@ -113,152 +118,188 @@ const ActivityPricing: FC<ActivityPricingProps> = ({
   }, [currency]);
 
   return (
-    <div className="space-y-4 pb-6 col-span-1 grid md:grid-flow-col w-full gap-4">
-      <div className="flex border-b border-primary pb-3 md:pb-12">
-        <h3 className="flex items-center justify-center w-6 h-6 p-5 md:w-12 lg:w-12 xl:w-12 md:h-12 lg:h-12 xl:h-12 bg-black text-primary text-lg font-bold rounded-full shadow-lg me-4">
-          A
-        </h3>
-        <div className="space-y-2 w-full">
-          <form onSubmit={handleSubmit(onSubmitPricing)}>
-            <p className="font-medium">{pricingType.title}</p>
-            <label className="flex justify-between">
-              <p className="font-light me-1">
-                Please enter the price per person per {pricingType.label}
-              </p>
-              <div className="w-full">
-                <Controller
-                  name="cost"
-                  control={control}
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      className="block w-full border p-1 mt-2"
-                    />
-                  )}
-                />
-                {errors.cost && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.cost.message}
+    <Accordion>
+      <AccordionSummary
+        expandIcon={
+          newProduct?.pricing?.find(
+            (pricing: ProductPricing) => pricing.type === pricingType.key
+          ) ? (
+            <span className="flex items-center text-primary">
+              <Pen className="w-6 h-6 me-2" />
+              Edit{" "}
+            </span>
+          ) : (
+            <span className="flex items-center text-green-500">
+              <Plus className="w-6 h-6 me-2" /> Add
+            </span>
+          )
+        }
+        aria-controls="panel1-content"
+        id="panel1-header"
+        sx={{
+          "& .MuiAccordionSummary-expandIconWrapper": {
+            transform: "none !important",
+          },
+        }}
+      >
+        <Typography component="span">{pricingType.title}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div className="space-y-4 pb-6 col-span-1 grid md:grid-flow-col w-full gap-4">
+          <div className="flex pb-3 md:pb-12">
+            <h3 className="flex items-center justify-center w-6 h-6 p-5 md:w-12 lg:w-12 xl:w-12 md:h-12 lg:h-12 xl:h-12 bg-black text-primary text-lg font-bold rounded-full shadow-lg me-4">
+              {pricingType?.key === PricingType.session
+                ? "A"
+                : pricingType?.key === PricingType.dayPass
+                ? "B"
+                : "C"}
+            </h3>
+            <div className="space-y-2 w-full">
+              <form onSubmit={handleSubmit(onSubmitPricing)}>
+                <p className="font-medium">{pricingType.title}</p>
+                <label className="flex justify-between">
+                  <p className="font-light me-1">
+                    Please enter the price per person per {pricingType.label}
                   </p>
-                )}
-              </div>
-            </label>
-            <label className="flex justify-between mt-2">
-              <p className="font-light me-1">
-                Bulk booking discounts (Optional)
-              </p>
-              <div className="w-full">
-                <Controller
-                  name="bulk_discount"
-                  control={control}
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      className="block w-full border p-1 mt-2"
+                  <div className="w-full">
+                    <Controller
+                      name="cost"
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="number"
+                          className="block w-full border p-1 mt-2"
+                        />
+                      )}
                     />
-                  )}
-                />
-                {errors.bulk_discount && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.bulk_discount.message}
+                    {errors.cost && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.cost.message}
+                      </p>
+                    )}
+                  </div>
+                </label>
+                <label className="flex justify-between mt-2">
+                  <p className="font-light me-1">
+                    Bulk booking discounts (Optional)
                   </p>
-                )}
-              </div>
-            </label>
+                  <div className="w-full">
+                    <Controller
+                      name="bulk_discount"
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="number"
+                          className="block w-full border p-1 mt-2"
+                        />
+                      )}
+                    />
+                    {errors.bulk_discount && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.bulk_discount.message}
+                      </p>
+                    )}
+                  </div>
+                </label>
 
-            <label className="flex justify-between mt-2">
-              <p className="font-light me-1">
-                Maximum number of tickets per session
-              </p>
-              <div className="w-full">
-                <Controller
-                  name="maximum_number_of_tickets"
-                  control={control}
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      className="block w-full border p-1 mt-2"
-                    />
-                  )}
-                />
-                {errors.maximum_number_of_tickets && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.maximum_number_of_tickets.message}
+                <label className="flex justify-between mt-2">
+                  <p className="font-light me-1">
+                    Maximum number of tickets per session
                   </p>
-                )}
-              </div>
-            </label>
-            <div>
-              {errors.currency && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.currency.message}
-                </p>
-              )}
+                  <div className="w-full">
+                    <Controller
+                      name="maximum_number_of_tickets"
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="number"
+                          className="block w-full border p-1 mt-2"
+                        />
+                      )}
+                    />
+                    {errors.maximum_number_of_tickets && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.maximum_number_of_tickets.message}
+                      </p>
+                    )}
+                  </div>
+                </label>
+                <div>
+                  {errors.currency && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.currency.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    margin="mt-6"
+                    bg="bg-primary"
+                    borderRadius="rounded"
+                    text="text-white"
+                    padding="py-1 px-3"
+                    type="submit"
+                    width="w-[50%]"
+                  >
+                    {isProcessingRequest ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
-            <div className="flex justify-end">
-              <Button
-                margin="mt-6"
-                bg="bg-primary"
-                borderRadius="rounded"
-                text="text-white"
-                padding="py-1 px-3"
-                type="submit"
-                width="w-[50%]"
-              >
-                {isProcessingRequest ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </div>
-          </form>
+          </div>
+          <div className="border border-primary px-6 py-4 space-y-3">
+            <h4 className="font-medium">
+              TOTAL CHARGEABLE {`(PER ${pricingType.label.toUpperCase()})`}
+            </h4>
+            <ul className="space-y-1">
+              <li className="flex justify-between">
+                <p>Amount:</p>{" "}
+                <span>
+                  {(watch("cost") &&
+                    addCommaSeparators(watch("cost") as number)) ||
+                    0.0}
+                </span>
+              </li>
+              <li className="flex justify-between">
+                <p> Discount:</p>
+                <span>
+                  {(watch("bulk_discount") &&
+                    addCommaSeparators(watch("bulk_discount") as number)) ||
+                    0.0}
+                </span>
+              </li>
+              <li className="flex justify-between">
+                <p>Service fee (5%):</p>
+                <span>
+                  {Math.round(
+                    0.05 *
+                      ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
+                  )}
+                </span>
+              </li>
+              <li className="font-bold text-green-600 flex justify-between">
+                <p>Total:</p>{" "}
+                <span>
+                  {Math.round(
+                    (watch("cost") ?? 0) -
+                      (watch("bulk_discount") ?? 0) +
+                      0.05 *
+                        ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
+                  )}
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div className="border border-primary px-6 py-4 space-y-3">
-        <h4 className="font-medium">
-          TOTAL CHARGEABLE {`(PER ${pricingType.label.toUpperCase()})`}
-        </h4>
-        <ul className="space-y-1">
-          <li className="flex justify-between">
-            <p>Amount:</p>{" "}
-            <span>
-              {(watch("cost") && addCommaSeparators(watch("cost") as number)) ||
-                0.0}
-            </span>
-          </li>
-          <li className="flex justify-between">
-            <p> Discount:</p>
-            <span>
-              {(watch("bulk_discount") &&
-                addCommaSeparators(watch("bulk_discount") as number)) ||
-                0.0}
-            </span>
-          </li>
-          <li className="flex justify-between">
-            <p>Service fee (5%):</p>
-            <span>
-              {Math.round(
-                0.05 * ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
-              )}
-            </span>
-          </li>
-          <li className="font-bold text-green-600 flex justify-between">
-            <p>Total:</p>{" "}
-            <span>
-              {Math.round(
-                (watch("cost") ?? 0) -
-                  (watch("bulk_discount") ?? 0) +
-                  0.05 * ((watch("cost") ?? 0) - (watch("bulk_discount") ?? 0))
-              )}
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 

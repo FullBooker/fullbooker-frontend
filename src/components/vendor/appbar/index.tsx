@@ -34,6 +34,7 @@ import ProfileItem from "@/components/vendor/profile/ProfileItem";
 import { CircularProgress } from "@mui/material";
 import ButtonAuth from "@/components/auth/ButtonAuth";
 import Image from "next/image";
+import Link from "next/link";
 
 type VendorAppBarProps = {
   open: boolean;
@@ -121,12 +122,14 @@ const VendorAppBar: FC<VendorAppBarProps> = ({
                 )}
               </div>
             </IconButton>
-            <Image
-              src="/assets/logo.svg"
-              alt="Fullbooker Logo"
-              width={120}
-              height={34}
-            />
+            <Link href="/">
+              <Image
+                src="/assets/logo.svg"
+                alt="Fullbooker Logo"
+                width={120}
+                height={34}
+              />
+            </Link>
           </div>
           <div>
             {authToken && (

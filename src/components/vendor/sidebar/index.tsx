@@ -48,12 +48,12 @@ const SIDENAV_ITEMS: SideNavItem[] = [
     icon: <Wallet width={22} height={22} />,
     submenu: false,
   },
-  // {
-  //   title: "Sales",
-  //   path: "/vendor/sales",
-  //   icon: <ArrowRightLeft width={22} height={22} />,
-  //   submenu: false,
-  // },
+  {
+    title: "Sales",
+    path: "/vendor/sales",
+    icon: <ArrowRightLeft width={22} height={22} />,
+    submenu: false,
+  },
   // {
   //   title: "Bills",
   //   path: "/vendor/bills",
