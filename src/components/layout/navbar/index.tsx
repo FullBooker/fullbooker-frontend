@@ -100,7 +100,7 @@ const Navbar: FC<NavbarProps> = ({
     <Box sx={{ flexGrow: 1, backgroundColor: "#FFF", marginBottom: 2 }}>
       <AppBar
         position="fixed"
-        sx={{ backgroundColor: "#FFF", boxShadow: "none", zIndex: 10 }}
+        sx={{ backgroundColor: "#FFF", boxShadow: "none", zIndex: 60 }}
       >
         <Toolbar
           sx={{
@@ -117,10 +117,10 @@ const Navbar: FC<NavbarProps> = ({
               color="inherit"
               aria-label="menu"
               sx={{ color: "#000" }}
+              onClick={() => onOpenSideNav()}
             >
               <div
                 className={`flex flex-col xl:hidden justify-center items-center rounded-full flex-shrink-0 cursor-pointer`}
-                onClick={() => onOpenSideNav()}
               >
                 <div className="rotate-90">
                   <Tally3 className="w-[30px] h-[30px]" />
@@ -240,17 +240,17 @@ const Navbar: FC<NavbarProps> = ({
                   openState={openProfile}
                   setOpenState={setOpenProfile}
                   classNames={
-                    "py-2 top-[44px] -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[180px] lg:top-[54px] lg:-left-[180px] xl:top-[56px] xl:-left-[180px] w-max"
+                    "py-2 top-[44px] z-50 -left-[140px] sm:top-[48px] sm:-left-[172px] md:top-[50px] md:-left-[180px] lg:top-[54px] lg:-left-[180px] xl:top-[56px] xl:-left-[180px] w-max"
                   }
                 >
                   <div
-                    className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat ${
+                    className={`flex h-full w-full flex-col justify-start rounded-[15px] sm:rounded-[20px] bg-cardColor bg-no-repeat relative z-50 ${
                       themeMode === "light"
                         ? "shadow-card-auth-shadow border-[1px] border-strokeColor2"
                         : "border-[1px] border-inputBorderColor"
                     }`}
                   >
-                    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center">
+                    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-5 items-center relative z-50">
                       {authToken && (
                         <>
                           <div className="flex flex-col gap-[1px] sm:gap-1 items-center">

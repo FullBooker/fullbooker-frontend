@@ -138,7 +138,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
               </span>
             </button>
             <Button
-              width="w-full md:w-[80%]"
+              width="w-full"
               bg="bg-primary"
               borderRadius="rounded"
               text="text-white font-base"
@@ -191,7 +191,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
           <span>Don't have an account?</span>
         </p>
         <Button
-          width="w-full md:w-[80%]"
+          width="w-full"
           bg="bg-primary"
           borderRadius="rounded"
           text="text-white font-base"

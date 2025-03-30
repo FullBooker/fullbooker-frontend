@@ -92,7 +92,6 @@ const EventPricing: FC<EventPricingProps> = ({
         },
     mode: "onBlur",
   });
-
   const onSubmitPricing = (data: any) => {
     const productHasCurrentPricingInContext =
       checkIdProductHasCurrentPricingInContext();

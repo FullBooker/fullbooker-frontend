@@ -151,7 +151,7 @@ const ForgotPasswordModalContent: FC<ForgotPasswordModalContentProps> = ({
 
         <div className="mt-20 text-center">
           <Button
-            width="w-full md:w-[80%]"
+            width="w-full"
             bg="bg-primary"
             borderRadius="rounded"
             text="text-white font-base"

@@ -272,12 +272,12 @@ const RegisterModalContent: FC<RegisterModalContentProps> = ({
 
           <div className="text-center mt-3">
             <Button
-              width="w-full md:w-[80%]"
+              width="w-full"
               bg="bg-primary"
               borderRadius="rounded"
               text="text-white font-base"
               padding="py-3"
-              margin="mb-2"
+              margin="mb-2 mt-3"
               type="submit"
             >
               {emailPassowrdRegisterRequestProcessing ? (

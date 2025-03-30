@@ -361,6 +361,7 @@ export const products = createModel<RootModel>()({
           dispatch.products.getProductMedia(id);
         }
       } catch (error: any) {
+        dispatch.products.setProductDetails(null);
         dispatch.alert.setFailureAlert(error?.message);
       }
     },

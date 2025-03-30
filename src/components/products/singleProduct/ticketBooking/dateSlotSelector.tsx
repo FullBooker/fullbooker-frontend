@@ -105,7 +105,7 @@ const DateSlotSelector: FC<DateSlotSelectorProps> = ({
               <div
                 key={index}
                 onClick={() => handleDateSelection(slot.fullDate)}
-                className={`flex flex-col items-center justify-center min-w-[100px] md:w-[100px] h-28 md:h-36 p-2 rounded-lg border md:space-y-2 ${
+                className={`flex flex-col items-center justify-center min-w-[100px] md:w-[100px] h-28 md:h-36 p-2 rounded-lg border space-y-1 md:space-y-2 ${
                   slot.isActive
                     ? "border-primary text-primary "
                     : "border-gray-500 text-gray-500"

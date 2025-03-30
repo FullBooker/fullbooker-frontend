@@ -21,6 +21,7 @@ type ProductGalleryProps = {
 const ProductGallery: FC<ProductGalleryProps> = ({
   productMedia,
   productsRequestProcessing,
+  product
 }) => {
   const isMobile = useIsMobile();
   const galleryContainerRef = useRef<HTMLDivElement>(null);
@@ -58,7 +59,8 @@ const ProductGallery: FC<ProductGalleryProps> = ({
             ))}
         </div>
       ) : (
-        <div className="flex justify-between w-full">
+        <div>
+          {product &&<div className="flex justify-between w-full">
           {!currentIndex && (
             <button
               className="hidden lg:block bg-white hover:text-primary flex-shrink-0 p-0"
@@ -123,6 +125,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
               <ChevronRight className="w-8 h-8 md:h-14 md:w-14" />
             </button>
           )}
+        </div>}
         </div>
       )}
       <Dialog

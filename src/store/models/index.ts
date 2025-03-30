@@ -4,9 +4,10 @@ import { authentication } from "./authentication";
 import { components } from "./components";
 import { profile } from "./profile";
 import { vendor } from "./vendor";
-import { settings } from './settings';
-import { products } from './products';
-import { tickets } from './ticket';
+import { settings } from "./settings";
+import { products } from "./products";
+import { tickets } from "./ticket";
+import { metadata } from "./metdata";
 
 export interface RootModel extends Models<RootModel> {
   alert: typeof alert;
@@ -17,6 +18,7 @@ export interface RootModel extends Models<RootModel> {
   settings: typeof settings;
   products: typeof products;
   tickets: typeof tickets;
+  metadata: typeof metadata;
 }
 
 export const models: RootModel = {
@@ -27,5 +29,6 @@ export const models: RootModel = {
   vendor,
   settings,
   products,
-  tickets
+  tickets,
+  metadata,
 };
