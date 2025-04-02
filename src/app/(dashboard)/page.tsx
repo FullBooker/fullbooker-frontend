@@ -62,7 +62,7 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
   return (
     <div className="h-fit bg-white">
       <div
-        className={`fixed z-50 bg-white w-full transition-shadow duration-300 ${
+        className={`fixed z-20 bg-white w-full transition-shadow duration-300 ${
           isScrolled ? "shadow-md" : ""
         }`}
       >

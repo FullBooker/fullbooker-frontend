@@ -9,7 +9,7 @@ import Button from "@/components/shared/button";
 interface SocialShareDialogProps {
   title: string;
   url: string;
-  setActiveProduct: (activeProduct: string | null) => void;
+  setActiveProduct?: (activeProduct: string | null) => void;
 }
 
 export function SocialShareDialog({
@@ -73,7 +73,7 @@ export function SocialShareDialog({
     <UniversalModal
       open={true}
       content={
-        <div className="p-4 w-full relative">
+        <div className="md:p-4 w-full relative">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <p className="text-gray-600 mt-1">
             Invite your friends or audience to join this experience!
@@ -92,7 +92,7 @@ export function SocialShareDialog({
           </div>
 
           <div className="flex items-center mt-4">
-            <div className="flex items-centerborder border-gray-300 rounded-md overflow-hidden w-[70%] me-2">
+            <div className="hidden md:flex items-centerborder border-gray-300 rounded-md overflow-hidden w-[70%] me-2">
               <input
                 type="text"
                 value={url}
@@ -103,7 +103,7 @@ export function SocialShareDialog({
 
             <Button
               onClick={handleCopyLink}
-              width="w-[30%]"
+              width="w-full md:w-[30%]"
               bg="bg-green-600"
               borderRadius="rounded"
               padding="px-2 py-2"
@@ -122,7 +122,11 @@ export function SocialShareDialog({
           </div>
         </div>
       }
-      onBeforeModalClose={() => setActiveProduct(null)}
+      onBeforeModalClose={() => {
+        if(setActiveProduct){
+          setActiveProduct(null)
+        }
+      }}
     />
   );
 }

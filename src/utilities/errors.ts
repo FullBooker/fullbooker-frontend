@@ -66,7 +66,7 @@ class UnauthorizedError extends APIError {
 class NotFoundError extends APIError {
   // eslint-disable-next-line require-jsdoc
   constructor(cause?: Error) {
-    super("Not found error", "notFound", cause);
+    super("The requested resource was not found.", "notFound", cause);
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }

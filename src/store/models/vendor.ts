@@ -241,7 +241,10 @@ export const vendor = createModel<RootModel>()({
       try {
         const response: any = await putRequest(
           `/products/${payload?.id}/`,
-          payload
+          {
+            ...payload,
+            active: undefined
+          }
         );
         if (response && response?.data) {
           const previousStep = rootState.vendor.activeStep;
@@ -272,17 +275,6 @@ export const vendor = createModel<RootModel>()({
         const response: any = await getRequest(`/products/${id}/`);
 
         if (response && response?.data) {
-          const product = response?.data as Product;
-          if (product.category) {
-            const isEvent = rootState.settings.productCategories
-              .find(
-                (category: ProductCategory) => category.id === product.category
-              )
-              ?.name?.includes("Event");
-            dispatch.vendor.setProductType(
-              isEvent ? ProductType.event : ProductType.others
-            );
-          }
           dispatch.vendor.setNewProductDetails(response?.data);
         }
       } catch (error: any) {

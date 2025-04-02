@@ -21,7 +21,7 @@ const ProductPricing: FC<ProductPricingProps> = ({
   }, []);
   return (
     <div>
-      {productType === ProductType.event ? (
+      {[ProductType.oneTime, ProductType.multiDay].includes(productType) ? (
         <EventsPricing />
       ) : (
         <OtherProductsPricing />

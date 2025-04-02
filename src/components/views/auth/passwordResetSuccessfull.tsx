@@ -39,7 +39,7 @@ const PasswordResetSuccessfullModal: FC<
 
       <div className="text-center mt-20">
         <Button
-          width="w-full md:w-[80%]"
+          width="w-full"
           bg="bg-primary"
           borderRadius="rounded"
           text="text-white font-base"
