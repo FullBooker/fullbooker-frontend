@@ -70,7 +70,7 @@ export interface DateSlot {
   date: number;
   time: string;
   isActive: boolean;
-  fullDate: Date | string
+  fullDate: Date | string;
 }
 
 export interface Product {
@@ -120,6 +120,7 @@ export interface CartSummary {
   currency?: string;
   base_currency?: string;
   selected_date?: Date | string;
+  selected_open_day: string;
   time?: string;
   prefill_all_items_with_primary_user_details: boolean;
   total_price: number;

@@ -69,23 +69,22 @@ const HomePage: FC<HomePageProps> & { layout: any } = ({
         <SearchFilters />
         <ProductTags />
       </div>
-      <div className="pt-[140px] md:pt-[200px] lg:pt-[200px]">
+      <div className="pt-[140px] md:pt-[200px] lg:pt-[200px] bg-white">
         {(!products || products?.results?.length === 0) &&
         (!nearByProducts || nearByProducts?.length === 0) &&
         (!recommendedProducts || recommendedProducts?.length === 0) &&
         (!upcomingProducts || upcomingProducts?.length === 0) &&
         (!popularProducts || popularProducts?.length) === 0 &&
-        !isProcessingRquest ? (
+        !isProcessingRquest && 
           <EmptyStoreDisclaimer />
-        ) : (
-          <div>
+        }
+          <div className="bg-white">
             <PopularProductsSection />
             <ProductsNearYouSection />
             <UpcomingProductsSection />
             <ProductsRecommendeForYouSection />
             <MoreProductsSection />
           </div>
-        )}
       </div>
     </div>
   );

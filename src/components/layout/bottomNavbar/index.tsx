@@ -20,14 +20,16 @@ type BottomNavTab = {
 
 type BottomNavBarProps = {
   setActiveModal: (modalId: ModalID) => void;
-  switchToHost: (payload: SwitchToHostPayload) => void;
+  switchToHost: (payload: SwitchToHostPayload) => Promise<boolean>;
   authData: AuthData;
+  isLoggedIn: boolean;
 };
 
 const BottomNavBar: FC<BottomNavBarProps> = ({
   setActiveModal,
   switchToHost,
   authData,
+  isLoggedIn,
 }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -58,8 +60,16 @@ const BottomNavBar: FC<BottomNavBarProps> = ({
       requiresAuth: true,
     },
   ];
-
   const [authToken, setAuthToken] = useState<string | null>(getToken());
+
+  const handleSwitchToHost = async () => {
+    const shouldRedirectToHostSide = await switchToHost({
+      user: authData?.user?.id,
+    } as SwitchToHostPayload);
+    if (shouldRedirectToHostSide) {
+      router.push("/vendor");
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -106,17 +116,11 @@ const BottomNavBar: FC<BottomNavBarProps> = ({
                 <button
                   type="button"
                   className="inline-flex flex-col items-center justify-center"
-                  onClick={() => {
-                    if (authToken) {
-                      switchToHost({
-                        user: authData?.user?.id,
-                      } as SwitchToHostPayload);
+                  onClick={async () => {
+                    if (isLoggedIn && authToken) {
+                      handleSwitchToHost();
                     } else {
-                      const newSearchParams = new URLSearchParams(
-                        searchParams.toString()
-                      );
-                      newSearchParams.set("user_flow", "vendor");
-                      router.push(`${pathname}?${newSearchParams.toString()}`);
+                      router.push(`${pathname}?redirect=vendor`);
                       setActiveModal(ModalID.login);
                     }
                   }}
@@ -137,58 +141,16 @@ const BottomNavBar: FC<BottomNavBarProps> = ({
           ))}
         </div>
       </div>
-
-      {/* <BottomNavigation
-        value={value}
-        onChange={handleChange}
-        showLabels
-        sx={{
-          width: "100%",
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          background: "#FFF",
-          color: "#E3E3E3",
-        }}
-      >
-        <BottomNavigationAction
-          label="Home"
-          icon={<HomeIcon />}
-          onClick={() => router.push("/")}
-          sx={{ color: "#E3E3E3" }}
-          className="bottom-nav-link"
-        />
-        <BottomNavigationAction
-          label="Promotions"
-          icon={<GiftIcon />}
-          onClick={() => router.push("/main-menu/promotions")}
-          sx={{ color: "#E3E3E3" }}
-          className="bottom-nav-link"
-        />
-        <BottomNavigationAction
-          label="Support"
-          icon={<Headphones />}
-          onClick={() => router.push("/cms/detail/contact-us")}
-          sx={{ color: "#E3E3E3" }}
-          className="bottom-nav-link"
-        />
-        <BottomNavigationAction
-          label="Profile"
-          icon={<UserCircle />}
-          onClick={() => router.push("/profile")}
-          sx={{ color: "#E3E3E3" }}
-          className="bottom-nav-link"
-        />
-      </BottomNavigation> */}
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  const { authData } = state.authentication;
+  const { authData, isLoggedIn } = state.authentication;
   return {
     state,
     authData,
+    isLoggedIn,
   };
 };
 

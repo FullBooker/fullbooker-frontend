@@ -6,7 +6,6 @@ import Sidebar from "@/components/layout/sidebar";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 import { RootState } from "@/store";
 import { connect } from "react-redux";
 import { ModalID } from "@/domain/components";
@@ -23,9 +22,9 @@ import SessionExpiredModal from "@/components/views/auth/sessionExpired";
 import PaymentSuccessfullModal from "@/components/products/singleProduct/modals/successfullPayment/index";
 import BottomNavBar from "@/components/layout/bottomNavbar";
 import ComprehensiveProductFilters from "@/components/products/homePage/comprehensiveProductFilters";
-import { CustomeEvents } from "@/constants";
 import useDeviceType from "@/lib/hooks/useDeviceType";
 import { DeviceType } from "@/domain/constants";
+import { useThemeMode } from "@/lib/hooks/useTheme";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -46,11 +45,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const searchParams = useSearchParams();
   const router = usePathname();
   const navigation = useRouter();
-  const { theme = "light" } = useTheme();
-  const [themeMode, setThemeMode] = useState("light");
+  const { themeMode } = useThemeMode();
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [shouldRedirectToHostView, setShouldRedirectToHostView] =
-    useState<boolean>(false);
+  const deviceType = useDeviceType();
 
   useEffect(() => {
     const handleResize = () => {
@@ -95,54 +92,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   }, [open]);
 
   useEffect(() => {
-    setThemeMode(theme);
-  }, [theme]);
-
-  useEffect(() => {
-    const handleSwitchedToHosting = async (event: any) => {
-      navigation.push("/vendor");
-    };
-
-    const handleSuccessfulAuth = async (event: any) => {
-      const redirect = searchParams?.get("redirect");
-      if (redirect) {
-        navigation.push(`/${redirect}`);
-      }
-    };
-
-    document.addEventListener(
-      CustomeEvents.switchedToHostingSuccessfullEvent,
-      handleSwitchedToHosting
-    );
-
-    document.addEventListener(
-      CustomeEvents.successfullUserAuthentication,
-      handleSuccessfulAuth
-    );
-
-    return () => {
-      document.removeEventListener(
-        CustomeEvents.switchedToHostingSuccessfullEvent,
-        handleSwitchedToHosting
-      );
-
-      document.removeEventListener(
-        CustomeEvents.successfullUserAuthentication,
-        handleSuccessfulAuth
-      );
-    };
-  }, []);
-
-  useEffect(() => {
-    if (shouldRedirectToHostView && isLoggedIn) {
-      navigation.push("/vendor");
+    const redirect = searchParams?.get("redirect");
+    if (isLoggedIn && redirect) {
+      navigation.push(`/${redirect}`);
     }
-  }, [isLoggedIn]);
-
-  const deviceType = useDeviceType();
+  }, [searchParams, isLoggedIn]);
 
   return (
-    <div className="flex h-fit w-full overflow-x-hidden">
+    <div className="flex h-fit w-full overflow-x-hidden bg-white">
       <div
         className="h-fit lg:hidden xl:hidden md:flex xs:hidden"
         ref={sidebarRef}
@@ -158,7 +115,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
       <div
         className={`h-full w-full overflow-x-hidden ${
           open && deviceType === DeviceType.mobile && themeMode === "dark"
-            ? "bg-black opacity-30 z-40"
+            ? "bg-white opacity-30 z-40"
             : open && deviceType === DeviceType.mobile && themeMode === "light"
             ? "blur-sm bg-white opacity-30 z-40"
             : ""
@@ -172,7 +129,6 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
               openNav={open}
               onOpenSideNav={() => setOpen(true)}
               isMobile={false}
-              setShouldRedirectToHostView={setShouldRedirectToHostView}
             />
           ) : (
             <></>

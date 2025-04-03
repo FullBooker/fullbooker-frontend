@@ -45,7 +45,7 @@ type NavbarProps = {
   showBalance: boolean;
   toggleBalanceVisibility: (showBalance: boolean) => void;
   setActiveModal: (modalId: ModalID) => void;
-  switchToHost: (payload: SwitchToHostPayload) => void;
+  switchToHost: (payload: SwitchToHostPayload) => Promise<boolean>;
   productCategories: Array<ProductCategory>;
   modalId: ModalID;
   setShouldRedirectToHostView: (shouldRedirectToHostView: boolean) => void;
@@ -78,6 +78,15 @@ const Navbar: FC<NavbarProps> = ({
 
   const handleCloseLink = () => {
     setOpenProfile(false);
+  };
+
+  const handleSwitchToHost = async () => {
+    const shouldRedirectToHostSide = await switchToHost({
+      user: authData?.user?.id,
+    } as SwitchToHostPayload);
+    if (shouldRedirectToHostSide) {
+      router.push("/vendor");
+    }
   };
 
   useEffect(() => {
@@ -179,12 +188,10 @@ const Navbar: FC<NavbarProps> = ({
                   text="text-sm"
                   isSecondary={true}
                   onClick={() => {
-                    if (authToken) {
-                      switchToHost({
-                        user: authData?.user?.id,
-                      } as SwitchToHostPayload);
+                    if (isLoggedIn && authToken) {
+                      handleSwitchToHost();
                     } else {
-                      setShouldRedirectToHostView(true);
+                      router.push(`${pathname}?redirect=vendor`);
                       setActiveModal(ModalID.login);
                     }
                   }}
@@ -204,7 +211,6 @@ const Navbar: FC<NavbarProps> = ({
                     borderRadius="rounded"
                     text="text-xs md:text-sm text-white"
                     onClick={() => {
-                      setShouldRedirectToHostView(false);
                       setActiveModal(ModalID.login);
                     }}
                     extraClasses="hidden md:flex"

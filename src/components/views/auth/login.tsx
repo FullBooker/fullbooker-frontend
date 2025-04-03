@@ -16,6 +16,7 @@ import { KeyRound, Mail, Phone } from "lucide-react";
 import { NotificationType } from "@/domain/notification";
 import { useGoogleLogin } from "@/lib/hooks/useGoogleAuth";
 import Button from "@/components/shared/button";
+import { CustomAlert } from "@/components/shared/customAlert";
 
 type LoginModalContentProps = {
   emailPassowrdLoginRequestProcessing: boolean;
@@ -27,6 +28,7 @@ type LoginModalContentProps = {
   setActiveModal: (modalId: ModalID) => void;
   type: NotificationType;
   googleLoginRequestProcessing: boolean;
+  sessionExpired?: boolean;
 };
 
 const defaultValues = {
@@ -52,6 +54,7 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
   signIn,
   setActiveModal,
   googleLoginRequestProcessing,
+  sessionExpired = false,
 }) => {
   const {
     control,
@@ -88,6 +91,17 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
       </div>
 
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        {sessionExpired && (
+          <div className="mb-6">
+            <CustomAlert
+              variant="destructive"
+              description="Your session has expired. Please sign in again to continue."
+              dismissible
+              className="bg-red-50 rounded-md border-none text-red-600"
+            />
+          </div>
+        )}
+
         <div className="space-y-4">
           <Controller
             name="email"
@@ -186,22 +200,24 @@ const LoginModalContent: FC<LoginModalContentProps> = ({
         </div>
       </form>
 
-      <div className="mt-10 text-center relative bottom-0 mb-8">
-        <p className="text-sm text-black font-thin mb-4">
-          <span>Don't have an account?</span>
-        </p>
-        <Button
-          width="w-full"
-          bg="bg-primary"
-          borderRadius="rounded"
-          text="text-white font-base"
-          padding="py-3"
-          margin="mb-2"
-          onClick={() => setActiveModal(ModalID.register)}
-        >
-          Create an account
-        </Button>
-      </div>
+      {!sessionExpired && (
+        <div className="mt-10 text-center relative bottom-0 mb-8">
+          <p className="text-sm text-black font-thin mb-4">
+            <span>Don't have an account?</span>
+          </p>
+          <Button
+            width="w-full"
+            bg="bg-primary"
+            borderRadius="rounded"
+            text="text-white font-base"
+            padding="py-3"
+            margin="mb-2"
+            onClick={() => setActiveModal(ModalID.register)}
+          >
+            Create an account
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

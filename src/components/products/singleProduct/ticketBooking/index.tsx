@@ -33,6 +33,7 @@ import moment from "moment";
 import DateSlotSelector from "./dateSlotSelector";
 import CustomTimePicker from "@/components/shared/customerTimePicker";
 import CustomDatePicker from "@/components/shared/customDatePicker";
+import { CustomAlert } from "@/components/shared/customAlert";
 
 type TicketBookingProps = {
   product: Product;
@@ -65,6 +66,19 @@ const TicketBooking: FC<TicketBookingProps> = ({
   const { themeMode } = useThemeMode();
   const [isEvent, setIsEvent] = useState<boolean>();
   const [isActivity, setIsActivity] = useState<any>();
+  const [generalBookingError, setGeneralBookingError] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (generalBookingError) {
+      const timer = setTimeout(() => {
+        setGeneralBookingError(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [generalBookingError]);
 
   useEffect(() => {
     setProductDetailsToCart({
@@ -134,15 +148,15 @@ const TicketBooking: FC<TicketBookingProps> = ({
 
   const showTicketSummaryIfValid = () => {
     if (cart?.length === 0) {
-      return setFailureAlert("You need to select atleast one ticket");
+      return setGeneralBookingError("You need to select atleast one ticket");
     }
 
     if (!cartSummary?.selected_date) {
-      return setFailureAlert("You need to select a date to proceed");
+      return setGeneralBookingError("You need to select a date to proceed");
     }
 
     if (isActivity && !cartSummary?.time) {
-      return setFailureAlert("You need to select a session to proceed");
+      return setGeneralBookingError("You need to select a session to proceed");
     }
     setActiveModal(ModalID.ticketBookingSummary);
   };
@@ -220,26 +234,58 @@ const TicketBooking: FC<TicketBookingProps> = ({
           <DateSlotSelector availability={product?.availability} />
         </div>
 
-        {isActivity && (
-          <div
-            className="flex justify-between items-center p-4 rounded-lg cursor-pointer
-            border border-primary mb-6"
-          >
-            <div className="">
-              <p className="text-black mb-2">Pick a session</p>
-              <CustomTimePicker
-                onChange={(time: any) =>
-                  setProductDetailsToCart({
-                    ...cartSummary,
-                    time: time,
-                  })
-                }
-              />
+        {isActivity &&
+          cartSummary?.selected_date &&
+          cartSummary?.selected_open_day && (
+            <div
+              className="flex justify-between items-center p-4 rounded-lg cursor-pointer shadow md:shadow-none
+            md:border md:border-gray-300 mb-6"
+            >
+              <div className="">
+                <p className="text-black mb-2">Pick a session</p>
+                <div className="md:flex justify-between w-full">
+                  <div>
+                    <CustomTimePicker
+                      label="Start Time"
+                      onChange={(time: any) =>
+                        setProductDetailsToCart({
+                          ...cartSummary,
+                          time: time,
+                        })
+                      }
+                      minTime={cartSummary?.selected_open_day?.split("-")[0]}
+                      maxTime={cartSummary?.selected_open_day?.split("-")[1]}
+                    />
+                  </div>
+                  <div>
+                    <CustomTimePicker
+                      label="End Time"
+                      onChange={(time: any) =>
+                        setProductDetailsToCart({
+                          ...cartSummary,
+                          time: time,
+                        })
+                      }
+                      minTime={cartSummary?.selected_open_day?.split("-")[0]}
+                      maxTime={cartSummary?.selected_open_day?.split("-")[1]}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
+
+        {generalBookingError && (
+          <div className="mb-6">
+            <CustomAlert
+              variant="destructive"
+              description={generalBookingError}
+              dismissible
+              className="bg-red-50 border-rounded border-none text-red-500"
+            />
           </div>
         )}
 
-        {/* Available Tickets */}
         <div className="rounded-sm md:border md:border-gray-300 md:p-3">
           <div className="mb-3">
             <p className="text-black">Available tickets</p>

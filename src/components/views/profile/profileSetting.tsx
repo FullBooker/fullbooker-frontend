@@ -1,20 +1,14 @@
 "use client";
 
+import { FC } from "react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
-
-import { FC, useEffect, useState } from "react";
-
 import { RootState } from "@/store";
-
 import { connect } from "react-redux";
 import { AuthData } from "@/domain/dto/output";
 import { UserProfile } from "@/domain/profile";
 import {
-  UpdatePasswordPayload,
   UpdateUserProfilePayload,
 } from "@/domain/dto/input";
-
 import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -166,7 +160,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
                 />
               )}
             />
-            {errors?.last_name?.message && (
+            {errors?.phone_number?.message && (
               <p className="text-red-500">{errors?.phone_number?.message}</p>
             )}
           </div>
@@ -196,88 +190,7 @@ const ProfileSetting: FC<ProfileSettingProps> = ({
               <p className="text-red-500">{errors?.email?.message}</p>
             )}
           </div>
-          {/* <div className="flex flex-col space-y-2 mb-4 md:mb-0">
-            <label
-              htmlFor="national_identification"
-              className="text-xs lg:text-sm xl:text-base"
-            >
-              National Identification ID
-            </label>
-            <Controller
-              name="national_id"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange, onBlur } }) => (
-                <input
-                  type="text"
-                  name="national_id"
-                  id="national_id"
-                  onChange={onChange}
-                  value={value || (profile?.national_id as any)}
-                  className={cn(
-                    "flex w-full text-xs py-4 px-4 rounded-sm bg-transparent border border-inputBorderColor file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-placeholderColor focus-visible:outline-none focus-visible:border focus-visible:ring-[1px] focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                  )}
-                  placeholder="Enter ID"
-                />
-              )}
-            />
-            {errors?.national_id?.message && (
-              <p className="text-red-500">{errors?.national_id?.message}</p>
-            )}
-          </div>
-          <div className="flex flex-col space-y-2 mb-4 md:mb-0">
-            <label htmlFor="city" className="text-xs lg:text-sm xl:text-base">
-              City
-            </label>
-            <Controller
-              name="city"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange, onBlur } }) => (
-                <input
-                  type="text"
-                  name="city"
-                  id="city"
-                  className={cn(
-                    "flex w-full text-xs py-4 px-4 rounded-sm bg-transparent border border-inputBorderColor file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-placeholderColor focus-visible:outline-none focus-visible:border focus-visible:ring-[1px] focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                  )}
-                  placeholder="Enter city"
-                  onChange={onChange}
-                  value={value || (profile?.city as any)}
-                />
-              )}
-            />
-            {errors?.city?.message && (
-              <p className="text-red-500">{errors?.city?.message}</p>
-            )}
-          </div> */}
         </div>
-        {/* <div className="w-full flex flex-col space-y-2 mb-5">
-          <label htmlFor="address" className="text-xs lg:text-sm xl:text-base">
-            Your Address
-          </label>
-          <Controller
-            name="address"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange, onBlur } }) => (
-              <textarea
-                name="address"
-                id="address"
-                className={cn(
-                  "flex w-full text-xs py-4 px-4 rounded-sm bg-transparent border border-inputBorderColor file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-placeholderColor focus-visible:outline-none focus-visible:border focus-visible:ring-[1px] focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                )}
-                placeholder="Enter your address"
-                rows={8}
-                onChange={onChange}
-                value={value || (profile?.address as any)}
-              />
-            )}
-          />
-          {errors?.address?.message && (
-            <p className="text-red-500">{errors?.address?.message}</p>
-          )}
-        </div> */}
 
         <div className="flex justify-end items-center">
           <Button

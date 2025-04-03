@@ -11,6 +11,9 @@ import { connect } from "react-redux";
 import { Dispatch, RootState } from "@/store";
 import { ModalID } from "@/domain/components";
 import NewPaymentMethodForm from "@/components/vendor/wallet/newPaymentMethod";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import { DeviceType } from "@/domain/constants";
+import LoginModalContent from "@/components/views/auth/login";
 
 type VendorLayoutProps = {
   children: React.ReactNode;
@@ -24,6 +27,7 @@ const VendorLayout: FC<VendorLayoutProps> = ({ children, modalId }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const deviceType = useDeviceType();
 
   useEffect(() => {
     const handleResize = () => {
@@ -101,6 +105,14 @@ const VendorLayout: FC<VendorLayoutProps> = ({ children, modalId }) => {
           theme={themeMode}
           open={true}
           content={<NewPaymentMethodForm />}
+        />
+      )}
+      {modalId === ModalID.login && (
+        <UniversalModal
+          theme={themeMode}
+          open={true}
+          content={<LoginModalContent sessionExpired />}
+          fullScreen={deviceType === DeviceType.mobile ? true : false}
         />
       )}
     </div>
