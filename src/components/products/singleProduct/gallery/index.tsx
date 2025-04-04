@@ -4,13 +4,10 @@ import React, { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { Product, ProductMedia } from "@/domain/product";
 import { MediaType } from "@/domain/constants";
-import {
-  ChevronLeft,
-  ChevronRight,
-  PlayIcon,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, PlayIcon } from "lucide-react";
 import useIsMobile from "@/lib/hooks/useIsMobile";
 import { Dialog } from "@headlessui/react";
+import ImageOutlet from "@/components/shared/image";
 
 type ProductGalleryProps = {
   product: Product;
@@ -21,7 +18,7 @@ type ProductGalleryProps = {
 const ProductGallery: FC<ProductGalleryProps> = ({
   productMedia,
   productsRequestProcessing,
-  product
+  product,
 }) => {
   const isMobile = useIsMobile();
   const galleryContainerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +46,7 @@ const ProductGallery: FC<ProductGalleryProps> = ({
     <div>
       {productsRequestProcessing ? (
         <div className="grid grid-cols-3 md:grid-cols-4 gap-4 px-4 md:px-7">
-          {Array(4)
+          {Array(isMobile ? 6 : 8)
             .fill(null)
             .map((_, index) => (
               <div
@@ -60,72 +57,99 @@ const ProductGallery: FC<ProductGalleryProps> = ({
         </div>
       ) : (
         <div>
-          {product &&<div className="flex justify-between w-full">
-          {!currentIndex && (
-            <button
-              className="hidden lg:block bg-white hover:text-primary flex-shrink-0 p-0"
-              onClick={() => {
-                if (galleryContainerRef.current) {
-                  galleryContainerRef.current.scrollBy({
-                    left: -200,
-                    behavior: "smooth",
-                  });
-                }
-              }}
-            >
-              <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
-            </button>
-          )}
-          <div
-            ref={galleryContainerRef}
-            className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
-          >
-            {productMedia?.map((media: ProductMedia, index: number) => (
-              <div key={index} onClick={() => setCurrentIndex(index)}>
-                {media?.media_type === MediaType.image ? (
-                  <Image
-                    src={`${media?.file || "/assets/quad.png"}`}
-                    alt={"Event"}
-                    width={isMobile ? 150 : 250}
-                    height={isMobile ? 150 : 250}
-                    className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
-                    unoptimized={true}
-                  />
-                ) : media?.media_type === MediaType.video ? (
-                  <div className="relative">
-                    <video
-                      src={media?.file}
-                      className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
-                      controls={false}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <button className="bg-white rounded-full p-2">
-                        <PlayIcon className="w-8 h-8" />
-                      </button>
+          {product && (
+            <div className="flex justify-between w-full">
+              {!currentIndex && (
+                <button
+                  className="hidden lg:block bg-white hover:text-primary flex-shrink-0 p-0"
+                  onClick={() => {
+                    if (galleryContainerRef.current) {
+                      galleryContainerRef.current.scrollBy({
+                        left: -200,
+                        behavior: "smooth",
+                      });
+                    }
+                  }}
+                >
+                  <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
+                </button>
+              )}
+              {productMedia?.length > 0 ? (
+                <div
+                  ref={galleryContainerRef}
+                  className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
+                >
+                  {productMedia?.map((media: ProductMedia, index: number) => (
+                    <div key={index} onClick={() => setCurrentIndex(index)}>
+                      {media?.media_type === MediaType.image ? (
+                        <ImageOutlet
+                          src={media?.file}
+                          alt={`${
+                            product?.name
+                              ? `${product?.name} Image`
+                              : "Event/Activity Image"
+                          }`}
+                          width={isMobile ? 150 : 250}
+                          height={isMobile ? 150 : 250}
+                          className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                        />
+                      ) : media?.media_type === MediaType.video ? (
+                        <div className="relative">
+                          <video
+                            src={media?.file}
+                            className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                            controls={false}
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <button className="bg-white rounded-full p-2">
+                              <PlayIcon className="w-8 h-8" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-            ))}
-          </div>
-          {!currentIndex && (
-            <button
-              className="hidden lg:block bg-white hover:text-primary flex-shrink-0"
-              onClick={() => {
-                if (galleryContainerRef.current) {
-                  galleryContainerRef.current.scrollBy({
-                    left: 200,
-                    behavior: "smooth",
-                  });
-                }
-              }}
-            >
-              <ChevronRight className="w-8 h-8 md:h-14 md:w-14" />
-            </button>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  ref={galleryContainerRef}
+                  className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
+                >
+                  {[...Array(6)].map((_, index: number) => (
+                    <div key={index}>
+                      <ImageOutlet
+                        alt={`${
+                          product?.name
+                            ? `${product?.name} Image`
+                            : "Event/Activity Image"
+                        }`}
+                        width={isMobile ? 150 : 250}
+                        height={isMobile ? 150 : 250}
+                        className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!currentIndex && (
+                <button
+                  className="hidden lg:block bg-white hover:text-primary flex-shrink-0"
+                  onClick={() => {
+                    if (galleryContainerRef.current) {
+                      galleryContainerRef.current.scrollBy({
+                        left: 200,
+                        behavior: "smooth",
+                      });
+                    }
+                  }}
+                >
+                  <ChevronRight className="w-8 h-8 md:h-14 md:w-14" />
+                </button>
+              )}
+            </div>
           )}
-        </div>}
         </div>
       )}
       <Dialog

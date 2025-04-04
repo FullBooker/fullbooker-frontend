@@ -12,6 +12,7 @@ import { SocialShareDialog } from "./social.share";
 import { ModalID } from "@/domain/components";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
+import ImageOutlet from "@/components/shared/image";
 
 type SingleProductProps = {
   product: Product;
@@ -114,15 +115,13 @@ const SingleProduct: FC<SingleProductProps> = ({
         className="max-w-sm rounded bg-white overflow-hidden cursor-pointer shadow transition-transform transform md:hover:shadow-lg ease-out duration-500 flex flex-col h-full"
       >
         <div className="relative shadow-xl">
-          <Image
-            src={`${product?.image?.file || "/assets/quad.png"}`}
-            alt={"Event"}
+          <ImageOutlet
+            src={product?.image?.file}
+            alt={`${product?.name ? `${product?.name} Image` : "Event/Activity Image"}`}
             width={250}
             height={250}
             className="w-full h-[250px] object-cover rounded-tl-sm rounded-tr-sm"
-            unoptimized={true}
           />
-
           <div className="absolute top-2 left-2 bg-[#715757] text-white text-xs font-medium px-4 py-1 rounded-lg">
             {categories?.length > 0
               ? extractSubcategories(categories)?.find(

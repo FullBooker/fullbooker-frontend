@@ -9,7 +9,7 @@ interface ImageOutletProps {
 }
 
 const ImageOutlet: React.FC<ImageOutletProps> = ({
-  src = "/assets/default-profile-picture-placeholder.jpg",
+  src = "/assets/zero-state-image-default.png",
   alt = "Profile Image",
   width = 35,
   height = 35,

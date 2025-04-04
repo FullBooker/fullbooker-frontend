@@ -131,7 +131,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
 
       <div className="md:py-8">
         {productsRequestProcessing ? (
-          <div className="flex justify-between mb-2 animate-pulse px-4 md:px-7">
+          <div className="flex justify-between mb-2 animate-pulse px-4 md:px-7 py-4">
             <div>
               <div className="-mb-1">
                 <div className="h-4 w-24 bg-gray-300 rounded"></div>
@@ -140,8 +140,9 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
                 <div className="h-6 w-32 bg-gray-300 rounded mt-2"></div>
               </div>
             </div>
-            <div>
-              <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+              <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         ) : (

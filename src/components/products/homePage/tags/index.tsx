@@ -92,7 +92,7 @@ const ProductsTags: FC<ProductTagsProps> = ({
     <div>
       {isProcessingRequest ? (
         <div className="py-1 md:py-2 bg-white px-2 md:px-3 lg:px-4">
-          <div className="flex items-center gap-8 py-4 px-4 md:px-7">
+          <div className="flex items-center gap-8 px-4 md:px-7">
             <div className="flex justify-evenly items-center gap-6 overflow-x-auto no-scrollbar">
               {[...Array(deviceType === DeviceType.mobile ? 10 : 51)].map(
                 (_, index) => (

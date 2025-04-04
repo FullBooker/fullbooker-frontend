@@ -20,6 +20,7 @@ import MobileMiniAppBar from "@/components/layout/mobileMiniAppBar";
 import { useTheme } from "next-themes";
 import { UpdateProfileImagePayload } from "@/domain/dto/profile.input";
 import { MediaType } from "@/domain/constants";
+import ImageOutlet from "@/components/shared/image";
 
 type ProfilePageProps = {
   profileLoading: boolean;
@@ -61,21 +62,17 @@ const ProfilePage: FC<ProfilePageProps> = ({
     <div>
       <MobileMiniAppBar title="My Profile" />
       <div className="flex flex-col gap-12 h-fit py-3 md:py-10 px-4 max-w-7xl mx-auto">
-        {/* BG Profile */}
         <div className="w-full flex flex-col">
           <div className="flex flex-col justify-center">
             <div className="sm:flex ms-6 sm:-mb-[58px] sm:ms-6 md:-mb-16 md:ms-12 lg:-mb-24 lg:ms-16 items-center sm:items-end gap-4 md:gap-6 lg:gap-8">
-              <Image
-                 src={`${
-                  profile?.image ||
-                  "/assets/default-profile-picture-placeholder.jpg"
-                } `}
+              <ImageOutlet
+                src={profile?.image}
                 alt="Profile Picture"
                 width={300}
                 height={300}
                 className="w-[75px] h-[75px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] lg:w-[200px] lg:h-[200px] rounded-full object-cover"
-                unoptimized={true}
               />
+
               <div className="w-full flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
                 <div className="flex flex-col gap-0 lg:gap-1">
                   <span className="text-black sm:text-primary text-sm sm:text-base md:text-lg lg:text-2xl">
@@ -125,29 +122,12 @@ const ProfilePage: FC<ProfilePageProps> = ({
           </div>
         </div>
 
-        {/* Profile Account */}
         <div
           className={`flex flex-col p-7 gap-4 bg-cardColor rounded md:rounded-[20px] mt-0 md:mt-10 lg:mt-28  mb-10 ${
             themeMode === "light" ? "shadow-card-auth-shadow" : ""
           }`}
         >
           <ProfileSetting />
-          <PasswordSetting />
-          {/* <div>
-            <h1 className="text-lg md:text-xl lg:text-2xl font-medium">
-              Deactivate Account
-            </h1>
-            <div className="md:w-3/4 lg:w-3/5 mt-1">
-              <span className="text-[11px] md:text-[13px] text-textColor">
-                Deactivate your account to take a break or say goodbye.
-                Temporarily hide your profile or permanently delete it. Choose
-                wisely, as permanent deactivation is irreversible.
-              </span>
-            </div>
-            <div className="flex justify-start items-center mt-4 md:mt-3 lg:mt-4">
-              <DeactiveModalAccount theme={themeMode} />
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

@@ -74,7 +74,14 @@ const SearchFilters: FC<SearchFiltersProps> = ({
           <Search
             width={isMobile ? 20 : 30}
             height={isMobile ? 20 : 30}
-            className="text-gray-400"
+            className="text-gray-400 cursor-pointer"
+            onClick={() => {
+              if (comprehensiveProductFilters?.search) {
+                fetchFilteredProducts({
+                  search: comprehensiveProductFilters?.search,
+                });
+              }
+            }}
           />
         </div>
         <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>

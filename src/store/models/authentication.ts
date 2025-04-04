@@ -94,6 +94,29 @@ export const authentication = createModel<RootModel>()({
         }
       }
     },
+    async getNewAnonymousAuthToken() {
+      try {
+        const response: any = await postRequest(
+          "/oauth2/token/",
+          {
+            grant_type: "client_credentials",
+            client_id: process.env.NEXT_PUBLIC_OAUTH2_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_OAUTH2_CLIENT_SECRET,
+          },
+          false,
+          true
+        );
+        if (response && response?.data) {
+          const token = response?.data?.access_token;
+          saveAnonymousAuthToken(token, response?.data?.expires_in);
+          dispatch.components.setActiveModal(ModalID.none);
+        }
+      } catch (error: any) {
+        dispatch.alert.setFailureAlert(
+          error?.message || "Failed to generate anonymous auth token."
+        );
+      }
+    },
     async register(payload, rootState) {
       try {
         const response: any = await postRequest("/accounts/signup/", payload);
@@ -209,17 +232,6 @@ export const authentication = createModel<RootModel>()({
         localStorage.removeItem("authData");
       }
     },
-    async logOut() {
-      const autToken = getToken();
-      try {
-        dispatch.authentication.setAuthStatusLoggedOut();
-      } catch (error: any) {
-        dispatch.alert.setFailureAlert(error?.message);
-      } finally {
-        autToken && removeToken();
-        localStorage.removeItem("authData");
-      }
-    },
     async requestOTP(payload: RequestOTPPayload, rootState) {
       try {
         const response: any = await postRequest(
@@ -279,26 +291,23 @@ export const authentication = createModel<RootModel>()({
         dispatch.alert.setFailureAlert(error?.message);
       }
     },
-    async switchToHost(payload: SwitchToHostPayload, rootState) {
+    async switchToHost(
+      payload: SwitchToHostPayload,
+      rootState
+    ): Promise<boolean> {
       try {
         const response: any = await postRequest("/hosts/", payload);
         if (response && response?.data) {
           dispatch.vendor.setVendorDetails(response?.data);
-          const switchedToHostingSuccessfullEvent = new CustomEvent(
-            CustomeEvents.switchedToHostingSuccessfullEvent,
-            {
-              detail: {},
-              bubbles: true,
-              cancelable: true,
-            }
-          );
-          document.dispatchEvent(switchedToHostingSuccessfullEvent);
           dispatch.alert.setSuccessAlert("Switched to hosting successfully!");
+          return true;
         }
+        return false;
       } catch (error: any) {
         dispatch.alert.setFailureAlert(
           error?.data?.non_field_errors || error?.message
         );
+        return false;
       }
     },
     async googleSocialSignin(

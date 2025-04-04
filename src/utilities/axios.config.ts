@@ -1,9 +1,11 @@
 import axios from "axios";
 import { authHeader } from "./auth.header";
 import { store } from "../store";
-
 import { NotFoundError, TechnicalError } from "./errors";
-import { removeAnonymousAuthToken, removeToken } from "./auth.cookie";
+import { ModalID } from "@/domain/components";
+import { getAnonymousAuthToken } from "./auth.cookie";
+let isRefreshing = false;
+let refreshPromise: Promise<any> | null = null;
 
 const publicApiEndpoints = [
   "/accounts/otp/request",
@@ -20,7 +22,6 @@ const isPublic = (url: string) => {
   return publicApiEndpoints.includes(url);
 };
 
-//Create axios instance
 const axiosClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 10000,
@@ -29,23 +30,46 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response.status === 401) {
-      if (store.getState()?.authentication?.isLoggedIn) {
-        store.dispatch.authentication.logOut();
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401) {
+      const state = store.getState();
+
+      if (state?.authentication?.isLoggedIn) {
+        store.dispatch.components.setActiveModal(ModalID.login);
+        return Promise.reject(error);
       }
-      return;
-    } else if (error.response.status === 500) {
-      return Promise.reject(new TechnicalError(error.response?.data));
-    } else if (error.response.status === 404) {
-      return Promise.reject(new NotFoundError(error.response?.data));
-    } else {
-      return Promise.reject({
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        data: error.response?.data,
-      });
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+        store.dispatch.components.setActiveModal(ModalID.sessionExpired);
+        refreshPromise = store.dispatch.authentication
+          .getNewAnonymousAuthToken()
+          .finally(() => {
+            isRefreshing = false;
+          });
+      }
+
+      try {
+        await refreshPromise;
+        return;
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
     }
+
+    if (error.response?.status === 500) {
+      return Promise.reject(new TechnicalError(error.response?.data));
+    } else if (error.response?.status === 404) {
+      return Promise.reject(new NotFoundError(error.response?.data));
+    }
+
+    return Promise.reject({
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data,
+    });
   }
 );
 

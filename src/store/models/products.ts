@@ -45,7 +45,7 @@ export const products = createModel<RootModel>()({
       max_price: "0",
       min_price: "0",
     },
-    searchHistory: ["1234"],
+    searchHistory: [],
   } as ProductsState,
   reducers: {
     setProductDetails(state: ProductsState, product: Product | null) {
