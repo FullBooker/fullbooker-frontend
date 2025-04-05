@@ -117,7 +117,7 @@ export const authentication = createModel<RootModel>()({
         );
       }
     },
-    async register(payload, rootState) {
+    async register(payload) {
       try {
         const response: any = await postRequest("/accounts/signup/", payload);
         if (response && response?.data?.user) {
@@ -161,7 +161,7 @@ export const authentication = createModel<RootModel>()({
         );
       }
     },
-    async signIn(credentials, rootState) {
+    async signIn(credentials) {
       try {
         const response: any = await postRequest(
           "/accounts/signin/",
@@ -222,8 +222,8 @@ export const authentication = createModel<RootModel>()({
     async signOut() {
       const autToken = getToken();
       try {
+        dispatch.authentication.getNewAnonymousAuthToken();
         dispatch.authentication.setAuthStatusLoggedOut();
-        dispatch.authentication.initializeAnonymousAuthTokenProcurement();
         removeToken();
       } catch (error: any) {
         dispatch.alert.setFailureAlert(error?.message);
@@ -232,7 +232,7 @@ export const authentication = createModel<RootModel>()({
         localStorage.removeItem("authData");
       }
     },
-    async requestOTP(payload: RequestOTPPayload, rootState) {
+    async requestOTP(payload: RequestOTPPayload) {
       try {
         const response: any = await postRequest(
           "/accounts/otp/request",
@@ -257,7 +257,7 @@ export const authentication = createModel<RootModel>()({
         );
       }
     },
-    async verifyOTP(payload: VerifyOTPPayload, rootState) {
+    async verifyOTP(payload: VerifyOTPPayload) {
       try {
         const response: any = await postRequest(
           "/accounts/otp/verify",
@@ -275,7 +275,7 @@ export const authentication = createModel<RootModel>()({
         );
       }
     },
-    async resetPassword(payload: ChangePasswordPayload, rootState) {
+    async resetPassword(payload: ChangePasswordPayload) {
       try {
         const response: any = await postRequest(
           "/accounts/password/reset",

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { RootState } from "@/store";
@@ -43,6 +42,7 @@ type SingleProductPageProps = {
   clearState: () => void;
   setActiveModal: (modalId: ModalID) => void;
   modalId: ModalID;
+  productsImagesRequestProcessing: boolean;
   params: {
     slug: string;
   };
@@ -60,6 +60,7 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
   clearState,
   modalId,
   setActiveModal,
+  productsImagesRequestProcessing
 }) => {
   const isMobile = useIsMobile();
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -179,7 +180,8 @@ const SingleProductPage: FC<SingleProductPageProps> & { layout: any } = ({
         <ProductGallery
           product={product}
           productMedia={productMedia}
-          productsRequestProcessing={productsRequestProcessing}
+          isFecthingProduct={productsRequestProcessing}
+          isFecthingMedia={productsImagesRequestProcessing}
         />
 
         <div className="px-4 md:px-7">
@@ -423,6 +425,8 @@ SingleProductPage.layout = DashBoardLayout;
 const mapStateToProps = (state: RootState) => {
   const productsRequestProcessing =
     state.loading.effects.products.getProductById;
+  const productsImagesRequestProcessing =
+    state.loading.effects.products.getProductMedia;
   const { product, productMedia } = state.products;
   const { productCategories, currencies } = state.settings;
   const { modalId } = state.components;
@@ -431,6 +435,7 @@ const mapStateToProps = (state: RootState) => {
     product,
     productCategories,
     productsRequestProcessing,
+    productsImagesRequestProcessing,
     currencies,
     modalId,
   };

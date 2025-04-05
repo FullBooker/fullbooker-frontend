@@ -124,7 +124,7 @@ const DateSlotSelector: FC<DateSlotSelectorProps> = ({
   return (
     <div>
       {slots?.length > 0 ? (
-        <div className="flex gap-2 overflow-x-auto w-full cursor-pointer">
+        <div className="flex gap-2 overflow-x-auto w-full cursor-pointer overflow-hidden">
           {slots?.map((slot, index) => {
             const isActive = slot?.fullDate === cartSummary?.selected_date;
             return (
