@@ -31,34 +31,16 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
     if (error.response?.status === 401) {
       const state = store.getState();
 
       if (state?.authentication?.isLoggedIn) {
-        store.dispatch.components.setActiveModal(ModalID.login);
-        return Promise.reject(error);
+        // Sign out the user as the backend develops a refresh tokken API endpoint
+        store.dispatch.authentication.signOut();
       }
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-        store.dispatch.components.setActiveModal(ModalID.sessionExpired);
-        refreshPromise = store.dispatch.authentication
-          .getNewAnonymousAuthToken()
-          .finally(() => {
-            isRefreshing = false;
-          });
-      }
-
-      try {
-        await refreshPromise;
-        return;
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
-      }
+      return;
     }
-
     if (error.response?.status === 500) {
       return Promise.reject(new TechnicalError(error.response?.data));
     } else if (error.response?.status === 404) {

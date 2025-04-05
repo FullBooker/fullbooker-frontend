@@ -3,24 +3,27 @@
 import React, { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { Product, ProductMedia } from "@/domain/product";
-import { MediaType } from "@/domain/constants";
+import { DeviceType, MediaType } from "@/domain/constants";
 import { ChevronLeft, ChevronRight, PlayIcon } from "lucide-react";
-import useIsMobile from "@/lib/hooks/useIsMobile";
 import { Dialog } from "@headlessui/react";
 import ImageOutlet from "@/components/shared/image";
+import useDeviceType from "@/lib/hooks/useDeviceType";
+import MediaCarousel from "@/components/shared/mediaCarousel";
 
 type ProductGalleryProps = {
   product: Product;
   productMedia: Array<ProductMedia>;
-  productsRequestProcessing: boolean;
+  isFecthingMedia: boolean;
+  isFecthingProduct: boolean;
 };
 
 const ProductGallery: FC<ProductGalleryProps> = ({
   productMedia,
-  productsRequestProcessing,
+  isFecthingMedia,
+  isFecthingProduct,
   product,
 }) => {
-  const isMobile = useIsMobile();
+  const deviceType = useDeviceType();
   const galleryContainerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
@@ -44,9 +47,9 @@ const ProductGallery: FC<ProductGalleryProps> = ({
 
   return (
     <div>
-      {productsRequestProcessing ? (
+      {isFecthingMedia || isFecthingProduct ? (
         <div className="grid grid-cols-3 md:grid-cols-4 gap-4 px-4 md:px-7">
-          {Array(isMobile ? 6 : 8)
+          {Array(deviceType === DeviceType.mobile ? 6 : 8)
             .fill(null)
             .map((_, index) => (
               <div
@@ -74,63 +77,130 @@ const ProductGallery: FC<ProductGalleryProps> = ({
                   <ChevronLeft className="w-8 h-8 md:h-14 md:w-14" />
                 </button>
               )}
-              {productMedia?.length > 0 ? (
-                <div
-                  ref={galleryContainerRef}
-                  className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
-                >
-                  {productMedia?.map((media: ProductMedia, index: number) => (
-                    <div key={index} onClick={() => setCurrentIndex(index)}>
-                      {media?.media_type === MediaType.image ? (
-                        <ImageOutlet
-                          src={media?.file}
-                          alt={`${
-                            product?.name
-                              ? `${product?.name} Image`
-                              : "Event/Activity Image"
-                          }`}
-                          width={isMobile ? 150 : 250}
-                          height={isMobile ? 150 : 250}
-                          className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
-                        />
-                      ) : media?.media_type === MediaType.video ? (
-                        <div className="relative">
-                          <video
-                            src={media?.file}
-                            className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
-                            controls={false}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <button className="bg-white rounded-full p-2">
-                              <PlayIcon className="w-8 h-8" />
-                            </button>
+
+              {product && productMedia?.length > 0 ? (
+                <div className="w-full">
+                  {deviceType === DeviceType.mobile ? (
+                    <MediaCarousel
+                      images={productMedia?.map((media: ProductMedia) => ({
+                        type: media?.media_type,
+                        src: media?.file,
+                        alt: product?.name
+                          ? `${product.name} Image`
+                          : "Event/Activity Image",
+                        fill: true,
+                        className: "object-cover",
+                      }))}
+                      isProcessingRequest={isFecthingMedia}
+                      className="block md:hidden"
+                    />
+                  ) : (
+                    <div
+                      ref={galleryContainerRef}
+                      className="hidden md:grid md:grid-flow-col md:auto-cols-max md:grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
+                    >
+                      {productMedia?.map(
+                        (media: ProductMedia, index: number) => (
+                          <div
+                            key={index}
+                            onClick={() => setCurrentIndex(index)}
+                          >
+                            {media?.media_type === MediaType.image ? (
+                              <ImageOutlet
+                                src={media?.file}
+                                alt={`${
+                                  product?.name
+                                    ? `${product?.name} Image`
+                                    : "Event/Activity Image"
+                                }`}
+                                width={250}
+                                height={250}
+                                className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                              />
+                            ) : media?.media_type === MediaType.video ? (
+                              <div className="relative">
+                                <video
+                                  src={media?.file}
+                                  className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                                  controls={false}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <button className="bg-white rounded-full p-2">
+                                    <PlayIcon className="w-8 h-8" />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <></>
+                            )}
                           </div>
-                        </div>
-                      ) : (
-                        <></>
+                        )
                       )}
                     </div>
-                  ))}
+                  )}
                 </div>
               ) : (
-                <div
-                  ref={galleryContainerRef}
-                  className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
-                >
-                  {[...Array(6)].map((_, index: number) => (
-                    <div key={index}>
-                      <ImageOutlet
-                        alt={`${
-                          product?.name
-                            ? `${product?.name} Image`
-                            : "Event/Activity Image"
-                        }`}
-                        width={isMobile ? 150 : 250}
-                        height={isMobile ? 150 : 250}
-                        className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                <div className="w-full">
+                  {deviceType === DeviceType.mobile ? (
+                    <div className="w-full">
+                      <MediaCarousel
+                        images={[
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                          {
+                            src: "/assets/zero-state-image-default.png",
+                            alt: "Event/Activity Image",
+                          },
+                        ]?.map((media: any) => ({
+                          type: MediaType.image,
+                          src: media?.src,
+                          alt: media?.alt,
+                          fill: true,
+                          className: "object-cover",
+                        }))}
+                        isProcessingRequest={isFecthingMedia}
+                        className="block md:hidden"
                       />
                     </div>
-                  ))}
+                  ) : (
+                    <div
+                      ref={galleryContainerRef}
+                      className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2 overflow-x-auto no-scrollbar w-full"
+                    >
+                      {[...Array(6)].map((_, index: number) => (
+                        <div key={index}>
+                          <ImageOutlet
+                            alt={`${
+                              product?.name
+                                ? `${product?.name} Image`
+                                : "Event/Activity Image"
+                            }`}
+                            width={250}
+                            height={250}
+                            className="w-full h-[150px] md:h-[250px] object-cover cursor-pointer"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
               {!currentIndex && (

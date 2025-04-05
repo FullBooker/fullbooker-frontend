@@ -7,7 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { RootState } from "@/store";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ModalID } from "@/domain/components";
 import UniversalModal from "@/components/layout/modal/UniversalModal";
 import LoginModalContent from "@/components/views/auth/login";
@@ -25,6 +25,8 @@ import ComprehensiveProductFilters from "@/components/products/homePage/comprehe
 import useDeviceType from "@/lib/hooks/useDeviceType";
 import { DeviceType } from "@/domain/constants";
 import { useThemeMode } from "@/lib/hooks/useTheme";
+import { startAnonymousTokenMonitor } from "@/utilities/anonymous-token-manager";
+import { startUserTokenMonitor } from "@/utilities/user-auth-token-manager";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -48,6 +50,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
   const { themeMode } = useThemeMode();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const deviceType = useDeviceType();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleResize = () => {
@@ -90,6 +93,11 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({
       document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, [open]);
+
+  useEffect(() => {
+    startAnonymousTokenMonitor(dispatch);
+    startUserTokenMonitor(dispatch)
+  }, []);
 
   useEffect(() => {
     const redirect = searchParams?.get("redirect");
