@@ -39,6 +39,7 @@ type SingleProductPageViewProps = {
   clearState: () => void;
   setActiveModal: (modalId: ModalID) => void;
   modalId: ModalID;
+  productMediaRequestProcessing: boolean;
   params: {
     slug: string;
   };
@@ -53,6 +54,7 @@ const SingleProductPageView: FC<SingleProductPageViewProps> = ({
   clearState,
   modalId,
   setActiveModal,
+  productMediaRequestProcessing
 }) => {
   const isMobile = useIsMobile();
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -140,7 +142,8 @@ const SingleProductPageView: FC<SingleProductPageViewProps> = ({
         <ProductGallery
           product={product}
           productMedia={productMedia}
-          productsRequestProcessing={productsRequestProcessing}
+          isFecthingProduct={productsRequestProcessing}
+          isFecthingMedia={productMediaRequestProcessing}
         />
 
         <div className="px-4 md:px-7">
@@ -362,6 +365,8 @@ const SingleProductPageView: FC<SingleProductPageViewProps> = ({
 const mapStateToProps = (state: RootState) => {
   const productsRequestProcessing =
     state.loading.effects.products.getProductById;
+  const productMediaRequestProcessing =
+    state.loading.effects.products.getProductById;
   const { product, productMedia } = state.products;
   const { productCategories, currencies } = state.settings;
   const { modalId } = state.components;
@@ -370,6 +375,7 @@ const mapStateToProps = (state: RootState) => {
     product,
     productCategories,
     productsRequestProcessing,
+    productMediaRequestProcessing,
     currencies,
     modalId,
   };
